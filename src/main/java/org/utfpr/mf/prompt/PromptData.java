@@ -1,7 +1,7 @@
-package org.mf.langchain.prompt;
+package org.utfpr.mf.prompt;
 
 import lombok.Data;
-import org.mf.langchain.metadata.DbMetadata;
+import org.utfpr.mf.metadata.DbMetadata;
 import org.springframework.data.util.Pair;
 
 import java.util.Iterator;

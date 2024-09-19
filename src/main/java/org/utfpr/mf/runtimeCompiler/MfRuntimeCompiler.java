@@ -1,21 +1,17 @@
-package org.mf.langchain.runtimeCompiler;
+package org.utfpr.mf.runtimeCompiler;
 
-import io.hypersistence.utils.common.ClassLoaderUtils;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor;
 
-import javax.annotation.Nullable;
 import javax.annotation.processing.Processor;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
-import javax.tools.SimpleJavaFileObject;
 import javax.tools.ToolProvider;
 import java.io.File;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URLClassLoader;
-import java.util.*;
-import lombok.launch.*;
-import org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MfRuntimeCompiler {
 
@@ -30,7 +26,6 @@ public class MfRuntimeCompiler {
                 System.out.println("[MfRuntimeCompiler] Executing pre-compile action for: " + className);
                 newSources.put(className, action.action(className, sources.get(className)));
             }
-            sources.clear();
             sources = newSources;
         }
         System.out.println("[MfRuntimeCompiler] Creating MfFileManager");

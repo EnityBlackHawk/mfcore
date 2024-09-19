@@ -1,6 +1,6 @@
-package org.mf.langchain.prompt;
+package org.utfpr.mf.prompt;
 
-import org.mf.langchain.metadata.DbMetadata;
+import org.utfpr.mf.metadata.DbMetadata;
 
 import java.util.Iterator;
 import java.util.Objects;

@@ -1,12 +1,10 @@
-package org.mf.langchain.util
+package org.utfpr.mf.tools
 
 import com.mongodb.DBRef
-import org.mf.langchain.DataImporter
-import org.mf.langchain.metadata.DbMetadata
+import org.utfpr.mf.metadata.DbMetadata
 import org.springframework.data.annotation.Id
 import java.sql.ResultSet
 import java.util.*
-import java.lang.Integer
 import java.sql.Connection
 
 class QueryResult(private val metadata: DbMetadata?) {

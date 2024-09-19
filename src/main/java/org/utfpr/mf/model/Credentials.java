@@ -1,4 +1,4 @@
-package org.mf.langchain.DTO;
+package org.utfpr.mf.model;
 
 public class Credentials {
 

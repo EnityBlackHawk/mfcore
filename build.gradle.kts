@@ -1,5 +1,6 @@
 plugins {
     id("java")
+    kotlin("jvm")
 }
 
 group = "org.utfpr.mf"
@@ -10,10 +11,29 @@ repositories {
 }
 
 dependencies {
+
+    implementation("org.springframework.data:spring-data-mongodb:4.3.4")
+    implementation("org.mongodb:mongodb-driver-sync:5.1.4")
+    implementation("org.springframework:spring-jdbc:6.1.13")
+    implementation("dev.langchain4j:langchain4j:0.34.0")
+
+    // Dev tools
+    testCompileOnly ("org.projectlombok:lombok:1.18.34")
+    testAnnotationProcessor ("org.projectlombok:lombok:1.18.34")
+    compileOnly ("org.projectlombok:lombok:1.18.34")
+    annotationProcessor ("org.projectlombok:lombok:1.18.34")
+    implementation(kotlin("stdlib-jdk8"))
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+
+    implementation("com.querydsl:querydsl-apt:5.0.0")
+
+
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+kotlin {
+    jvmToolchain(21)
 }

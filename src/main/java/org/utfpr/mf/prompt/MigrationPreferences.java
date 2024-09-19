@@ -1,4 +1,4 @@
-package org.mf.langchain.prompt;
+package org.utfpr.mf.prompt;
 
 public enum MigrationPreferences {
     PREFER_PERFORMANCE("Optimize for performance (most efficient queries possible)"),

@@ -1,4 +1,4 @@
-package org.mf.langchain.util;
+package org.utfpr.mf.tools;
 
 import java.util.concurrent.Callable;
 import java.util.function.Function;

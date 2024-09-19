@@ -1,4 +1,4 @@
-package org.mf.langchain.metadata;
+package org.utfpr.mf.metadata;
 
 import java.util.List;
 

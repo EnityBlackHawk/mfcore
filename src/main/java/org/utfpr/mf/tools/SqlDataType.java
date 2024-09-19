@@ -1,4 +1,4 @@
-package org.mf.langchain.util;
+package org.utfpr.mf.tools;
 
 public enum SqlDataType {
 

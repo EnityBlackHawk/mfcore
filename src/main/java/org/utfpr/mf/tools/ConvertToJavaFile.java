@@ -1,4 +1,4 @@
-package org.mf.langchain;
+package org.utfpr.mf.tools;
 
 import java.io.*;
 import java.util.ArrayList;

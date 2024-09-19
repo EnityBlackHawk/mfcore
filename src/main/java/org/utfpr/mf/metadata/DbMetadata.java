@@ -1,10 +1,8 @@
-package org.mf.langchain.metadata;
+package org.utfpr.mf.metadata;
 
-import jakarta.persistence.EntityManager;
-import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-import org.mf.langchain.DTO.Credentials;
-import org.mf.langchain.util.SqlDataType;
+import org.utfpr.mf.model.Credentials;
+import org.utfpr.mf.tools.SqlDataType;
 
 import java.sql.*;
 import java.util.ArrayList;

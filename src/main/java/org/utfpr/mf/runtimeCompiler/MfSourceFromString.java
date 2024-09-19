@@ -1,6 +1,5 @@
-package org.mf.langchain.runtimeCompiler;
+package org.utfpr.mf.runtimeCompiler;
 
-import javax.tools.JavaFileObject;
 import javax.tools.SimpleJavaFileObject;
 import java.net.URI;
 
@@ -10,7 +9,7 @@ public class MfSourceFromString extends SimpleJavaFileObject {
 
     public MfSourceFromString(String className, String source)
     {
-        super(URI.create("string:///" + className.replace('.', '/') + JavaFileObject.Kind.SOURCE.extension), JavaFileObject.Kind.SOURCE);
+        super(URI.create("string:///" + className.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
         this.source = source;
     }
 

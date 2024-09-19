@@ -1,7 +1,7 @@
-package org.mf.langchain.metadata;
+package org.utfpr.mf.metadata;
 
 import org.jetbrains.annotations.Nullable;
-import org.mf.langchain.util.SqlDataType;
+import org.utfpr.mf.tools.SqlDataType;
 
 public record Column(String name, SqlDataType dataType, Boolean isPk, @Nullable FkInfo fkInfo) {
 

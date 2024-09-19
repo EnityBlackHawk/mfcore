@@ -1,4 +1,4 @@
-package org.mf.langchain.runtimeCompiler;
+package org.utfpr.mf.runtimeCompiler;
 
 import javax.naming.OperationNotSupportedException;
 

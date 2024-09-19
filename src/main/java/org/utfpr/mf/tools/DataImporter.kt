@@ -1,7 +1,7 @@
-package org.mf.langchain
+package org.utfpr.mf.tools
 
-import org.mf.langchain.metadata.DbMetadata
-import org.mf.langchain.util.QueryResult
+import org.utfpr.mf.metadata.DbMetadata
+import org.utfpr.mf.tools.QueryResult
 import org.springframework.core.io.PathResource
 import org.springframework.core.io.support.EncodedResource
 import org.springframework.jdbc.datasource.init.ScriptUtils
