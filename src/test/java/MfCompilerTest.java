@@ -18,8 +18,8 @@ public class MfCompilerTest {
                 }
             }
         """;
-
-        Map<String, Class<?>> classList = MfRuntimeCompiler.compile(
+        var mrc = new MfRuntimeCompiler();
+        Map<String, Class<?>> classList = mrc.compile(
                 Map.of("HelloWorld", source),
                 new MfDefaultPreCompileAction()
                 );

@@ -2,7 +2,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.utfpr.mf.DocumentTest;
 
 public class MongoTemplateTest {
 

@@ -1,5 +1,3 @@
-package org.utfpr.mf;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.data.annotation.Id;

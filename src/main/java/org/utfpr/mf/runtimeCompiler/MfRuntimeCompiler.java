@@ -2,6 +2,7 @@ package org.utfpr.mf.runtimeCompiler;
 
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor;
+import org.utfpr.mf.tools.CodeSession;
 
 import javax.annotation.processing.Processor;
 import javax.tools.JavaCompiler;
@@ -13,13 +14,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MfRuntimeCompiler {
+public class MfRuntimeCompiler extends CodeSession {
 
-    public static Map<String, Class<?>> compile(Map<String, String> sources, @Nullable IMfPreCompileAction action) throws Exception {
+    public MfRuntimeCompiler() {
+        super("MfRuntimeCompiler");
+    }
+
+    public Map<String, Class<?>> compile(Map<String, String> sources, @Nullable IMfPreCompileAction action) throws Exception {
 
         System.out.println("Initializing MfRuntimeCompiler");
 
-        System.out.println("[MfRuntimeCompiler] Executing pre-compile actions");
+        BEGIN("Executing pre-compile actions");
         if(action != null) {
             Map<String, String> newSources = new HashMap<>();
             for (String className : sources.keySet()) {
@@ -28,25 +33,26 @@ public class MfRuntimeCompiler {
             }
             sources = newSources;
         }
-        System.out.println("[MfRuntimeCompiler] Creating MfFileManager");
+        BEGIN("Creating MfFileManager");
         JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         MfFileManager fileManager = new MfFileManager(compiler.getStandardFileManager(null, null, null));
         List<JavaFileObject> files = new ArrayList<>();
 
         for (String className : sources.keySet()) {
-            System.out.println("[MfRuntimeCompiler] Creating source for: " + className);
+            BEGIN_SUB("Creating source for: " + className);
             JavaFileObject sourceObj = new MfSourceFromString(className, sources.get(className));
             files.add(sourceObj);
         }
-
+        // TODO: Fix classpath to be dynamic
+        BEGIN("Getting classpath");
         var classPath = System.getProperty("java.class.path") +
                 File.pathSeparator + "/home/luan/jars/lombok.jar" +
                 File.pathSeparator + "/home/luan/jars/spring-data-commons-3.3.4.jar" +
                 File.pathSeparator + "/home/luan/jars/spring-data-mongodb-4.3.4.jar";
         Iterable<String> options = List.of("-classpath", classPath, "--add-exports", "jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED");
 
-        System.out.println("[MfRuntimeCompiler] Using classpath: " + classPath);
-        System.out.println("[MfRuntimeCompiler] Getting Processors:");
+        INFO(" Using classpath: " + classPath);
+        BEGIN("Getting Processors:");
 
         //Class<?> cLombokProcessor = Class.forName("lombok.launch.AnnotationProcessorHider$AnnotationProcessor");
         //Processor lomProcessor = (Processor) cLombokProcessor.getDeclaredConstructor().newInstance();
@@ -55,14 +61,14 @@ public class MfRuntimeCompiler {
 
         for(var x : processors)
         {
-            System.out.println("[MfRuntimeCompiler] Using Processor: " + x.getClass().getSimpleName());
+            INFO("Using Processor: " + x.getClass().getSimpleName());
         }
 
-        System.out.println("[MfRuntimeCompiler] Config compilation");
+        BEGIN("Config compilation");
         JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, options, sources.keySet(), files);
         task.setProcessors(processors);
 
-        System.out.println("[MfRuntimeCompiler] Compiling");
+        BEGIN("Compiling");
         boolean result = task.call();
         if (!result) {
             throw new RuntimeException("Compilation failed.");
@@ -71,7 +77,7 @@ public class MfRuntimeCompiler {
 
         Map<String, Class<?>> classes = new HashMap<>();
 
-        System.out.println("[MfRuntimeCompiler] Getting compiled classes");
+        BEGIN("Getting compiled classes");
         for(String className : sources.keySet()) {
             classes.put(className, classLoader.loadClass(className));
         }
@@ -79,23 +85,8 @@ public class MfRuntimeCompiler {
         return classes;
     }
 
-    public static Class<?> compile(String className, String source) throws Exception {
+    public Class<?> compile(String className, String source) throws Exception {
 
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-        MfFileManager fileManager = new MfFileManager(compiler.getStandardFileManager(null, null, null));
-
-        JavaFileObject sourceObj = new MfSourceFromString(className, source);
-        List<JavaFileObject> files = List.of(sourceObj);
-
-        var classPath = System.getProperty("java.class.path") + File.pathSeparator + "/home/luan/jars/lombok.jar";
-        Iterable<String> options = List.of("-classpath", "/home/luan/jars/lombok.jar");
-
-        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, null, options, null, files);
-        boolean result = task.call();
-        if (!result) {
-            throw new RuntimeException("Compilation failed.");
-        }
-        ClassLoader classLoader = fileManager.getClassLoader(null);
-        return classLoader.loadClass(className);
+        return compile(Map.of(className, source), new MfDefaultPreCompileAction()).get(className);
     }
 }
