@@ -16,11 +16,17 @@ import java.util.Map;
 
 public class MfRuntimeCompiler extends CodeSession {
 
+
     public MfRuntimeCompiler() {
         super("MfRuntimeCompiler");
     }
 
-    public Map<String, Class<?>> compile(Map<String, String> sources, @Nullable IMfPreCompileAction action) throws Exception {
+
+    public Map<String, Class<?>> compile(Map<String, String> sources, MfCompilerParams compileParams) throws Exception {
+        return compile(sources, compileParams, null);
+    }
+
+    public Map<String, Class<?>> compile(Map<String, String> sources, MfCompilerParams compileParams, @Nullable IMfPreCompileAction action) throws Exception {
 
         System.out.println("Initializing MfRuntimeCompiler");
 
@@ -45,10 +51,7 @@ public class MfRuntimeCompiler extends CodeSession {
         }
         // TODO: Fix classpath to be dynamic
         BEGIN("Getting classpath");
-        var classPath = System.getProperty("java.class.path") +
-                File.pathSeparator + "/home/luan/jars/lombok.jar" +
-                File.pathSeparator + "/home/luan/jars/spring-data-commons-3.3.4.jar" +
-                File.pathSeparator + "/home/luan/jars/spring-data-mongodb-4.3.4.jar";
+        var classPath = compileParams.getClasspath();
         Iterable<String> options = List.of("-classpath", classPath, "--add-exports", "jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED");
 
         INFO(" Using classpath: " + classPath);
@@ -85,8 +88,8 @@ public class MfRuntimeCompiler extends CodeSession {
         return classes;
     }
 
-    public Class<?> compile(String className, String source) throws Exception {
+    public Class<?> compile(String className, String source, @Nullable MfCompilerParams params) throws Exception {
 
-        return compile(Map.of(className, source), new MfDefaultPreCompileAction()).get(className);
+        return compile(Map.of(className, source), params, new MfDefaultPreCompileAction()).get(className);
     }
 }
