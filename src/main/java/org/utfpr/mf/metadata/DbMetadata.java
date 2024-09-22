@@ -15,6 +15,7 @@ public class DbMetadata {
     private final Connection _connection;
     private ArrayList<Table> tables = new ArrayList<>();
     private DatabaseMetaData _metadata;
+    private String lastError = "";
 
     public DbMetadata(Connection connection, @Nullable String tableNamePatter) throws SQLException {
         _connection = connection;
@@ -86,6 +87,7 @@ public class DbMetadata {
         try {
             tmp_connection = DriverManager.getConnection(connectionString, username, password);
         } catch (SQLException e) {
+            lastError = e.getMessage();
             tmp_connection = null;
         }
         _connection = tmp_connection;
@@ -164,6 +166,10 @@ public class DbMetadata {
 
     public List<Table> getTables() {
         return tables;
+    }
+
+    public String getLastError() {
+        return lastError;
     }
 
     @Override

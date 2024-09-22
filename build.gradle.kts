@@ -16,6 +16,7 @@ dependencies {
     implementation("org.mongodb:mongodb-driver-sync:5.1.4")
     implementation("org.springframework:spring-jdbc:6.1.13")
     implementation("dev.langchain4j:langchain4j:0.34.0")
+    implementation("dev.langchain4j:langchain4j-open-ai:0.34.0")
 
     // Dev tools
     testCompileOnly ("org.projectlombok:lombok:1.18.34")
@@ -27,6 +28,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation("com.querydsl:querydsl-apt:5.0.0")
+    implementation("org.postgresql:postgresql:42.7.4")
+    implementation("com.google.code.gson:gson:2.11.0")
+
 
 
 }
