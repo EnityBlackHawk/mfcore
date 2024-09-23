@@ -7,7 +7,9 @@ import dev.langchain4j.model.openai.OpenAiChatModelName;
 import dev.langchain4j.service.AiServices;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.util.Pair;
+import org.utfpr.mf.MockLayer;
 import org.utfpr.mf.annotarion.Injected;
+import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.exceptions.DBConnectionException;
 import org.utfpr.mf.llm.ChatAssistant;
 import org.utfpr.mf.metadata.RelationCardinality;
@@ -31,7 +33,7 @@ import java.util.Objects;
 
 public class AcquireMetadataStep extends MfMigrationStepEx {
 
-    @Injected
+    @Injected(DefaultInjectParams.LLM_KEY)
     public String llm_key;
 
     public AcquireMetadataStep() {
@@ -44,7 +46,7 @@ public class AcquireMetadataStep extends MfMigrationStepEx {
 
     @Override
     public Object execute(Object input) {
-
+        assert llm_key != null : "llm_key is not set";
         RdbCredentials cred = (RdbCredentials) input;
         String data = "";
         List<RelationCardinality> card = null;
@@ -152,7 +154,14 @@ public class AcquireMetadataStep extends MfMigrationStepEx {
 
         BEGIN("Getting relations");
 
-        String response = gptAssistant.getRelations(q);
+        String response;
+        if(MockLayer.isActivated) {
+            response = MOCK_RESPONSE;
+        }
+        else {
+            var result = gptAssistant.chat(q);
+            response = result.content().text();
+        }
         String responseCode = extractTextMarkdownCode(response, "json");
         Gson gson = new Gson();
         return gson.fromJson(responseCode, listType);
@@ -161,5 +170,30 @@ public class AcquireMetadataStep extends MfMigrationStepEx {
     static String extractTextMarkdownCode(String text, String language) {
         return text.substring(text.indexOf("```") + 3 + language.length(), text.lastIndexOf("```"));
     }
+
+    public static final String MOCK_RESPONSE = """
+            Based on the provided database schema, the relations between the tables can be summarized in the following JSON format:
+            
+            ```json
+            [
+                {"table_source": "aircraft", "table_target": "airline", "cardinality": "many-to-one"},
+                {"table_source": "aircraft", "table_target": "manufacturer", "cardinality": "many-to-one"},
+                {"table_source": "booking", "table_target": "flight", "cardinality": "many-to-one"},
+                {"table_source": "booking", "table_target": "passenger", "cardinality": "many-to-one"},
+                {"table_source": "flight", "table_target": "airport", "cardinality": "many-to-one"},
+                {"table_source": "flight", "table_target": "aircraft", "cardinality": "many-to-one"},
+                {"table_source": "flight", "table_target": "flight", "cardinality": "one-to-many (self-reference)"}
+            ]
+            ```
+            
+            ### Explanation of Relations:
+            1. **aircraft to airline**: Each aircraft is associated with one airline, but an airline can have multiple aircraft (many-to-one).
+            2. **aircraft to manufacturer**: Each aircraft is manufactured by one manufacturer, but a manufacturer can produce multiple aircraft (many-to-one).
+            3. **booking to flight**: Each booking is for one flight, but a flight can have multiple bookings (many-to-one).
+            4. **booking to passenger**: Each booking is made by one passenger, but a passenger can have multiple bookings (many-to-one).
+            5. **flight to airport**: Each flight departs from and arrives at one airport, but an airport can serve multiple flights (many-to-one).
+            6. **flight to aircraft**: Each flight is operated by one aircraft, but an aircraft can operate multiple flights (many-to-one).
+            7. **flight to flight**: A flight can connect to another flight, creating a self-reference where one flight can have multiple connections to other flights (one-to-many).
+            """;
 
 }

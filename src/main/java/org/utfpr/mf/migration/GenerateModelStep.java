@@ -5,6 +5,7 @@ import dev.langchain4j.service.AiServices;
 import kotlin.Metadata;
 import org.utfpr.mf.MockLayer;
 import org.utfpr.mf.annotarion.Injected;
+import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.llm.ChatAssistant;
 import org.utfpr.mf.migration.params.MetadataInfo;
 import org.utfpr.mf.migration.params.MigrationSpec;
@@ -16,12 +17,13 @@ import org.utfpr.mf.prompt.Query;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GenerateModelStep extends MfMigrationStepEx{
 
     private final MigrationSpec migrationSpec;
 
-    @Injected
+    @Injected(DefaultInjectParams.LLM_KEY)
     private String llm_key;
 
     public GenerateModelStep(MigrationSpec spec) {
@@ -30,6 +32,9 @@ public class GenerateModelStep extends MfMigrationStepEx{
 
     public GenerateModelStep(MigrationSpec spec, PrintStream printStream) {
         super("GenerateModelStep", printStream, MetadataInfo.class, Model.class);
+        if(spec == null) {
+            throw new IllegalArgumentException("MigrationSpec cannot be null");
+        }
         this.migrationSpec = spec;
     }
 
@@ -37,6 +42,8 @@ public class GenerateModelStep extends MfMigrationStepEx{
     public Object execute(Object input) {
 
         MetadataInfo metadataInfo = (MetadataInfo) input;
+
+        assert llm_key != null : "llm_key is not set";
 
         var gpt = new OpenAiChatModel.OpenAiChatModelBuilder()
                 .apiKey(llm_key)
@@ -53,8 +60,8 @@ public class GenerateModelStep extends MfMigrationStepEx{
                 migrationSpec.getFramework(),
                 metadataInfo.getRelations().toString(),
                 true,
-                migrationSpec.getWorkload().stream().map(Query::new).toList(),
-                migrationSpec.getCustom_prompt()
+                migrationSpec.getWorkload() != null ? migrationSpec.getWorkload().stream().map(Query::new).toList() : new ArrayList<>(),
+                migrationSpec.getCustom_prompt() != null ? migrationSpec.getCustom_prompt() : new ArrayList<>()
 
         );
         var p = prompt.next();
@@ -63,7 +70,7 @@ public class GenerateModelStep extends MfMigrationStepEx{
         ArrayList<String> objs = new ArrayList<>();
 
         if(MockLayer.isActivated) {
-            resultString = MockLayer.MOCK_GENERATE_MODEL;
+            resultString = MOCK_GENERATE_MODEL;
         }
         else {
             var result = gptAssistant.chat(p);
@@ -94,4 +101,90 @@ public class GenerateModelStep extends MfMigrationStepEx{
         var finalResult = objs.stream().reduce("", String::concat);
         return new Model(finalResult, tokens);
     }
+
+    public static final String MOCK_GENERATE_MODEL = """
+            ```json
+            // Aircraft collection
+            {
+            	"id": "string",
+            	"type": "string",
+            	"airline": {
+            		"id": "string",
+            		"name": "string"
+            	},
+            	"manufacturer": {
+            		"id": "string",
+            		"name": "string"
+            	},
+            	"registration": "string",
+            	"max_passengers": "int"
+            }
+            
+            // Airline collection
+            {
+            	"id": "string",
+            	"name": "string"
+            }
+            
+            // Airport collection
+            {
+            	"id": "string",
+            	"name": "string",
+            	"city": "string",
+            	"country": "string"
+            }
+            
+            // Booking collection
+            {
+            	"id": "string",
+            	"flight": {
+            		"number": "string",
+            		"airport_from": {
+            			"id": "string",
+            			"name": "string",
+            			"city": "string",
+            			"country": "string"
+            		},
+            		"airport_to": {
+            			"id": "string",
+            			"name": "string",
+            			"city": "string",
+            			"country": "string"
+            		},
+            		"departure_time_scheduled": "timestamp",
+            		"departure_time_actual": "timestamp",
+            		"arrival_time_scheduled": "timestamp",
+            		"arrival_time_actual": "timestamp",
+            		"gate": "int",
+            		"aircraft": {
+            			"id": "string",
+            			"type": "string",
+            			"registration": "string"
+            		},
+            		"connects_to": "string"
+            	},
+            	"passenger": {
+            		"id": "string",
+            		"first_name": "string",
+            		"last_name": "string",
+            		"passport_number": "string"
+            	},
+            	"seat": "string"
+            }
+            
+            // Manufacturer collection
+            {
+            	"id": "string",
+            	"name": "string"
+            }
+            
+            // Passenger collection
+            {
+            	"id": "string",
+            	"first_name": "string",
+            	"last_name": "string",
+            	"passport_number": "string"
+            }
+            ```
+            """;
 }

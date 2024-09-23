@@ -1,6 +1,7 @@
 package org.utfpr.mf.migration;
 
 import org.utfpr.mf.annotarion.Injected;
+import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.exceptions.InvalidData;
 import org.utfpr.mf.tools.CodeSession;
 
@@ -14,6 +15,10 @@ public class MfMigrator extends CodeSession {
 
     public static class Binder {
         private final Map<String, Object> bindings = new HashMap<>();
+
+        public Binder bind(DefaultInjectParams key, Object value) {
+            return bind(key.getValue(), value);
+        }
 
         public Binder bind(String key, Object value) {
             bindings.put(key, value);
@@ -32,10 +37,11 @@ public class MfMigrator extends CodeSession {
 //                    throw new RuntimeException(e);
 //                }
 //            }
-            Arrays.stream(target.getClass().getFields()).filter(f -> f.isAnnotationPresent(Injected.class)).forEach(f -> {
+            Arrays.stream(target.getClass().getDeclaredFields()).filter(f -> f.isAnnotationPresent(Injected.class)).forEach(f -> {
+                var an = f.getAnnotation(Injected.class);
                 f.setAccessible(true);
                 try {
-                    f.set(target, bindings.get(f.getName()));
+                    f.set(target, bindings.get(an.value() == DefaultInjectParams.UNSET ? f.getName() : an.value().getValue()));
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -60,6 +66,7 @@ public class MfMigrator extends CodeSession {
     }
 
     public Object execute(Object firstInput) {
+
         BEGIN("Injecting values");
         for (var x : steps) {
             binder.inject(x);
