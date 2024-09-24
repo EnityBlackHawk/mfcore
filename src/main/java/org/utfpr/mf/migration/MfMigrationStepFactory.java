@@ -24,6 +24,10 @@ public class MfMigrationStepFactory {
         return new GenerateModelStep(migrationSpec, printStream);
     }
 
+    public IMfMigrationStep createGenerateJavaCodeStep() {
+        return new GenerateJavaCodeStep(printStream);
+    }
+
     public void setPrintStream(PrintStream printStream) {
         this.printStream = printStream;
     }

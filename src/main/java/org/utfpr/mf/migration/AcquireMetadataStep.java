@@ -159,7 +159,7 @@ public class AcquireMetadataStep extends MfMigrationStepEx {
             response = MOCK_RESPONSE;
         }
         else {
-            var result = gptAssistant.chat(q);
+            var result = gptAssistant.getRelations(q);
             response = result.content().text();
         }
         String responseCode = extractTextMarkdownCode(response, "json");

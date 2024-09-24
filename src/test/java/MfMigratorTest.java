@@ -29,18 +29,19 @@ public class MfMigratorTest {
                 .build();
 
         MfMigrationStepFactory mfMigrationStepFactory = new MfMigrationStepFactory();
+
         IMfMigrationStep acquireMetadataStep = mfMigrationStepFactory.createAcquireMetadataStep();
         IMfMigrationStep generateModelStep = mfMigrationStepFactory.createGenerateModelStep(migrationSpec);
-        assertNotNull(acquireMetadataStep);
+        IMfMigrationStep generateJavaCodeStep = mfMigrationStepFactory.createGenerateJavaCodeStep();
 
         MfMigrator.Binder binder = new MfMigrator.Binder()
                 .bind(DefaultInjectParams.LLM_KEY, System.getenv("LLM_KEY"));
 
-        MfMigrator mfMigrator = new MfMigrator(binder, List.of(acquireMetadataStep, generateModelStep));
+        MfMigrator mfMigrator = new MfMigrator(binder, List.of(acquireMetadataStep, generateModelStep, generateJavaCodeStep));
         var cred = new RdbCredentials("jdbc:postgresql://localhost/airport3", "admin", "admin");
         var result = mfMigrator.execute(cred);
 
-        assertEquals("Model", result.getClass().getSimpleName());
+        assertEquals("GeneratedJavaCode", result.getClass().getSimpleName());
 
     }
 

@@ -44,7 +44,7 @@ public class GenerateModelStep extends MfMigrationStepEx{
         MetadataInfo metadataInfo = (MetadataInfo) input;
 
         assert llm_key != null : "llm_key is not set";
-
+        BEGIN("Generating LLM interface");
         var gpt = new OpenAiChatModel.OpenAiChatModelBuilder()
                 .apiKey(llm_key)
                 .modelName(migrationSpec.getLLM())
@@ -52,7 +52,7 @@ public class GenerateModelStep extends MfMigrationStepEx{
                 .temperature(1d)
                 .build();
         var gptAssistant = AiServices.builder(ChatAssistant.class).chatLanguageModel(gpt).build();
-
+        BEGIN("Building prompt");
         var prompt = new PromptData3(
                 metadataInfo.getSql(),
                 migrationSpec.getPrioritize_performance() ? MigrationPreferences.PREFER_PERFORMANCE : MigrationPreferences.PREFER_CONSISTENCY,
@@ -68,7 +68,7 @@ public class GenerateModelStep extends MfMigrationStepEx{
         int tokens = 0;
         String resultString;
         ArrayList<String> objs = new ArrayList<>();
-
+        BEGIN("Generating model");
         if(MockLayer.isActivated) {
             resultString = MOCK_GENERATE_MODEL;
         }
@@ -77,7 +77,7 @@ public class GenerateModelStep extends MfMigrationStepEx{
             tokens = result.tokenUsage().totalTokenCount();
             resultString = result.content().text();
         }
-
+        BEGIN("Extracting JSON objects");
         while (true) {
             int iS = resultString.indexOf("```json");
             if(iS == -1) break;
@@ -86,18 +86,7 @@ public class GenerateModelStep extends MfMigrationStepEx{
             objs.add(resultString.substring(iS, iE));
             resultString = resultString.substring(iE + 3);
         }
-
-
-
-//        persistenceService.persist(
-//                new TestResultDTO(
-//                        prompt.get(),
-//                        SpecificationDTO.overrideCardinality(SpecificationDTO.overrideDataSource(gSpecs.getSpecification(), gSpecs.getMetadataInfo().getSql()), gSpecs.getMetadataInfo().getRelations()),
-//                        result.content().text(),
-//                        result.tokenUsage().totalTokenCount()
-//                )
-//        );
-
+        BEGIN("Finalizing model");
         var finalResult = objs.stream().reduce("", String::concat);
         return new Model(finalResult, tokens);
     }
