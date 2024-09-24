@@ -1,8 +1,10 @@
 package org.utfpr.mf.migration;
 
+import org.utfpr.mf.annotarion.Export;
 import org.utfpr.mf.tools.CodeSession;
 
 import java.io.PrintStream;
+import java.util.Arrays;
 
 public abstract class MfMigrationStepEx extends CodeSession implements IMfMigrationStep {
 
@@ -24,12 +26,26 @@ public abstract class MfMigrationStepEx extends CodeSession implements IMfMigrat
 
     @Override
     public boolean hasValidOutput(Object selfOutput) {
-        return outputType.isInstance(selfOutput);
+        return selfOutput == outputType || outputType.isInstance(selfOutput);
     }
 
     @Override
     public boolean hasValidInput(Object input) {
         return inputType.isInstance(input);
+    }
+
+    @Override
+    public void export(IMfBinder binder) {
+        var fields = Arrays.stream(getClass().getDeclaredFields()).filter(f -> f.isAnnotationPresent(Export.class)).toList();
+        for(var f : fields) {
+            var an = f.getAnnotation(Export.class);
+            f.setAccessible(true);
+            try {
+                binder.bind(an.value().getValue(), f.get(this));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

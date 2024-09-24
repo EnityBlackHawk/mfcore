@@ -89,7 +89,7 @@ class QueryResult(private val metadata: DbMetadata?) {
                 field.isAccessible = true
                 if(row[i] == null || row[i].isEmpty()) continue
                 when (field.type.name) {
-                    "int" -> field.set(obj, row[i].toInt())
+                    "int", "java.lang.Integer" -> field.set(obj, row[i].toInt())
                     "long" -> field.set(obj, row[i].toLong())
                     "float" -> field.set(obj, row[i].toFloat())
                     "double" -> field.set(obj, row[i].toDouble())

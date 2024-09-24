@@ -1,6 +1,7 @@
 package org.utfpr.mf.migration;
 
 import org.utfpr.mf.migration.params.MigrationSpec;
+import org.utfpr.mf.mongoConnection.MongoConnectionCredentials;
 
 import java.io.PrintStream;
 
@@ -26,6 +27,10 @@ public class MfMigrationStepFactory {
 
     public IMfMigrationStep createGenerateJavaCodeStep() {
         return new GenerateJavaCodeStep(printStream);
+    }
+
+    public IMfMigrationStep createMigrateDatabaseStep(MongoConnectionCredentials credentials) {
+        return new MigrateDatabaseStep(credentials);
     }
 
     public void setPrintStream(PrintStream printStream) {

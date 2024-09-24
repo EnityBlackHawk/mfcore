@@ -8,6 +8,7 @@ import dev.langchain4j.service.AiServices;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.util.Pair;
 import org.utfpr.mf.MockLayer;
+import org.utfpr.mf.annotarion.Export;
 import org.utfpr.mf.annotarion.Injected;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.exceptions.DBConnectionException;
@@ -34,7 +35,10 @@ import java.util.Objects;
 public class AcquireMetadataStep extends MfMigrationStepEx {
 
     @Injected(DefaultInjectParams.LLM_KEY)
-    public String llm_key;
+    private String llm_key;
+
+    @Export(DefaultInjectParams.DB_METADATA)
+    private DbMetadata mdb;
 
     public AcquireMetadataStep() {
         this(System.out);
@@ -42,6 +46,11 @@ public class AcquireMetadataStep extends MfMigrationStepEx {
 
     public AcquireMetadataStep(PrintStream printStream) {
         super("AcquireMetadataStep", printStream, RdbCredentials.class, MetadataInfo.class);
+    }
+
+    @Override
+    public boolean hasValidOutput(Object selfOutput) {
+        return super.hasValidOutput(selfOutput) && mdb.isConnected();
     }
 
     @Override
@@ -58,7 +67,7 @@ public class AcquireMetadataStep extends MfMigrationStepEx {
         var passw = cred.getPassword() != null ? cred.getPassword() : "admin";
         BEGIN("Connecting to database");
         try {
-            var mdb = new DbMetadata(
+            mdb = new DbMetadata(
                     cred.getConnectionString(),
                     user,
                     passw,
