@@ -1,11 +1,17 @@
 package org.utfpr.mf.migration;
 
+import lombok.Getter;
 import org.utfpr.mf.migration.params.MigrationSpec;
 import org.utfpr.mf.mongoConnection.MongoConnectionCredentials;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MfMigrationStepFactory {
+
+    @Getter
+    private List<IMfMigrationStep> steps = new ArrayList<>();
 
     private PrintStream printStream;
 
@@ -18,23 +24,33 @@ public class MfMigrationStepFactory {
     }
 
     public IMfMigrationStep createAcquireMetadataStep() {
-        return new AcquireMetadataStep(printStream);
+        var tmp = new AcquireMetadataStep(printStream);
+        steps.add(tmp);
+        return tmp;
     }
 
     public IMfMigrationStep createGenerateModelStep(MigrationSpec migrationSpec) {
-        return new GenerateModelStep(migrationSpec, printStream);
+        var tmp = new GenerateModelStep(migrationSpec, printStream);
+        steps.add(tmp);
+        return tmp;
     }
 
     public IMfMigrationStep createGenerateJavaCodeStep() {
-        return new GenerateJavaCodeStep(printStream);
+        var tmp = new GenerateJavaCodeStep(printStream);
+        steps.add(tmp);
+        return tmp;
     }
 
     public IMfMigrationStep createMigrateDatabaseStep(MongoConnectionCredentials credentials) {
-        return new MigrateDatabaseStep(credentials);
+        var tmp = new MigrateDatabaseStep(credentials);
+        steps.add(tmp);
+        return tmp;
     }
 
     public IMfMigrationStep createValidatorStep() {
-        return new VerificationStep(printStream);
+        var tmp = new VerificationStep(printStream);
+        steps.add(tmp);
+        return tmp;
     }
 
     public void setPrintStream(PrintStream printStream) {

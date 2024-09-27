@@ -21,6 +21,14 @@ public class MfMigrator extends CodeSession {
 
     }
 
+    public MfMigrator(IMfBinder binder, MfMigrationStepFactory factory) {
+        this(binder, factory.getSteps(), System.out);
+    }
+
+    public MfMigrator(IMfBinder binder, MfMigrationStepFactory factory, PrintStream printStream) {
+        this(binder, factory.getSteps(), printStream);
+    }
+
     public MfMigrator(IMfBinder binder, List<IMfMigrationStep> steps) {
         this(binder, steps, System.out);
     }
@@ -36,7 +44,6 @@ public class MfMigrator extends CodeSession {
     }
 
     public Object execute(Object firstInput) {
-
 
         Object lastOutput = firstInput;
         for (var x : steps) {
