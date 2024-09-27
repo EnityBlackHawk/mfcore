@@ -33,6 +33,10 @@ public class MfMigrationStepFactory {
         return new MigrateDatabaseStep(credentials);
     }
 
+    public IMfMigrationStep createValidatorStep() {
+        return new VerificationStep(printStream);
+    }
+
     public void setPrintStream(PrintStream printStream) {
         this.printStream = printStream;
     }

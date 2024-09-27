@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 public @interface Injected {
     DefaultInjectParams value() default DefaultInjectParams.UNSET;
+    boolean required() default true;
 }

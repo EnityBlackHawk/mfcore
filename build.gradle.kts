@@ -30,6 +30,8 @@ dependencies {
     implementation("com.querydsl:querydsl-apt:5.0.0")
     implementation("org.postgresql:postgresql:42.7.4")
     implementation("com.google.code.gson:gson:2.11.0")
+    implementation("commons-codec:commons-codec:1.17.1")
+
 
 
 

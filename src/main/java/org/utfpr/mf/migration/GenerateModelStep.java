@@ -78,6 +78,13 @@ public class GenerateModelStep extends MfMigrationStepEx{
             resultString = result.content().text();
         }
         BEGIN("Extracting JSON objects");
+        extracted(resultString, objs);
+        BEGIN("Finalizing model");
+        var finalResult = objs.stream().reduce("", String::concat);
+        return new Model(finalResult, tokens);
+    }
+
+    public static void extracted(String resultString, ArrayList<String> objs) {
         while (true) {
             int iS = resultString.indexOf("```json");
             if(iS == -1) break;
@@ -86,93 +93,95 @@ public class GenerateModelStep extends MfMigrationStepEx{
             objs.add(resultString.substring(iS, iE));
             resultString = resultString.substring(iE + 3);
         }
-        BEGIN("Finalizing model");
-        var finalResult = objs.stream().reduce("", String::concat);
-        return new Model(finalResult, tokens);
     }
 
     public static final String MOCK_GENERATE_MODEL = """
             ```json
             // Aircraft collection
             {
-            	"id": "string",
-            	"type": "string",
-            	"airline": {
-            		"id": "string",
-            		"name": "string"
-            	},
-            	"manufacturer": {
-            		"id": "string",
-            		"name": "string"
-            	},
-            	"registration": "string",
-            	"max_passengers": "int"
+                "_id": "ObjectId",
+                "type": "string",
+                "airline": {
+                    "id": "ObjectId",
+                    "name": "string"
+                },
+                "manufacturer": {
+                    "id": "ObjectId",
+                    "name": "string"
+                },
+                "registration": "string",
+                "max_passengers": "integer"
             }
             
             // Airline collection
             {
-            	"id": "string",
-            	"name": "string"
+                "_id": "ObjectId",
+                "name": "string"
             }
             
             // Airport collection
             {
-            	"id": "string",
-            	"name": "string",
-            	"city": "string",
-            	"country": "string"
+                "_id": "string",
+                "name": "string",
+                "city": "string",
+                "country": "string"
             }
             
             // Booking collection
             {
-            	"id": "string",
-            	"flight": {
-            		"number": "string",
-            		"airport_from": {
-            			"id": "string",
-            			"name": "string",
-            			"city": "string",
-            			"country": "string"
-            		},
-            		"airport_to": {
-            			"id": "string",
-            			"name": "string",
-            			"city": "string",
-            			"country": "string"
-            		},
-            		"departure_time_scheduled": "timestamp",
-            		"departure_time_actual": "timestamp",
-            		"arrival_time_scheduled": "timestamp",
-            		"arrival_time_actual": "timestamp",
-            		"gate": "int",
-            		"aircraft": {
-            			"id": "string",
-            			"type": "string",
-            			"registration": "string"
-            		},
-            		"connects_to": "string"
-            	},
-            	"passenger": {
-            		"id": "string",
-            		"first_name": "string",
-            		"last_name": "string",
-            		"passport_number": "string"
-            	},
-            	"seat": "string"
+                "_id": "ObjectId",
+                "flight": {
+                    "number": "string"
+                },
+                "passenger": {
+                    "id": "ObjectId",
+                    "first_name": "string",
+                    "last_name": "string",
+                    "passport_number": "string"
+                },
+                "seat": "string"
+            }
+            
+            // Flight collection
+            {
+                "_id": "string",
+                "airport_from": {
+                    "id": "string"
+                },
+                "airport_to": {
+                    "id": "string"
+                },
+                "departure_time_scheduled": "ISODate",
+                "departure_time_actual": "ISODate",
+                "arrival_time_scheduled": "ISODate",
+                "arrival_time_actual": "ISODate",
+                "gate": "integer",
+                "aircraft": {
+                    "id": "ObjectId",
+                    "type": "string",
+                    "manufacturer": {
+                        "id": "ObjectId",
+                        "name": "string"
+                    },
+                    "registration": "string"
+                },
+                "connects_to": {
+                    "number": "string"
+                }
             }
             
             // Manufacturer collection
             {
-            	"id": "string",
-            	"name": "string"
+                "_id": "ObjectId",
+                "name": "string"
             }
             
             // Passenger collection
             {
-            	"id": "string",
-            	"first_name": "string",
-            	"last_name": "string",
-            	"passport_number": "string"
+                "_id": "ObjectId",
+                "first_name": "string",
+                "last_name": "string",
+                "passport_number": "string"
             }
             ```
             """;

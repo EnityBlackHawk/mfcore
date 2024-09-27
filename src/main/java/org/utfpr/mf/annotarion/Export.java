@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
 public @interface Export {
     DefaultInjectParams value() default DefaultInjectParams.UNSET;
+    boolean override() default false;
 }

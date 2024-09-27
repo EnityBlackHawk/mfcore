@@ -59,18 +59,19 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx{
     }
 
     public static String MOCK_RESPONSE = """
-            Sure! Below are the Java classes representing the MongoDB model you provided, using Lombok annotations for brevity and together with Spring Data MongoDB annotations.
+            Here is the Java code representing the MongoDB model you provided, using Lombok annotations and Spring Data MongoDB framework:
             
             ### Aircraft.java
+            
             ```java
             import lombok.Data;
             import org.springframework.data.annotation.Id;
             import org.springframework.data.mongodb.core.mapping.Document;
             
-            @Data
             @Document(collection = "aircraft")
+            @Data
             public class Aircraft {
-            
+             \s
                 @Id
                 private String id;
                 private String type;
@@ -81,12 +82,14 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx{
             
                 @Data
                 public static class Airline {
+                    @Id
                     private String id;
                     private String name;
                 }
             
                 @Data
                 public static class Manufacturer {
+                    @Id
                     private String id;
                     private String name;
                 }
@@ -94,15 +97,16 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx{
             ```
             
             ### Airline.java
+            
             ```java
             import lombok.Data;
             import org.springframework.data.annotation.Id;
             import org.springframework.data.mongodb.core.mapping.Document;
             
-            @Data
             @Document(collection = "airline")
+            @Data
             public class Airline {
-            
+             \s
                 @Id
                 private String id;
                 private String name;
@@ -110,15 +114,16 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx{
             ```
             
             ### Airport.java
+            
             ```java
             import lombok.Data;
             import org.springframework.data.annotation.Id;
             import org.springframework.data.mongodb.core.mapping.Document;
             
-            @Data
             @Document(collection = "airport")
+            @Data
             public class Airport {
-            
+             \s
                 @Id
                 private String id;
                 private String name;
@@ -128,13 +133,14 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx{
             ```
             
             ### Booking.java
+            
             ```java
             import lombok.Data;
             import org.springframework.data.annotation.Id;
             import org.springframework.data.mongodb.core.mapping.Document;
             
-            @Data
             @Document(collection = "booking")
+            @Data
             public class Booking {
             
                 @Id
@@ -145,45 +151,25 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx{
             
                 @Data
                 public static class Flight {
+                    @Id
                     private String number;
-                    private String departureTimeScheduled;
-                    private String departureTimeActual;
-                    private String arrivalTimeScheduled;
-                    private String arrivalTimeActual;
-                    private Integer gate;
-                    private Airport airportFrom;
-                    private Airport airportTo;
-                    private Aircraft aircraft;
-                    private ConnectsTo connectsTo;
-            
-                    @Data
-                    public static class ConnectsTo {
-                        private String number;
-                    }
-                }
-            
-                @Data
-                public static class Passenger {
-                    private String id;
-                    private String firstName;
-                    private String lastName;
-                    private String passportNumber;
                 }
             }
             ```
             
             ### Flight.java
+            
             ```java
             import lombok.Data;
             import org.springframework.data.annotation.Id;
             import org.springframework.data.mongodb.core.mapping.Document;
             
-            @Data
             @Document(collection = "flight")
+            @Data
             public class Flight {
-            
+             \s
                 @Id
-                private String number;
+                private String id;
                 private Airport airportFrom;
                 private Airport airportTo;
                 private String departureTimeScheduled;
@@ -202,15 +188,16 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx{
             ```
             
             ### Manufacturer.java
+            
             ```java
             import lombok.Data;
             import org.springframework.data.annotation.Id;
             import org.springframework.data.mongodb.core.mapping.Document;
             
-            @Data
             @Document(collection = "manufacturer")
+            @Data
             public class Manufacturer {
-            
+             \s
                 @Id
                 private String id;
                 private String name;
@@ -218,15 +205,16 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx{
             ```
             
             ### Passenger.java
+            
             ```java
             import lombok.Data;
             import org.springframework.data.annotation.Id;
             import org.springframework.data.mongodb.core.mapping.Document;
             
-            @Data
             @Document(collection = "passenger")
+            @Data
             public class Passenger {
-            
+             \s
                 @Id
                 private String id;
                 private String firstName;
@@ -235,11 +223,12 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx{
             }
             ```
             
-            ### Summary
-            - The above classes represent different collections in your MongoDB model, using Lombok’s `@Data` annotation to generate getters and setters automatically.
-            - Each class is annotated with `@Document` to specify the corresponding MongoDB collection.
-            - Nested classes are defined where appropriate (e.g., `Airline` in `Aircraft`, `Flight` and `Passenger` in `Booking`) to organize related entities.\s
+            ### Notes
+            - Each class corresponds to a MongoDB collection as per the provided model.
+            - Lombok `@Data` annotation is used to generate getters, setters, equals, hashCode, and toString methods for the entities.
+            - The `@Document` annotation specifies the collection name in MongoDB.
+            - The inner classes for `Aircraft` now include `Airline` and `Manufacturer`, aligning with the model structure.\s
             
-            Make sure you have Lombok and Spring Data MongoDB dependencies added to your project to use this code.
+            This code is ready to be used within a Spring Data MongoDB project where these classes would facilitate interactions with the underlying MongoDB documents.
             """;
 }

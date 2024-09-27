@@ -46,6 +46,7 @@ public class PromptData3 extends PromptData2{
         }
         sb.append( allowReferences ? "- Use references for less frequently accessed data \n" : "");
         sb.append("- ").append( migrationPreference.getDescription()).append("\n");
+        sb.append("- Convert the primary key to the `_id` field of type string in MongoDB \n");
 
         if(userDefinedPrompts != null) {
             for(var x : userDefinedPrompts)
@@ -82,9 +83,36 @@ public class PromptData3 extends PromptData2{
                 "- Generate Java classes for the MongoDB model" + "\n" +
                 "- Use Lombok annotations for data classes" + "\n" +
                 "- Use " + framework.getFramework() + " framework for the Java code" + "\n" +
+                "- All classes must have one @Id annotation, even in the inner classes" + "\n" +
                 "### Output format" + "\n" +
                 "- Java code in separate classes for each entity" + "\n" +
-                "Please generate the Java code for the MongoDB model based on provided details";
+                "Please generate the Java code for the MongoDB model based on provided details following the example:" + "\n" +
+                """
+                ```java
+                public class Booking {
+            
+                    @Id
+                    private String id;
+                    private Flight flight;
+                    private Passenger passenger;
+                    private String seat;
+                
+                    @Data
+                    public static class Flight {
+                        @Id
+                        private String number;
+                        private String departureTimeScheduled;
+                        private String departureTimeActual;
+                        private String arrivalTimeScheduled;
+                        private String arrivalTimeActual;
+                        private Integer gate;
+                        private Airport airportFrom;
+                        private Airport airportTo;
+                        private Aircraft aircraft;
+                        private ConnectsTo connectsTo;
+                    }
+                }
+                 ```""";
         return sb;
     }
 

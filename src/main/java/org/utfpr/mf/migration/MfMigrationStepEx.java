@@ -31,7 +31,7 @@ public abstract class MfMigrationStepEx extends CodeSession implements IMfMigrat
 
     @Override
     public boolean hasValidInput(Object input) {
-        return inputType.isInstance(input);
+        return inputType == null || inputType == input || inputType.isInstance(input);
     }
 
     @Override
@@ -39,6 +39,9 @@ public abstract class MfMigrationStepEx extends CodeSession implements IMfMigrat
         var fields = Arrays.stream(getClass().getDeclaredFields()).filter(f -> f.isAnnotationPresent(Export.class)).toList();
         for(var f : fields) {
             var an = f.getAnnotation(Export.class);
+            if(!an.override() && binder.has(an.value().getValue())) {
+                continue;
+            }
             f.setAccessible(true);
             try {
                 binder.bind(an.value().getValue(), f.get(this));

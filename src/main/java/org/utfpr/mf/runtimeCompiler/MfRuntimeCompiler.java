@@ -23,7 +23,7 @@ public class MfRuntimeCompiler extends CodeSession {
 
 
     public Map<String, Class<?>> compile(Map<String, String> sources, MfCompilerParams compileParams) throws Exception {
-        return compile(sources, compileParams, null);
+        return compile(sources, compileParams, new MfDefaultPreCompileAction());
     }
 
     public Map<String, Class<?>> compile(Map<String, String> sources, MfCompilerParams compileParams, @Nullable IMfPreCompileAction action) throws Exception {

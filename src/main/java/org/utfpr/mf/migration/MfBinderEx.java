@@ -12,7 +12,7 @@ public abstract class MfBinderEx implements IMfBinder{
     protected final Map<String, Object> bindings = new HashMap<>();
 
     @Override
-    public IMfBinder bind(String key, Object value) {
+    public MfBinderEx bind(String key, Object value) {
         bindings.put(key, value);
         return this;
     }
@@ -28,5 +28,15 @@ public abstract class MfBinderEx implements IMfBinder{
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    @Override
+    public Object get(String key) {
+        return bindings.get(key);
+    }
+
+    @Override
+    public boolean has(String key) {
+        return bindings.containsKey(key);
     }
 }

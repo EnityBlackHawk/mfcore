@@ -1,14 +1,15 @@
 package org.utfpr.mf.migration;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.utfpr.mf.annotarion.Export;
 import org.utfpr.mf.annotarion.Injected;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.metadata.DbMetadata;
 import org.utfpr.mf.migration.params.GeneratedJavaCode;
+import org.utfpr.mf.migration.params.MigrationDatabaseReport;
 import org.utfpr.mf.mongoConnection.MongoConnection;
 import org.utfpr.mf.mongoConnection.MongoConnectionCredentials;
 import org.utfpr.mf.runtimeCompiler.MfCompilerParams;
@@ -28,15 +29,19 @@ public class MigrateDatabaseStep extends MfMigrationStepEx {
     @Setter
     private MongoConnectionCredentials mongoConnectionCredentials;
 
+    @Export(DefaultInjectParams.MONGO_CONNECTION)
+    private MongoConnection mongoConnection;
+
     @Injected(DefaultInjectParams.DB_METADATA)
-    private DbMetadata dbMetadata;
+    @Export(DefaultInjectParams.DB_METADATA)
+    private DbMetadata dbMetadata = null;
 
     public MigrateDatabaseStep(MongoConnectionCredentials connectionCredentials) {
         this(connectionCredentials, System.out);
     }
 
     public MigrateDatabaseStep(MongoConnectionCredentials connectionCredentials, PrintStream printStream) {
-        super("MigrateDatabaseStep", printStream, GeneratedJavaCode.class, null);
+        super("MigrateDatabaseStep", printStream, GeneratedJavaCode.class, MigrationDatabaseReport.class);
         this.mongoConnectionCredentials = connectionCredentials;
     }
 
@@ -60,13 +65,14 @@ public class MigrateDatabaseStep extends MfMigrationStepEx {
         assert !compiledClasses.isEmpty() : "No classes were compiled";
 
         BEGIN("Connecting to MongoDB");
-        MongoConnection connection = new MongoConnection(mongoConnectionCredentials);
+        mongoConnection = new MongoConnection(mongoConnectionCredentials);
         BEGIN("Migrating data");
-        makeMigration(dbMetadata, connection, compiledClasses);
-        return null;
+        var counts = makeMigration(dbMetadata, mongoConnection, compiledClasses);
+        return new MigrationDatabaseReport(counts, compiledClasses);
     }
 
-    private void makeMigration(DbMetadata dbMetadata, MongoConnection mongoConnection, Map<String, Class<?>> classes) {
+    private Map<String, Integer> makeMigration(DbMetadata dbMetadata, MongoConnection mongoConnection, Map<String, Class<?>> classes) {
+        HashMap<String, Integer> classCount = new HashMap<>();
         for(String className : classes.keySet())
         {
             BEGIN_SUB("Querying data from " + className);
@@ -75,12 +81,14 @@ public class MigrateDatabaseStep extends MfMigrationStepEx {
             List<?> objects = qr.asObject(classes.get(className));
             BEGIN_SUB("Persisting data: " + className);
             MongoTemplate mTemplate = mongoConnection.getTemplate();
-
+            int count = 0;
             for(var obj : objects)
             {
                 mTemplate.insert(obj);
+                count++;
             }
-
+            classCount.put(className, count);
         }
+        return classCount;
     }
 }

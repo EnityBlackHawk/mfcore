@@ -3,6 +3,7 @@ package org.utfpr.mf.tools
 import com.mongodb.DBRef
 import org.utfpr.mf.metadata.DbMetadata
 import org.springframework.data.annotation.Id
+import org.utfpr.mf.metadata.GenericRegistry
 import java.sql.ResultSet
 import java.util.*
 import java.sql.Connection
@@ -142,6 +143,18 @@ class QueryResult(private val metadata: DbMetadata?) {
             res.add(obj)
         }
         return res;
+    }
+
+    fun asGenericRegistry() : List<GenericRegistry> {
+        val res = mutableListOf<GenericRegistry>()
+        for (row in rows) {
+            val obj = GenericRegistry()
+            for (i in 0 until columns.size) {
+                obj[columns[i]] = row[i] ?: ""
+            }
+            res.add(obj)
+        }
+        return res
     }
 
     fun String.snakeToCamelCase(): String {

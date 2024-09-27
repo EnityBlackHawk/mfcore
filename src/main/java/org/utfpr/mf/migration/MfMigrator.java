@@ -15,7 +15,7 @@ public class MfMigrator extends CodeSession {
 
     public static class Binder extends MfBinderEx {
 
-        public IMfBinder bind(DefaultInjectParams key, Object value) {
+        public MfBinderEx bind(DefaultInjectParams key, Object value) {
             return bind(key.getValue(), value);
         }
 

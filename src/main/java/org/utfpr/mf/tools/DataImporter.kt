@@ -111,8 +111,6 @@ class DataImporter {
             }
         }
 
-
-
         fun createDatabase(connection : Connection, databaseName : String) : String {
             return runSQL("CREATE DATABASE $databaseName", connection)
         }
