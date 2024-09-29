@@ -23,32 +23,47 @@ public class MfMigrationStepFactory {
         this.printStream = printStream;
     }
 
-    public IMfMigrationStep createAcquireMetadataStep() {
+    public IMfMigrationStep createAcquireMetadataStep(IMfStepObserver... observer) {
         var tmp = new AcquireMetadataStep(printStream);
+        for (var o : observer) {
+            tmp.addObserver(o);
+        }
         steps.add(tmp);
         return tmp;
     }
 
-    public IMfMigrationStep createGenerateModelStep(MigrationSpec migrationSpec) {
+    public IMfMigrationStep createGenerateModelStep(MigrationSpec migrationSpec, IMfStepObserver... observers) {
         var tmp = new GenerateModelStep(migrationSpec, printStream);
+        for (var o : observers) {
+            tmp.addObserver(o);
+        }
         steps.add(tmp);
         return tmp;
     }
 
-    public IMfMigrationStep createGenerateJavaCodeStep() {
+    public IMfMigrationStep createGenerateJavaCodeStep(IMfStepObserver... observers) {
         var tmp = new GenerateJavaCodeStep(printStream);
+        for (var o : observers) {
+            tmp.addObserver(o);
+        }
         steps.add(tmp);
         return tmp;
     }
 
-    public IMfMigrationStep createMigrateDatabaseStep(MongoConnectionCredentials credentials) {
+    public IMfMigrationStep createMigrateDatabaseStep(MongoConnectionCredentials credentials, IMfStepObserver... observers) {
         var tmp = new MigrateDatabaseStep(credentials);
+        for (var o : observers) {
+            tmp.addObserver(o);
+        }
         steps.add(tmp);
         return tmp;
     }
 
-    public IMfMigrationStep createValidatorStep() {
+    public IMfMigrationStep createValidatorStep(IMfStepObserver... observers) {
         var tmp = new VerificationStep(printStream);
+        for (var o : observers) {
+            tmp.addObserver(o);
+        }
         steps.add(tmp);
         return tmp;
     }

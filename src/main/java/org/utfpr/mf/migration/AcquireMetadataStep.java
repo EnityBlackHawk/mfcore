@@ -16,7 +16,6 @@ import org.utfpr.mf.llm.ChatAssistant;
 import org.utfpr.mf.metadata.RelationCardinality;
 import org.utfpr.mf.migration.params.MetadataInfo;
 import org.utfpr.mf.migration.params.RdbCredentials;
-import org.utfpr.mf.tools.CodeSession;
 import org.utfpr.mf.metadata.DbMetadata;
 import org.utfpr.mf.tools.DataImporter;
 import org.utfpr.mf.tools.QueryResult;
@@ -32,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class AcquireMetadataStep extends MfMigrationStepEx {
+public class AcquireMetadataStep extends MfMigrationStepEx<RdbCredentials, MetadataInfo> {
 
     @Injected(DefaultInjectParams.LLM_KEY)
     private String llm_key;
@@ -53,10 +52,9 @@ public class AcquireMetadataStep extends MfMigrationStepEx {
         return super.hasValidOutput(selfOutput) && mdb.isConnected();
     }
 
-    @Override
-    public Object execute(Object input) {
+    private MetadataInfo process(RdbCredentials cred) {
         assert llm_key != null : "llm_key is not set";
-        RdbCredentials cred = (RdbCredentials) input;
+
         String data = "";
         List<RelationCardinality> card = null;
 
@@ -85,6 +83,11 @@ public class AcquireMetadataStep extends MfMigrationStepEx {
                 data,
                 card
         );
+    }
+
+    @Override
+    public Object execute(Object input) {
+        return executeHelper(this::process, input);
     }
 
     public List<RelationCardinality> getRelationsCardinality(DbMetadata metadata) {

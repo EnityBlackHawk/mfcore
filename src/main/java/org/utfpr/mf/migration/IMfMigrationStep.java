@@ -1,6 +1,6 @@
 package org.utfpr.mf.migration;
 
-public interface IMfMigrationStep {
+public interface IMfMigrationStep{
 
     Object execute(Object input);
     void export(IMfBinder binder);

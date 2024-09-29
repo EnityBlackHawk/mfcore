@@ -19,7 +19,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GenerateModelStep extends MfMigrationStepEx{
+public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
 
     private final MigrationSpec migrationSpec;
 
@@ -38,10 +38,7 @@ public class GenerateModelStep extends MfMigrationStepEx{
         this.migrationSpec = spec;
     }
 
-    @Override
-    public Object execute(Object input) {
-
-        MetadataInfo metadataInfo = (MetadataInfo) input;
+    private Model process(MetadataInfo metadataInfo) {
 
         assert llm_key != null : "llm_key is not set";
         BEGIN("Generating LLM interface");
@@ -82,6 +79,11 @@ public class GenerateModelStep extends MfMigrationStepEx{
         BEGIN("Finalizing model");
         var finalResult = objs.stream().reduce("", String::concat);
         return new Model(finalResult, tokens);
+    }
+
+    @Override
+    public Object execute(Object input) {
+        return executeHelper(this::process, input);
     }
 
     public static void extracted(String resultString, ArrayList<String> objs) {

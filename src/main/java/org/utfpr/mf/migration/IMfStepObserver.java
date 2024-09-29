@@ -1,9 +1,9 @@
 package org.utfpr.mf.migration;
 
-public interface IMfStepObserver {
+public interface IMfStepObserver<TInput, TOutput> {
 
-    boolean OnStepStart(String stepName, Object input);
-    boolean OnStepEnd(String stepName, Object output);
-    void OnStepCrash(String stepName, Throwable error);
+    boolean OnStepStart(String stepName, TInput input);
+    boolean OnStepEnd(String stepName, TOutput output);
+    boolean OnStepCrash(String stepName, Throwable error);
     boolean OnStepError(String stepName, String message);
 }

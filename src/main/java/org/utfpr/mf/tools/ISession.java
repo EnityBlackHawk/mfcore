@@ -30,4 +30,10 @@ public interface ISession {
         getPrintStream().println(sb);
     }
 
+    default void ERROR(String message) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\t[ERROR] ").append(message);
+        getPrintStream().println(sb);
+    }
+
 }

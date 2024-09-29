@@ -20,7 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-public class VerificationStep extends MfMigrationStepEx {
+public class VerificationStep extends MfMigrationStepEx<MigrationDatabaseReport, VerificationReport> {
 
     @Injected(DefaultInjectParams.DB_METADATA)
     private DbMetadata dbMetadata = null;
@@ -37,10 +37,7 @@ public class VerificationStep extends MfMigrationStepEx {
         super("VerificationStep", printStream, MigrationDatabaseReport.class, VerificationReport.class);
     }
 
-    @Override
-    public Object execute(Object input) {
-
-        MigrationDatabaseReport report = (MigrationDatabaseReport) input;
+    private VerificationReport process(MigrationDatabaseReport report) {
 
         var verificationBuilder = VerificationReport.builder();
 
@@ -102,6 +99,11 @@ public class VerificationStep extends MfMigrationStepEx {
         }
 
         return verificationBuilder.build();
+    }
+
+    @Override
+    public Object execute(Object input) {
+        return executeHelper(this::process, input);
     }
 
     public String generateMd5(Object data) throws IllegalAccessException {

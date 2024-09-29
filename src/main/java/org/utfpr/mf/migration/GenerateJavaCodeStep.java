@@ -15,7 +15,7 @@ import org.utfpr.mf.tools.ConvertToJavaFile;
 
 import java.io.PrintStream;
 
-public class GenerateJavaCodeStep extends MfMigrationStepEx{
+public class GenerateJavaCodeStep extends MfMigrationStepEx<Model, GeneratedJavaCode> {
 
     @Injected(DefaultInjectParams.LLM_KEY)
     private String key;
@@ -29,10 +29,7 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx{
         super("GenerateJavaCodeStep", printStream, Model.class, GeneratedJavaCode.class);
     }
 
-    @Override
-    public Object execute(Object input) {
-
-        Model model = (Model) input;
+    private GeneratedJavaCode process(Model model) {
         BEGIN("Building LLM interface");
         var gpt = new OpenAiChatModel.OpenAiChatModelBuilder()
                 .apiKey(key)
@@ -56,6 +53,11 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx{
         BEGIN("Parsing response");
         var mapResult = ConvertToJavaFile.toMap(result);
         return new GeneratedJavaCode(mapResult, token);
+    }
+
+    @Override
+    public Object execute(Object input) {
+        return executeHelper(this::process, input);
     }
 
     public static String MOCK_RESPONSE = """

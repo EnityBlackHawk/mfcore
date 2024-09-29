@@ -28,6 +28,36 @@ public class MfMigratorTest {
 
         MockLayer.isActivated = true;
 
+        final boolean[] valuesStart = { false, false, false, false, false };
+        final boolean[] valuesEnd = { false, false, false, false, false };
+
+        IMfStepObserver observer = new IMfStepObserver() {
+
+            static int index;
+
+            @Override
+            public boolean OnStepStart(String stepName, Object o) {
+                valuesStart[index] = true;
+                return true;
+            }
+
+            @Override
+            public boolean OnStepEnd(String stepName, Object o) {
+                valuesEnd[index++] = true;
+                return true;
+            }
+
+            @Override
+            public boolean OnStepCrash(String stepName, Throwable error) {
+                return true;
+            }
+
+            @Override
+            public boolean OnStepError(String stepName, String message) {
+                return true;
+            }
+        };
+
         MigrationSpec migrationSpec = MigrationSpec.builder()
                 .LLM("gpt-4o-mini")
                 .allow_ref(true)
@@ -45,11 +75,11 @@ public class MfMigratorTest {
 
         MfMigrationStepFactory mfMigrationStepFactory = new MfMigrationStepFactory();
 
-        IMfMigrationStep acquireMetadataStep = mfMigrationStepFactory.createAcquireMetadataStep();
-        IMfMigrationStep generateModelStep = mfMigrationStepFactory.createGenerateModelStep(migrationSpec);
-        IMfMigrationStep generateJavaCodeStep = mfMigrationStepFactory.createGenerateJavaCodeStep();
-        IMfMigrationStep migrateDatabaseStep = mfMigrationStepFactory.createMigrateDatabaseStep(credentials);
-        IMfMigrationStep validatorStep = mfMigrationStepFactory.createValidatorStep();
+        IMfMigrationStep acquireMetadataStep = mfMigrationStepFactory.createAcquireMetadataStep(observer);
+        IMfMigrationStep generateModelStep = mfMigrationStepFactory.createGenerateModelStep(migrationSpec, observer);
+        IMfMigrationStep generateJavaCodeStep = mfMigrationStepFactory.createGenerateJavaCodeStep(observer);
+        IMfMigrationStep migrateDatabaseStep = mfMigrationStepFactory.createMigrateDatabaseStep(credentials, observer);
+        IMfMigrationStep validatorStep = mfMigrationStepFactory.createValidatorStep(observer);
 
         IMfBinder binder = new MfMigrator.Binder()
                 .bind(DefaultInjectParams.LLM_KEY, System.getenv("LLM_KEY"));
@@ -60,6 +90,8 @@ public class MfMigratorTest {
 
         assertTrue(rep.isCountTestSucceeded(), () -> "Count test failed: " + rep.getCountTestMessage());
         assertTrue(rep.isHashTestSucceeded(), () -> "Hash test failed: " + rep.getHashTestMessage());
+        assertArrayEquals(new boolean[] {true, true, true, true, true}, valuesStart);
+        assertArrayEquals(new boolean[] {true, true, true, true, true}, valuesEnd);
     }
 
     @Test
@@ -69,6 +101,32 @@ public class MfMigratorTest {
         IMfBinder binder = new MfMigrator.Binder()
                 .bind(DefaultInjectParams.LLM_KEY, System.getenv("LLM_KEY"));
 
+        final boolean[] values = { false, false };
+
+        IMfStepObserver<Model, GeneratedJavaCode> observer = new IMfStepObserver<Model, GeneratedJavaCode>() {
+            @Override
+            public boolean OnStepStart(String stepName, Model model) {
+                values[0] = true;
+                return true;
+            }
+
+            @Override
+            public boolean OnStepEnd(String stepName, GeneratedJavaCode generatedJavaCode) {
+                values[1] = true;
+                return true;
+            }
+
+            @Override
+            public boolean OnStepCrash(String stepName, Throwable error) {
+                return true;
+            }
+
+            @Override
+            public boolean OnStepError(String stepName, String message) {
+                return true;
+            }
+        };
+
         String result = GenerateModelStep.MOCK_GENERATE_MODEL;
         ArrayList<String> objs = new ArrayList<>();
         GenerateModelStep.extracted(result, objs);
@@ -76,7 +134,8 @@ public class MfMigratorTest {
         Model model = new Model( objs.stream().reduce("", String::concat), 0 );
 
         MfMigrationStepFactory mfMigrationStepFactory = new MfMigrationStepFactory();
-        IMfMigrationStep generateJavaCodeStep = mfMigrationStepFactory.createGenerateJavaCodeStep();
+
+        IMfMigrationStep generateJavaCodeStep = mfMigrationStepFactory.createGenerateJavaCodeStep(observer);
 
         MfMigrator migrator = new MfMigrator(binder, List.of(generateJavaCodeStep));
         GeneratedJavaCode res = (GeneratedJavaCode) migrator.execute(model);
@@ -88,6 +147,7 @@ public class MfMigratorTest {
         var classes = compiler.compile(res.getCode(), params);
 
         assertNotNull(classes);
+        assertArrayEquals(new boolean[] {true, true}, values);
     }
 
 

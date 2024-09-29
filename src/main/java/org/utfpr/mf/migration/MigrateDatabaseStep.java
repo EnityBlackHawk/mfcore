@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MigrateDatabaseStep extends MfMigrationStepEx {
+public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, MigrationDatabaseReport> {
 
     @Getter
     @Setter
@@ -45,10 +45,9 @@ public class MigrateDatabaseStep extends MfMigrationStepEx {
         this.mongoConnectionCredentials = connectionCredentials;
     }
 
-    @Override
-    public Object execute(Object input) {
+    private MigrationDatabaseReport process(GeneratedJavaCode generatedJavaCode) {
         assert dbMetadata != null : "dbMetadata is not set";
-        GeneratedJavaCode generatedJavaCode = (GeneratedJavaCode) input;
+
         BEGIN("Initializing MfRuntimeCompiler");
         MfRuntimeCompiler compiler = new MfRuntimeCompiler();
         MfCompilerParams params = MfCompilerParams.builder()
@@ -69,6 +68,12 @@ public class MigrateDatabaseStep extends MfMigrationStepEx {
         BEGIN("Migrating data");
         var counts = makeMigration(dbMetadata, mongoConnection, compiledClasses);
         return new MigrationDatabaseReport(counts, compiledClasses);
+    }
+
+
+    @Override
+    public Object execute(Object input) {
+        return executeHelper(this::process, input);
     }
 
     private Map<String, Integer> makeMigration(DbMetadata dbMetadata, MongoConnection mongoConnection, Map<String, Class<?>> classes) {
