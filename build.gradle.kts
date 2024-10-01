@@ -1,7 +1,13 @@
+import org.gradle.kotlin.dsl.testImplementation
+
 plugins {
     id("java")
     kotlin("jvm")
+    "java-library"
+    `maven-publish`
 }
+
+
 
 group = "org.utfpr.mf"
 version = "1.0-SNAPSHOT"
@@ -9,6 +15,23 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenJava") {
+            groupId = group as String
+            artifactId = "mfcore"
+            version = "1.0"
+
+            // Specify the JAR file you want to install
+            artifact(tasks.jar.get())
+        }
+    }
+    repositories {
+        mavenLocal() // This will install the JAR to your local Maven repository (~/.m2/repository)
+    }
+}
+
 
 dependencies {
 
@@ -32,10 +55,10 @@ dependencies {
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("commons-codec:commons-codec:1.17.1")
 
-
-
-
 }
+
+
+
 
 tasks.test {
     useJUnitPlatform()

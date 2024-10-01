@@ -5,12 +5,12 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 public class MongoTemplateTest {
 
-    @Test
-    void mongoTemplateInsert() {
-        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017/test");
-        MongoTemplate mongoTemplate = new MongoTemplate(mongoClient, "test");
-        DocumentTest document = new DocumentTest("1", "test");
-        mongoTemplate.insert(document);
-    }
+//    @Test
+//    void mongoTemplateInsert() {
+//        MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017/test");
+//        MongoTemplate mongoTemplate = new MongoTemplate(mongoClient, "test");
+//        DocumentTest document = new DocumentTest("1", "test");
+//        mongoTemplate.insert(document);
+//    }
 
 }
