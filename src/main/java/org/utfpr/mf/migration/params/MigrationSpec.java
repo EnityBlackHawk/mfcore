@@ -1,7 +1,9 @@
 package org.utfpr.mf.migration.params;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.utfpr.mf.annotarion.Optional;
 import org.utfpr.mf.metadata.RelationCardinality;
 import org.utfpr.mf.prompt.Framework;
@@ -10,6 +12,8 @@ import java.util.List;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MigrationSpec {
     private String name;
     @Optional(overriddenBy = MetadataInfo.class)

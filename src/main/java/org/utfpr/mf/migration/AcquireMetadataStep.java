@@ -15,8 +15,8 @@ import org.utfpr.mf.exceptions.DBConnectionException;
 import org.utfpr.mf.llm.ChatAssistant;
 import org.utfpr.mf.metadata.RelationCardinality;
 import org.utfpr.mf.migration.params.MetadataInfo;
-import org.utfpr.mf.migration.params.RdbCredentials;
 import org.utfpr.mf.metadata.DbMetadata;
+import org.utfpr.mf.model.Credentials;
 import org.utfpr.mf.tools.DataImporter;
 import org.utfpr.mf.tools.QueryResult;
 import org.utfpr.mf.tools.TemplatedString;
@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class AcquireMetadataStep extends MfMigrationStepEx<RdbCredentials, MetadataInfo> {
+public class AcquireMetadataStep extends MfMigrationStepEx<Credentials, MetadataInfo> {
 
     @Injected(DefaultInjectParams.LLM_KEY)
     private String llm_key;
@@ -44,7 +44,7 @@ public class AcquireMetadataStep extends MfMigrationStepEx<RdbCredentials, Metad
     }
 
     public AcquireMetadataStep(PrintStream printStream) {
-        super("AcquireMetadataStep", printStream, RdbCredentials.class, MetadataInfo.class);
+        super("AcquireMetadataStep", printStream, Credentials.class, MetadataInfo.class);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class AcquireMetadataStep extends MfMigrationStepEx<RdbCredentials, Metad
         return super.hasValidOutput(selfOutput) && mdb.isConnected();
     }
 
-    private MetadataInfo process(RdbCredentials cred) {
+    private MetadataInfo process(Credentials cred) {
         assert llm_key != null : "llm_key is not set";
 
         String data = "";

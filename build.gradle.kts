@@ -1,7 +1,5 @@
-import org.gradle.kotlin.dsl.testImplementation
 
 plugins {
-    id("java")
     kotlin("jvm")
     "java-library"
     `maven-publish`
@@ -16,23 +14,6 @@ repositories {
     mavenCentral()
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            groupId = group as String
-            artifactId = "mfcore"
-            version = "1.0"
-
-            // Specify the JAR file you want to install
-            artifact(tasks.jar.get())
-        }
-    }
-    repositories {
-        mavenLocal() // This will install the JAR to your local Maven repository (~/.m2/repository)
-    }
-}
-
-
 dependencies {
 
     implementation("org.springframework.data:spring-data-mongodb:4.3.4")
@@ -46,7 +27,7 @@ dependencies {
     testAnnotationProcessor ("org.projectlombok:lombok:1.18.34")
     compileOnly ("org.projectlombok:lombok:1.18.34")
     annotationProcessor ("org.projectlombok:lombok:1.18.34")
-    implementation(kotlin("stdlib-jdk8"))
+    api(kotlin("stdlib-jdk8"))
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
@@ -57,6 +38,17 @@ dependencies {
 
 }
 
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = group as String
+            artifactId = "mfcore"
+            version = "1.1-SNAPSHOT"
+
+            from(components["java"])
+        }
+    }
+}
 
 
 
