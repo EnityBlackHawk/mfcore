@@ -1,12 +1,14 @@
 package org.utfpr.mf.migration;
 
 import org.utfpr.mf.annotarion.Export;
+import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.tools.CodeSession;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession implements IMfMigrationStep{
@@ -102,7 +104,8 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
             }
             f.setAccessible(true);
             try {
-                binder.bind(an.value().getValue(), f.get(this));
+                String key = Objects.equals(an.value().getValue(), DefaultInjectParams.UNSET.getValue()) ? f.getName() : an.value().getValue();
+                binder.bind(key, f.get(this));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

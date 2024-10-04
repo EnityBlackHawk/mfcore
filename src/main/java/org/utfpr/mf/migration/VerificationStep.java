@@ -49,7 +49,7 @@ public class VerificationStep extends MfMigrationStepEx<MigrationDatabaseReport,
             throw new RuntimeException("Database connection is not established");
         }
 
-        BEGIN("Aquiring data from MongoDB and RDB");
+        BEGIN("Acquiring data from MongoDB and RDB");
         for(Class<?> source : report.getSources().values()) {
 
             BEGIN("Verifying data from " + source.getSimpleName());

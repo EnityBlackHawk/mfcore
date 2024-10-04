@@ -27,6 +27,9 @@ public class MigrationSpec {
     @Optional(overriddenBy = MetadataInfo.class)
     private List<RelationCardinality> cardinality;
 
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     @Data
     public static class Workload {
         private Integer regularity;

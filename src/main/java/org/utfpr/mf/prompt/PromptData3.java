@@ -67,7 +67,7 @@ public class PromptData3 extends PromptData2{
         sb.append("}").append("\n");
         sb.append("```").append("\n");
 
-        sb.append("Please generate only the MongoDB model in JSON format based on the provided details.");
+        sb.append("Please generate only the MongoDB model in JSON format based on the provided details. And a little explanation of why you choose this model.").append("\n");
 
         return sb.toString();
     }

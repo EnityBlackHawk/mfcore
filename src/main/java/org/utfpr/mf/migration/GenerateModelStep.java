@@ -4,6 +4,7 @@ import dev.langchain4j.model.openai.OpenAiChatModel;
 import dev.langchain4j.service.AiServices;
 import kotlin.Metadata;
 import org.utfpr.mf.MockLayer;
+import org.utfpr.mf.annotarion.Export;
 import org.utfpr.mf.annotarion.Injected;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.llm.ChatAssistant;
@@ -26,6 +27,9 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
 
     @Injected(DefaultInjectParams.LLM_KEY)
     private String llm_key;
+
+    @Export(DefaultInjectParams.UNSET)
+    private String llm_response;
 
     public GenerateModelStep(MigrationSpec spec) {
         this(spec, System.out);
@@ -75,11 +79,12 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
             tokens = result.tokenUsage().totalTokenCount();
             resultString = result.content().text();
         }
+        llm_response = resultString;
         BEGIN("Extracting JSON objects");
-        extracted(resultString, objs);
+        var explanation = extracted(resultString, objs);
         BEGIN("Finalizing model");
         var finalResult = objs.stream().reduce("", String::concat);
-        return new Model(finalResult, tokens);
+        return new Model(finalResult, explanation, tokens);
     }
 
     @Override
@@ -87,10 +92,10 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
         return executeHelper(this::process, input);
     }
 
-    public static void extracted(String resultString, ArrayList<String> objs) {
+    public static String extracted(String resultString, ArrayList<String> objs) {
         while (true) {
             int iS = resultString.indexOf("```json");
-            if(iS == -1) break;
+            if(iS == -1) return resultString.trim();
             iS += 7;
             int iE = resultString.indexOf("```", iS);
             objs.add(resultString.substring(iS, iE));
@@ -102,90 +107,131 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
             ```json
             // Aircraft collection
             {
-                "_id": "ObjectId",
-                "type": "string",
-                "airline": {
-                    "id": "ObjectId",
-                    "name": "string"
-                },
-                "manufacturer": {
-                    "id": "ObjectId",
-                    "name": "string"
-                },
-                "registration": "string",
-                "max_passengers": "integer"
+            	"_id": "string",
+            	"type": "string",
+            	"registration": "string",
+            	"max_passengers": "integer",
+            	"airline": {
+            		"id": "string",
+            		"name": "string"
+            	},
+            	"manufacturer": {
+            		"id": "string",
+            		"name": "string"
+            	}
             }
             
             // Airline collection
             {
-                "_id": "ObjectId",
-                "name": "string"
+            	"_id": "string",
+            	"name": "string"
             }
             
             // Airport collection
             {
-                "_id": "string",
-                "name": "string",
-                "city": "string",
-                "country": "string"
-            }
-            
-            // Booking collection
-            {
-                "_id": "ObjectId",
-                "flight": {
-                    "number": "string"
-                },
-                "passenger": {
-                    "id": "ObjectId",
-                    "first_name": "string",
-                    "last_name": "string",
-                    "passport_number": "string"
-                },
-                "seat": "string"
+            	"_id": "string",
+            	"name": "string",
+            	"city": "string",
+            	"country": "string"
             }
             
             // Flight collection
             {
-                "_id": "string",
-                "airport_from": {
-                    "id": "string"
-                },
-                "airport_to": {
-                    "id": "string"
-                },
-                "departure_time_scheduled": "ISODate",
-                "departure_time_actual": "ISODate",
-                "arrival_time_scheduled": "ISODate",
-                "arrival_time_actual": "ISODate",
-                "gate": "integer",
-                "aircraft": {
-                    "id": "ObjectId",
-                    "type": "string",
-                    "manufacturer": {
-                        "id": "ObjectId",
-                        "name": "string"
-                    },
-                    "registration": "string"
-                },
-                "connects_to": {
-                    "number": "string"
-                }
+            	"_id": "string",
+            	"number": "string",
+            	"departure_time_scheduled": "timestamp",
+            	"departure_time_actual": "timestamp",
+            	"arrival_time_scheduled": "timestamp",
+            	"arrival_time_actual": "timestamp",
+            	"gate": "integer",
+            	"aircraft": {
+            		"id": "string",
+            		"type": "string",
+            		"registration": "string",
+            		"max_passengers": "integer",
+            		"airline": {
+            			"id": "string",
+            			"name": "string"
+            		},
+            		"manufacturer": {
+            			"id": "string",
+            			"name": "string"
+            		}
+            	},
+            	"airport_from": {
+            		"id": "string",
+            		"name": "string",
+            		"city": "string",
+            		"country": "string"
+            	},
+            	"airport_to": {
+            		"id": "string",
+            		"name": "string",
+            		"city": "string",
+            		"country": "string"
+            	},
+            	"connects_to": {
+            		"number": "string",
+            		"connecting_airport": {
+            			"id": "string",
+            			"name": "string"
+            		}
+            	}
             }
             
             // Manufacturer collection
             {
-                "_id": "ObjectId",
-                "name": "string"
+            	"_id": "string",
+            	"name": "string"
             }
             
             // Passenger collection
             {
-                "_id": "ObjectId",
-                "first_name": "string",
-                "last_name": "string",
-                "passport_number": "string"
+            	"_id": "string",
+            	"first_name": "string",
+            	"last_name": "string",
+            	"passport_number": "string",
+            	"bookings": [
+            		{
+            			"seat": "string",
+            			"flight": {
+            				"id": "string",
+            				"number": "string",
+            				"departure_time_scheduled": "timestamp",
+            				"airport_from": {
+            					"id": "string",
+            					"name": "string"
+            				},
+            				"airport_to": {
+            					"id": "string",
+            					"name": "string"
+            				}
+            			}
+            		}
+            	]
+            }
+            
+            // Booking collection
+            {
+            	"_id": "string",
+            	"flight": {
+            		"number": "string"
+            	},
+            	"passenger": {
+            		"id": "string",
+            		"first_name": "string",
+            		"last_name": "string",
+            		"passport_number": "string"
+            	},
+            	"seat": "string"
             }
             ```
+            
+            ### Explanation:
+            1. **Denormalization**: In MongoDB, it is often efficient to denormalize and embed related data together in a single document when they are frequently accessed together. For example, the `Flight` collection embeds `aircraft`, along with its associated `airline` and `manufacturer` information. This design optimizes for the most frequently used queries which require flight and aircraft information.
+            2. **References for Less Frequently Accessed Data**: In our model, the `Passenger` and `Booking` collections reference necessary data rather than embedding all information, as this data is less frequently used and typically required for specific queries (i.e., booking details).\s
+            3. **Primary Key to `_id`**: All documents now utilize a string-based `_id` field, in line with MongoDB's document structure, ensuring that every item is uniquely identifiable.
+            4. **Maintain Relationships**: The model retains key relationships from the relational structure, like referencing airports and flights, facilitating easy querying while reducing the need for complex joins.
+            5. **Performance Optimization**: The design reduces the number of joins by embedding the most frequently queried data together, which improves read performance, especially for the defined usage patterns.
             """;
 }
