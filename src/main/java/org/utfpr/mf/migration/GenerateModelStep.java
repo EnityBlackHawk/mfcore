@@ -31,6 +31,9 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
     @Export(DefaultInjectParams.UNSET)
     private String llm_response;
 
+    @Export(DefaultInjectParams.UNSET)
+    private String prompt;
+
     public GenerateModelStep(MigrationSpec spec) {
         this(spec, System.out);
     }
@@ -67,6 +70,7 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
 
         );
         var p = prompt.next();
+        this.prompt = p;
         int tokens = 0;
         String resultString;
         ArrayList<String> objs = new ArrayList<>();

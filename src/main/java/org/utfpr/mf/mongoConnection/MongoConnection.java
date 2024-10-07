@@ -30,4 +30,9 @@ public class MongoConnection {
         this.template = new MongoTemplate(mongoClient, credentials.getDatabase());
     }
 
+    public void clearAll() {
+        template.getCollectionNames().forEach(template::dropCollection);
+    }
+
+
 }

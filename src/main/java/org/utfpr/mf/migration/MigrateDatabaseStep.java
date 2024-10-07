@@ -29,6 +29,7 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
     @Setter
     private MongoConnectionCredentials mongoConnectionCredentials;
 
+    @Injected(DefaultInjectParams.MONGO_CONNECTION)
     @Export(DefaultInjectParams.MONGO_CONNECTION)
     private MongoConnection mongoConnection;
 
@@ -64,7 +65,12 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
         assert !compiledClasses.isEmpty() : "No classes were compiled";
 
         BEGIN("Connecting to MongoDB");
-        mongoConnection = new MongoConnection(mongoConnectionCredentials);
+        if(mongoConnection == null) {
+            mongoConnection = new MongoConnection(mongoConnectionCredentials);
+        }
+        else {
+            INFO("MongoConnection already set, using existing");
+        }
         BEGIN("Migrating data");
         var counts = makeMigration(dbMetadata, mongoConnection, compiledClasses);
         return new MigrationDatabaseReport(counts, compiledClasses);
