@@ -6,7 +6,8 @@ public enum BasicClasses {
     STRING("String"),
     BOOLEAN("Boolean"),
     DOUBLE("Double"),
-    FLOAT("Float");
+    FLOAT("Float"),
+    LOCAL_DATA_TIME("LocalDateTime");
 
     private final String type;
 

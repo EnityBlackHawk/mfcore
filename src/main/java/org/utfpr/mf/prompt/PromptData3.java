@@ -46,7 +46,7 @@ public class PromptData3 extends PromptData2{
         }
         sb.append( allowReferences ? "- Use references for less frequently accessed data \n" : "");
         sb.append("- ").append( migrationPreference.getDescription()).append("\n");
-        sb.append("- Convert the primary key to the `_id` field of type string in MongoDB \n");
+        // sb.append("- Convert the primary key to the `_id` field of type string in MongoDB \n");
 
         if(userDefinedPrompts != null) {
             for(var x : userDefinedPrompts)
@@ -84,6 +84,7 @@ public class PromptData3 extends PromptData2{
                 "- Use Lombok annotations for data classes" + "\n" +
                 "- Use " + framework.getFramework() + " framework for the Java code" + "\n" +
                 "- All classes must have one @Id annotation, even in the inner classes" + "\n" +
+                "- Timestamp and dates types must be converted to LocalDataTime" + "\n" +
                 "### Output format" + "\n" +
                 "- Java code in separate classes for each entity" + "\n" +
                 "Please generate the Java code for the MongoDB model based on provided details following the example:" + "\n" +

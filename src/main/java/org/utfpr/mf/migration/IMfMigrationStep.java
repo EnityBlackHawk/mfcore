@@ -6,5 +6,7 @@ public interface IMfMigrationStep{
     void export(IMfBinder binder);
     boolean hasValidOutput(Object selfOutput);
     boolean hasValidInput(Object input);
+    boolean validateOutput(Object output);
+    boolean validateInput(Object input);
 
 }

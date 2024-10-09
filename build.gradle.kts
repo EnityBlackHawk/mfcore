@@ -16,8 +16,8 @@ repositories {
 
 dependencies {
 
-    implementation("org.springframework.data:spring-data-mongodb:4.3.4")
-    implementation("org.mongodb:mongodb-driver-sync:5.1.4")
+    api("org.springframework.data:spring-data-mongodb:4.3.4")
+    api("org.mongodb:mongodb-driver-sync:5.1.4")
     implementation("org.springframework:spring-jdbc:6.1.13")
     implementation("dev.langchain4j:langchain4j:0.34.0")
     implementation("dev.langchain4j:langchain4j-open-ai:0.34.0")

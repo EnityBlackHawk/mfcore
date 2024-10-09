@@ -91,9 +91,9 @@ class QueryResult(private val metadata: DbMetadata?) {
                 if(row[i] == null || row[i].isEmpty()) continue
                 when (field.type.name) {
                     "int", "java.lang.Integer" -> field.set(obj, row[i].toInt())
-                    "long" -> field.set(obj, row[i].toLong())
-                    "float" -> field.set(obj, row[i].toFloat())
-                    "double" -> field.set(obj, row[i].toDouble())
+                    "long", "java.lang.Long" -> field.set(obj, row[i].toLong())
+                    "float", "java.lang.Float" -> field.set(obj, row[i].toFloat())
+                    "double", "java.lang.Double" -> field.set(obj, row[i].toDouble())
                     "java.lang.String" -> field.set(obj, row[i])
                     "java.sql.Date" -> field.set(obj, java.sql.Date.valueOf(row[i]))
                     "java.util.Date" -> {

@@ -51,12 +51,14 @@ public class MfMigrator extends CodeSession {
             BEGIN_SUB("Injecting dependencies");
             binder.inject(x);
 
-            if(!x.hasValidInput(lastOutput)) {
-                throw new InvalidData(x.getClass().getName(), lastOutput.getClass().getName());
+            if(!x.validateInput(lastOutput)) {
+                break;
             }
+
             lastOutput = x.execute(lastOutput);
-            if(!x.hasValidOutput(lastOutput)) {
-                throw new RuntimeException("Step " + x.getClass().getSimpleName() + " has invalid output: " + lastOutput.getClass().getName());
+
+            if(!x.validateOutput(lastOutput)) {
+                break;
             }
             x.export(binder);
         }

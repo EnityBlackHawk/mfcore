@@ -2,6 +2,8 @@ package org.utfpr.mf.migration;
 
 import org.utfpr.mf.annotarion.Export;
 import org.utfpr.mf.enums.DefaultInjectParams;
+import org.utfpr.mf.exceptions.InvalidData;
+import org.utfpr.mf.exceptions.InvalidOutputData;
 import org.utfpr.mf.tools.CodeSession;
 
 import java.io.PrintStream;
@@ -76,13 +78,14 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
         }
     }
 
-    protected boolean notifyError(String message) {
+    public boolean notifyError(String message) {
         boolean rest = true;
         for(var o : observers) {
             rest = o.OnStepError(getClassName(), message);
         }
         return rest;
     }
+
 
     @Override
     public boolean hasValidOutput(Object selfOutput) {
@@ -92,6 +95,26 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
     @Override
     public boolean hasValidInput(Object input) {
         return inputType == null || inputType == input || inputType.isInstance(input);
+    }
+
+    @Override
+    public boolean validateOutput(Object output) {
+        if(!hasValidOutput(output)) {
+            notifyCrash(new InvalidOutputData(getClass().getName(), output == null ? "null" : output.getClass().getName()));
+            ERROR("Invalid output data: " + (output == null ? "null" : output.getClass().getName()));
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean validateInput(Object input) {
+        if(!hasValidInput(input)) {
+            notifyCrash(new InvalidData(getClass().getName(), input == null ? "null" : input.getClass().getName()));
+            ERROR("Invalid input data: " + (input == null ? "null" : input.getClass().getName()));
+            return false;
+        }
+        return true;
     }
 
     @Override

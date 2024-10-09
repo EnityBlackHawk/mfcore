@@ -10,6 +10,7 @@ public class MongoConnection {
 
     private MongoClient client;
     private MongoTemplate template;
+    private MongoConnectionCredentials credentials;
 
     public MongoConnection(MongoConnectionCredentials credentials) {
 
@@ -28,6 +29,7 @@ public class MongoConnection {
 
         this.client = mongoClient;
         this.template = new MongoTemplate(mongoClient, credentials.getDatabase());
+        this.credentials = credentials;
     }
 
     public void clearAll() {
