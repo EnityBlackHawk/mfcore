@@ -49,7 +49,7 @@ public class MfRuntimeCompiler extends CodeSession {
             JavaFileObject sourceObj = new MfSourceFromString(className, sources.get(className));
             files.add(sourceObj);
         }
-        // TODO: Fix classpath to be dynamic
+
         BEGIN("Getting classpath");
         var classPath = compileParams.getClasspath();
         Iterable<String> options = List.of("-classpath", classPath, "--add-exports", "jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED");

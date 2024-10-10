@@ -21,6 +21,6 @@ public class MfDefaultPreCompileAction implements IMfPreCompileAction {
 
     @Override
     public void setNext(IMfPreCompileAction next) throws OperationNotSupportedException {
-        throw new OperationNotSupportedException("Cannot decorate the default pre-compile action");
+        throw new OperationNotSupportedException("Cannot decorate the default pre-compile action after initialization");
     }
 }

@@ -12,9 +12,7 @@ import org.utfpr.mf.migration.params.GeneratedJavaCode;
 import org.utfpr.mf.migration.params.MigrationDatabaseReport;
 import org.utfpr.mf.mongoConnection.MongoConnection;
 import org.utfpr.mf.mongoConnection.MongoConnectionCredentials;
-import org.utfpr.mf.runtimeCompiler.MfCompilerParams;
-import org.utfpr.mf.runtimeCompiler.MfDefaultPreCompileAction;
-import org.utfpr.mf.runtimeCompiler.MfRuntimeCompiler;
+import org.utfpr.mf.runtimeCompiler.*;
 import org.utfpr.mf.tools.DataImporter;
 import org.utfpr.mf.tools.QueryResult;
 
@@ -56,8 +54,9 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
                 .classPath(List.of("lombok.jar", "spring-data-commons-3.3.4.jar", "spring-data-mongodb-4.3.4.jar"))
                 .build();
         Map<String, Class<?>> compiledClasses = new HashMap<>();
+        IMfPreCompileAction action = new MfDefaultPreCompileAction( new MfVerifyImportAction());
         try {
-            compiledClasses = compiler.compile(generatedJavaCode.getCode(), params, new MfDefaultPreCompileAction());
+            compiledClasses = compiler.compile(generatedJavaCode.getCode(), params, action);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

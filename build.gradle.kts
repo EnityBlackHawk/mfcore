@@ -35,6 +35,8 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.4")
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("commons-codec:commons-codec:1.17.1")
+    implementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.2")
+
 
 }
 
