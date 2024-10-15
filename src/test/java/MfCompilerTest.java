@@ -15,13 +15,16 @@ public class MfCompilerTest {
     void compileAndRun() throws Exception {
 
         String source = """
-            public class HelloWorld {
-                private LocalDateTime date;
-                public String hello() {
-                    return "Hello, World!";
-                }
-            }
-        """;
+       public class HelloWorld {
+           public static class Test {
+            private LocalDateTime date;
+           }
+       
+           public String hello() {
+               return "Hello, World!";
+           }
+       }
+       """;
         var mrc = new MfRuntimeCompiler();
         Map<String, Class<?>> classList = mrc.compile(
                 Map.of("HelloWorld", source),

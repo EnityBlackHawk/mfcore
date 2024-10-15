@@ -26,7 +26,11 @@ public class PromptData3 extends PromptData2{
     public String getFirst() {
         StringBuilder sb = new StringBuilder();
         var infos = getSqlTablesAndQueries();
-        sb.append("You are an expert in database modeling. Your task is to help migrate a relational database to a MongoDB database. Follow the instructions and details provided below to generate the MongoDB model. \n")
+        sb.append("You are an expert in database modeling. Your task is to help migrate a relational database to a MongoDB database. " +
+                        "Follow the instructions and details provided below to generate the MongoDB model. " +
+                        "making sure to" +
+                        (migrationPreference == MigrationPreferences.PREFER_CONSISTENCY ? " **use references for less frequently accessed data** as instructed. " : " **embed frequently accessed data** into the main documents for efficiency.") +
+                        "\n")
                 .append("### Task Overview\n")
                 .append("We have a relational database that needs to be migrated to MongoDB. The goal is to create an optimized MongoDB schema based on the usage patterns of the data. \n");
 
@@ -38,8 +42,13 @@ public class PromptData3 extends PromptData2{
 
         sb.append("### MongoDB Model Considerations").append("\n");
 
+        sb.append("-    **Critically ensure** the use of " +
+                (migrationPreference == MigrationPreferences.PREFER_CONSISTENCY
+                        ? "**references (DBRef)** to reduce redundancy."
+                        : "**embedded documents for frequently accessed data** to optimize read performance.")).append("\n");
+
         if(queryList != null) {
-            sb.append("- Optimize for the following frequently used queries:").append("\n");
+            sb.append("-    Optimize for the following frequently used queries:").append("\n");
             for(var query : queryList) {
                 sb.append("\t- ").append("**Used ").append(query.regularity()).append("% of the time:** ").append(query.query()).append("\n");
             }
@@ -85,6 +94,7 @@ public class PromptData3 extends PromptData2{
                 "- Use " + framework.getFramework() + " framework for the Java code" + "\n" +
                 "- All classes must have one @Id annotation, even in the inner classes" + "\n" +
                 "- Timestamp and dates types must be converted to LocalDataTime" + "\n" +
+                "- Use @DBRef annotation for references" + "\n" +
                 "### Output format" + "\n" +
                 "- Java code in separate classes for each entity" + "\n" +
                 "Please generate the Java code for the MongoDB model based on provided details following the example:" + "\n" +
@@ -95,6 +105,7 @@ public class PromptData3 extends PromptData2{
                     @Id
                     private String id;
                     private Flight flight;
+                    @DBRef
                     private Passenger passenger;
                     private String seat;
                 

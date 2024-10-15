@@ -4,16 +4,20 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.utils.Pair;
+import org.utfpr.mf.tools.CodeSession;
 
 import javax.naming.OperationNotSupportedException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MfVerifyImportAction implements IMfPreCompileAction{
+public class MfVerifyImportAction extends CodeSession implements IMfPreCompileAction{
 
     private IMfPreCompileAction _next;
 
@@ -22,6 +26,7 @@ public class MfVerifyImportAction implements IMfPreCompileAction{
     }
 
     public MfVerifyImportAction(IMfPreCompileAction next) {
+        super("MfVerifyImportAction");
         this._next = next;
     }
 
@@ -31,8 +36,10 @@ public class MfVerifyImportAction implements IMfPreCompileAction{
         CompilationUnit unit = parser.parse(source).getResult().orElse(null);
 
         if(unit == null) {
+            ERROR("CompilationUnit is null for " + className);
             return source;
         }
+
 
         List<ImportDeclaration> imports = unit.getImports();
         Set<String> importedTypes = new HashSet<>();
@@ -42,23 +49,52 @@ public class MfVerifyImportAction implements IMfPreCompileAction{
         }
 
         // Extract the fields of the class
-        TypeDeclaration<?> classDeclaration = unit.getType(0);  // Get the first class/interface
-        List<FieldDeclaration> fields = classDeclaration.getFields();
 
-        for (FieldDeclaration field : fields) {
-            // Extract the type of each field
-            Type fieldType = field.getElementType();
-            String fieldTypeName = fieldType.asString();
+        //TypeDeclaration<?> classDeclaration = unit.getType(0); // Get the first class/interface
 
-            // Check if the type is already imported or is in java.lang (implicitly available)
-            if (!isImported(fieldTypeName, importedTypes) && !isJavaLangType(fieldTypeName)) {
-                if (fieldTypeName.equals("LocalDateTime")) {// Add the import for LocalDateTime
-                    unit.addImport("java.time.LocalDateTime");
+        for(TypeDeclaration<?> classDeclaration : unit.getTypes()) {
+
+            //List<FieldDeclaration> fields = classDeclaration.getFields();
+
+            for(BodyDeclaration member : classDeclaration.getMembers()) {
+                if(member.isClassOrInterfaceDeclaration()) {
+                    var l = extracted(member.asClassOrInterfaceDeclaration().getFields(), importedTypes);
+                    for(var x : l) {
+                        unit.addImport(x);
+                    }
+                }
+                else if(member.isFieldDeclaration()) {
+                    var p = extracted(member.asFieldDeclaration(), importedTypes);
+                    if(p != null) {
+                        unit.addImport(p);
+                    }
                 }
             }
         }
         String result = unit.toString();
         return _next != null ? _next.action(className, result) : result;
+    }
+
+    private List<String> extracted(List<FieldDeclaration> fields, Set<String> importedTypes) {
+        ArrayList<String> result = new ArrayList<>();
+        for (FieldDeclaration field : fields) {
+            var x = extracted(field, importedTypes);
+            if(x != null) {
+                result.add(x);
+            }
+        }
+        return result;
+    }
+
+    private String extracted(FieldDeclaration field, Set<String> importedTypes) {
+        Type fieldType = field.getElementType();
+        String fieldTypeName = fieldType.asString();
+        if (!isImported(fieldTypeName, importedTypes) && !isJavaLangType(fieldTypeName)) {
+            if (fieldTypeName.equals("LocalDateTime")) {
+                return "java.time.LocalDateTime";
+            }
+        }
+        return null;
     }
 
     @Override
