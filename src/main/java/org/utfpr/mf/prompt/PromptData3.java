@@ -45,7 +45,7 @@ public class PromptData3 extends PromptData2{
         sb.append("-    **Critically ensure** the use of " +
                 (migrationPreference == MigrationPreferences.PREFER_CONSISTENCY
                         ? "**references (DBRef)** to reduce redundancy."
-                        : "**embedded documents for frequently accessed data** to optimize read performance.")).append("\n");
+                        : "**embedded documents** to optimize read performance.")).append("\n");
 
         if(queryList != null) {
             sb.append("-    Optimize for the following frequently used queries:").append("\n");
@@ -94,7 +94,7 @@ public class PromptData3 extends PromptData2{
                 "- Use " + framework.getFramework() + " framework for the Java code" + "\n" +
                 "- All classes must have one @Id annotation, even in the inner classes" + "\n" +
                 "- Timestamp and dates types must be converted to LocalDataTime" + "\n" +
-                "- Use @DBRef annotation for references" + "\n" +
+                // "- Use @DBRef annotation for **referencing documents only**" + "\n" +
                 "### Output format" + "\n" +
                 "- Java code in separate classes for each entity" + "\n" +
                 "Please generate the Java code for the MongoDB model based on provided details following the example:" + "\n" +
