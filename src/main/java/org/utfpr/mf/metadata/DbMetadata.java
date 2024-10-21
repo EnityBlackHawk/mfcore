@@ -152,6 +152,14 @@ public class DbMetadata {
 
     }
 
+    public static Connection createConnection(String connectionString, String username, String password) throws SQLException {
+        try {
+            return DriverManager.getConnection(connectionString, username, password);
+        } catch (SQLException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
     public boolean isConnected() {
         try {
             return _connection != null && !_connection.isClosed();

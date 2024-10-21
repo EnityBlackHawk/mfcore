@@ -82,6 +82,14 @@ class DataImporter {
             return result
         }
 
+        fun cronQuery(sql : String, connection : Connection) : Long {
+            connection.createStatement().use { statement ->
+                val initTime = System.nanoTime()
+                val rs = statement.executeQuery(sql)
+                return System.nanoTime() - initTime
+            }
+        }
+
         fun <T> runQuery(sql : String, connection: Connection, output : Class<T>) : T {
 
                 connection.createStatement().use { statement ->

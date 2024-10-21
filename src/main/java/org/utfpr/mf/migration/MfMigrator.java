@@ -1,8 +1,8 @@
 package org.utfpr.mf.migration;
 
-import org.utfpr.mf.annotarion.Injected;
 import org.utfpr.mf.enums.DefaultInjectParams;
-import org.utfpr.mf.exceptions.InvalidData;
+import org.utfpr.mf.interfaces.IMfBinder;
+import org.utfpr.mf.interfaces.IMfMigrationStep;
 import org.utfpr.mf.tools.CodeSession;
 
 import java.io.PrintStream;

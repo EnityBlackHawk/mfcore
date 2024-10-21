@@ -4,6 +4,9 @@ import org.utfpr.mf.annotarion.Export;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.exceptions.InvalidData;
 import org.utfpr.mf.exceptions.InvalidOutputData;
+import org.utfpr.mf.interfaces.IMfBinder;
+import org.utfpr.mf.interfaces.IMfMigrationStep;
+import org.utfpr.mf.interfaces.IMfStepObserver;
 import org.utfpr.mf.tools.CodeSession;
 
 import java.io.PrintStream;
@@ -13,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession implements IMfMigrationStep{
+public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession implements IMfMigrationStep {
 
     protected final Class<TInput> inputType;
     protected final Class<TOutput> outputType;

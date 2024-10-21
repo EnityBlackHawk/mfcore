@@ -2,12 +2,13 @@ package org.utfpr.mf.migration;
 
 import org.utfpr.mf.annotarion.Injected;
 import org.utfpr.mf.enums.DefaultInjectParams;
+import org.utfpr.mf.interfaces.IMfBinder;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class MfBinderEx implements IMfBinder{
+public abstract class MfBinderEx implements IMfBinder {
 
     protected final Map<String, Object> bindings = new HashMap<>();
 

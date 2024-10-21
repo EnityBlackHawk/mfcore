@@ -27,11 +27,8 @@ class QueryResult(private val metadata: DbMetadata?) {
         }
     }
 
-    constructor(map : Map<String, Int>, vararg columnNames : String) : this(null) {
+    constructor(vararg columnNames : String) : this(null) {
         this.columns.addAll(columnNames)
-        for((k, v) in map) {
-            addRow(k, v.toString())
-        }
     }
 
     fun addRow(vararg row: String): QueryResult {

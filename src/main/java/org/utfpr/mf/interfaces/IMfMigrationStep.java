@@ -1,4 +1,4 @@
-package org.utfpr.mf.migration;
+package org.utfpr.mf.interfaces;
 
 public interface IMfMigrationStep{
 

@@ -1,6 +1,8 @@
 package org.utfpr.mf.migration;
 
 import lombok.Getter;
+import org.utfpr.mf.interfaces.IMfMigrationStep;
+import org.utfpr.mf.interfaces.IMfStepObserver;
 import org.utfpr.mf.migration.params.MigrationSpec;
 import org.utfpr.mf.mongoConnection.MongoConnectionCredentials;
 
@@ -9,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MfMigrationStepFactory {
+
 
     @Getter
     private List<IMfMigrationStep> steps = new ArrayList<>();
@@ -61,6 +64,15 @@ public class MfMigrationStepFactory {
 
     public IMfMigrationStep createValidatorStep(IMfStepObserver... observers) {
         var tmp = new VerificationStep(printStream);
+        for (var o : observers) {
+            tmp.addObserver(o);
+        }
+        steps.add(tmp);
+        return tmp;
+    }
+
+    public IMfMigrationStep createBenchmarkStep(IMfStepObserver... observers) {
+        var tmp = new BenchmarkStep(printStream);
         for (var o : observers) {
             tmp.addObserver(o);
         }

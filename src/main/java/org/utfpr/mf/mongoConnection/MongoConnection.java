@@ -2,6 +2,7 @@ package org.utfpr.mf.mongoConnection;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
 import lombok.Data;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -30,6 +31,10 @@ public class MongoConnection {
         this.client = mongoClient;
         this.template = new MongoTemplate(mongoClient, credentials.getDatabase());
         this.credentials = credentials;
+    }
+
+    public MongoDatabase getDatabase() {
+        return client.getDatabase(credentials.getDatabase());
     }
 
     public void clearAll() {
