@@ -54,7 +54,7 @@ public class MfMigrationStepFactory {
     }
 
     public IMfMigrationStep createMigrateDatabaseStep(MongoConnectionCredentials credentials, IMfStepObserver... observers) {
-        var tmp = new MigrateDatabaseStep(credentials);
+        var tmp = new MigrateDatabaseStep(credentials, printStream);
         for (var o : observers) {
             tmp.addObserver(o);
         }

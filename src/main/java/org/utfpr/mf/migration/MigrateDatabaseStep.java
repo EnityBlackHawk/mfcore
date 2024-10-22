@@ -48,7 +48,7 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
         assert dbMetadata != null : "dbMetadata is not set";
 
         BEGIN("Initializing MfRuntimeCompiler");
-        MfRuntimeCompiler compiler = new MfRuntimeCompiler();
+        MfRuntimeCompiler compiler = new MfRuntimeCompiler(_printStream);
         MfCompilerParams params = MfCompilerParams.builder()
                 .classpathBasePath("/home/luan/jars/")
                 .classPath(List.of("lombok.jar", "spring-data-commons-3.3.4.jar", "spring-data-mongodb-4.3.4.jar"))

@@ -5,7 +5,7 @@ import java.io.PrintStream;
 public class CodeSession implements ISession {
 
     private final String _className;
-    private final PrintStream _printStream;
+    protected final PrintStream _printStream;
 
     public CodeSession(String className) {
         this(className, System.out);

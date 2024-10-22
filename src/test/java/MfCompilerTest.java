@@ -3,6 +3,7 @@ import org.utfpr.mf.runtimeCompiler.MfCompilerParams;
 import org.utfpr.mf.runtimeCompiler.MfDefaultPreCompileAction;
 import org.utfpr.mf.runtimeCompiler.MfRuntimeCompiler;
 import org.utfpr.mf.runtimeCompiler.MfVerifyImportAction;
+import org.utfpr.mf.stream.StringPrintStream;
 
 import java.util.List;
 import java.util.Map;
@@ -40,5 +41,4 @@ public class MfCompilerTest {
         assertEquals("Hello, World!", value);
 
     }
-
 }

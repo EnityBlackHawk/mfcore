@@ -9,6 +9,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,11 @@ public class MfRuntimeCompiler extends CodeSession {
 
 
     public MfRuntimeCompiler() {
-        super("MfRuntimeCompiler");
+        this(System.out);
+    }
+
+    public MfRuntimeCompiler(PrintStream printStream) {
+        super("MfRuntimeCompiler", printStream);
     }
 
 
