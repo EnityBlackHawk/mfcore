@@ -16,6 +16,11 @@ public class StringPrintStream extends PrintStream {
         return byteArray.toString();
     }
 
+    public StringPrintStream clean() {
+        byteArray.reset();
+        return this;
+    }
+
     @Override
     public String toString() {
         return get();
