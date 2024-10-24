@@ -1,9 +1,10 @@
 package org.utfpr.mf.stream;
 
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-public class StringPrintStream extends PrintStream {
+public class StringPrintStream extends MfPrintStream<String> {
 
     private ByteArrayOutputStream byteArray;
 
