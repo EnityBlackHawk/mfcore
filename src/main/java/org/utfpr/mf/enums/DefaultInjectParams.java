@@ -8,6 +8,7 @@ public enum DefaultInjectParams {
     UNSET("unset"),
     LLM_KEY("llm_key"),
     DB_METADATA("dbMetadata"),
+    PROMPT_DATA_VERSION("promptDataVersion"),
     MONGO_CONNECTION("mongoConnection");
 
 

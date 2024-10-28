@@ -34,6 +34,9 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
     @Export(DefaultInjectParams.UNSET)
     private String prompt;
 
+    @Export(DefaultInjectParams.PROMPT_DATA_VERSION)
+    private Integer promptDataVersion;
+
     public GenerateModelStep(MigrationSpec spec) {
         this(spec, System.out);
     }
@@ -58,6 +61,8 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
                 .build();
         var gptAssistant = AiServices.builder(ChatAssistant.class).chatLanguageModel(gpt).build();
         BEGIN("Building prompt");
+        promptDataVersion = 3;
+        INFO("Using PromptData3");
         var prompt = new PromptData3(
                 metadataInfo.getSql(),
                 migrationSpec.getPrioritize_performance() ? MigrationPreferences.PREFER_PERFORMANCE : MigrationPreferences.PREFER_CONSISTENCY,

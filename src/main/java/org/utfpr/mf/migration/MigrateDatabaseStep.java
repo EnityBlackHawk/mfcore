@@ -68,7 +68,7 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
             mongoConnection = new MongoConnection(mongoConnectionCredentials);
         }
         else {
-            INFO("MongoConnection already set, using existing");
+            INFO("MongoConnection already set, using existing: " + mongoConnection.getCredentials().toString());
         }
         BEGIN("Migrating data");
         var counts = makeMigration(dbMetadata, mongoConnection, compiledClasses);

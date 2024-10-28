@@ -35,7 +35,7 @@ public class CombinedPrintStream extends MfPrintStream<String> {
     @Override
     public void print(@Nullable Object obj) {
         super.print(obj);
-        for (PrintStream printStream : printStreams) {
+        for (MfPrintStream printStream : printStreams) {
             printStream.print(obj);
         }
     }
@@ -43,23 +43,23 @@ public class CombinedPrintStream extends MfPrintStream<String> {
     @Override
     public void println(@Nullable Object x) {
         super.println(x);
-        for (PrintStream printStream : printStreams) {
+        for (MfPrintStream printStream : printStreams) {
             printStream.println(x);
         }
     }
 
     @Override
     public void print(@Nullable String s) {
-        main.println(s);
+        main.print(s);
         for (MfPrintStream printStream : printStreams) {
-             printStream.println(s);
+             printStream.print(s);
         }
     }
 
     @Override
     public void println(@Nullable String x) {
         super.println(x);
-        for (PrintStream printStream : printStreams) {
+        for (MfPrintStream printStream : printStreams) {
             printStream.println(x);
         }
     }
