@@ -72,6 +72,30 @@ class QueryResult(private val metadata: DbMetadata?) {
         return sb.toString()
     }
 
+    fun asMarkdown() : String {
+        val sb = StringBuilder();
+        var formatSting = "| "
+        for(i in 0 until  columns.size) {
+            formatSting += ("%${
+                (rows.map { it[i] }.maxByOrNull { it: String? -> it?.length ?: 0  }?.length ?: 0).coerceAtLeast(
+                    columns[i].length
+                )
+            }s" + if(i + 1 == columns.size) " |" else " | ")
+        }
+        formatSting += "\n"
+
+        sb.append(String.format(formatSting, *columns.toTypedArray()))
+        val vars = ":--:".repeatList(columns.size);
+        sb.append(String.format(formatSting, *vars.toTypedArray()))
+
+        for (i in 0 until rows.size) {
+            sb.append(String.format(formatSting, *rows[i].toTypedArray()))
+        }
+
+        return sb.toString()
+    }
+
+
     fun <T> asObject(clazz : Class<T>) : List<T> {
         if(metadata == null)
             throw Exception("Metadata required")
@@ -158,6 +182,16 @@ class QueryResult(private val metadata: DbMetadata?) {
         val pattern = "_[a-z]".toRegex()
         return replace(pattern) { it.value.last().uppercase() }
     }
+
+    fun String.repeatList(n : Int) : List<String> {
+        val value = this.toString()
+        val result = mutableListOf<String>()
+        for(i in 1..n) {
+            result.add(value)
+        }
+        return result
+    }
+
 
     override fun toString() : String {
         return asString()
