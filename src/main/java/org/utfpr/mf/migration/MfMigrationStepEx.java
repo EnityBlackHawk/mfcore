@@ -21,6 +21,7 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
     protected final Class<TInput> inputType;
     protected final Class<TOutput> outputType;
     protected ArrayList<IMfStepObserver<TInput, TOutput>> observers = new ArrayList<>();
+    private boolean stopSign = false;
 
 
     public MfMigrationStepEx(String className, Class<TInput> inputType, Class<TOutput> outputType) {
@@ -60,7 +61,7 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
     }
 
     protected boolean notifyStart(TInput input) {
-        boolean rest = true;
+        boolean rest = false;
         for(var o : observers) {
             rest = o.OnStepStart(getClassName(), input);
         }
@@ -68,7 +69,7 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
     }
 
     protected boolean notifyEnd(TOutput output) {
-        boolean rest = true;
+        boolean rest = false;
         for(var o : observers) {
             rest = o.OnStepEnd(getClassName(), output);
         }
@@ -82,11 +83,15 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
     }
 
     public boolean notifyError(String message) {
-        boolean rest = true;
+        boolean rest = false;
         for(var o : observers) {
             rest = o.OnStepError(getClassName(), message);
         }
         return rest;
+    }
+
+    protected void callStopSign() {
+        stopSign = true;
     }
 
 
@@ -118,6 +123,11 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean wasStopSignCalled() {
+        return stopSign;
     }
 
     @Override

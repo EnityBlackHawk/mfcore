@@ -8,6 +8,7 @@ import lombok.Data;
 public class BenchmarkResult {
 
     private String queryName;
+    private String query;
     private long nanoSeconds;
 
     public double getMilliseconds() {

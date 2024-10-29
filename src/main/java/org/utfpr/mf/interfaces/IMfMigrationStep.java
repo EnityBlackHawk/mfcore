@@ -8,5 +8,6 @@ public interface IMfMigrationStep{
     boolean hasValidInput(Object input);
     boolean validateOutput(Object output);
     boolean validateInput(Object input);
+    boolean wasStopSignCalled();
 
 }

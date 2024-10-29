@@ -29,12 +29,19 @@ public class BenchmarkStep extends MfMigrationStepEx<IQueryExecutor, BenchmarkRe
             ArrayList<Long> times = new ArrayList<>();
             for(int i = 0; i < input.getTimesEach(); i++) {
                 long time = input.executeAndGetTime();
+                if(time == -1) {
+                    if(notifyError("Execution " + (i + 1) + ": result was invalid")) {
+                        callStopSign();
+                        return null;
+                    }
+                    time = 0;
+                }
                 BEGIN_SUB("Execution " + (i + 1) + " with " + time / Math.pow(10, 6));
                 times.add(time);
             }
             IQuery query = input.next();
             long timeNano = times.stream().reduce(0L, Long::sum) / times.size();
-            var br = new BenchmarkResult(query.getName(), timeNano);
+            var br = new BenchmarkResult(query.getName(), query.getStringQuery(), timeNano);
             resultList.add(br);
             BEGIN("Query: " + query.getName() + " executed " + times.size() + " times, in " + br.getMilliseconds());
         }

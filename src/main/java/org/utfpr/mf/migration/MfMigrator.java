@@ -57,6 +57,10 @@ public class MfMigrator extends CodeSession {
 
             lastOutput = x.execute(lastOutput);
 
+            if(x.wasStopSignCalled()) {
+                INFO("Stop called by: " + x.getClass().getSimpleName());
+            }
+
             if(!x.validateOutput(lastOutput)) {
                 break;
             }

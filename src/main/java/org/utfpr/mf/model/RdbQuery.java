@@ -27,6 +27,11 @@ public class RdbQuery implements IQuery<Connection, QueryResult> {
     }
 
     @Override
+    public String getStringQuery() {
+        return query;
+    }
+
+    @Override
     public long cronExecute(Connection connection) {
         return DataImporter.Companion.cronQuery(query, connection);
     }
