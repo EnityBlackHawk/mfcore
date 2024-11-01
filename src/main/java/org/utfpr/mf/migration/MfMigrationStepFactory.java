@@ -35,6 +35,15 @@ public class MfMigrationStepFactory {
         return tmp;
     }
 
+    public IMfMigrationStep createGenerateModelStep(IMfStepObserver... observers) {
+        var tmp = new GenerateModelStep(null, printStream);
+        for (var o : observers) {
+            tmp.addObserver(o);
+        }
+        steps.add(tmp);
+        return tmp;
+    }
+
     public IMfMigrationStep createGenerateModelStep(MigrationSpec migrationSpec, IMfStepObserver... observers) {
         var tmp = new GenerateModelStep(migrationSpec, printStream);
         for (var o : observers) {
@@ -46,6 +55,15 @@ public class MfMigrationStepFactory {
 
     public IMfMigrationStep createGenerateJavaCodeStep(IMfStepObserver... observers) {
         var tmp = new GenerateJavaCodeStep(printStream);
+        for (var o : observers) {
+            tmp.addObserver(o);
+        }
+        steps.add(tmp);
+        return tmp;
+    }
+
+    public IMfMigrationStep createMigrateDatabaseStep(IMfStepObserver... observers) {
+        var tmp = new MigrateDatabaseStep(printStream);
         for (var o : observers) {
             tmp.addObserver(o);
         }

@@ -25,6 +25,7 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
 
     @Getter
     @Setter
+    @Injected(DefaultInjectParams.MONGO_CREDENTIALS)
     private MongoConnectionCredentials mongoConnectionCredentials;
 
     @Injected(DefaultInjectParams.MONGO_CONNECTION)
@@ -35,8 +36,16 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
     @Export(DefaultInjectParams.DB_METADATA)
     private DbMetadata dbMetadata = null;
 
+    public MigrateDatabaseStep() {
+        this((MongoConnectionCredentials) null);
+    }
+
     public MigrateDatabaseStep(MongoConnectionCredentials connectionCredentials) {
         this(connectionCredentials, System.out);
+    }
+
+    public MigrateDatabaseStep(PrintStream printStream) {
+        this(null, printStream);
     }
 
     public MigrateDatabaseStep(MongoConnectionCredentials connectionCredentials, PrintStream printStream) {

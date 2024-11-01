@@ -4,6 +4,7 @@ import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.interfaces.IMfBinder;
 import org.utfpr.mf.interfaces.IMfMigrationStep;
 import org.utfpr.mf.tools.CodeSession;
+import org.utfpr.mf.tools.TemplatedThread;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -42,6 +43,14 @@ public class MfMigrator extends CodeSession {
     public void addStep(IMfMigrationStep step) {
         steps.add(step);
     }
+
+    public TemplatedThread<Object> executeAsync(Object firstInput) {
+
+        var thread = new TemplatedThread<Object>(() -> execute(firstInput));
+        thread.runAsync();
+        return thread;
+    }
+
 
     public Object execute(Object firstInput) {
 

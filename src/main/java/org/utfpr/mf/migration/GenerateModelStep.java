@@ -22,7 +22,7 @@ import java.util.List;
 
 public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
 
-    // TODO: Make Injectable
+    @Injected(DefaultInjectParams.MIGRATION_SPEC)
     private final MigrationSpec migrationSpec;
 
     @Injected(DefaultInjectParams.LLM_KEY)
@@ -37,21 +37,31 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
     @Export(DefaultInjectParams.PROMPT_DATA_VERSION)
     private Integer promptDataVersion;
 
+    public GenerateModelStep(){
+        this(null, System.out);
+    }
+
+    public GenerateModelStep(PrintStream printStream) {
+        this(null, printStream);
+    }
+
     public GenerateModelStep(MigrationSpec spec) {
         this(spec, System.out);
     }
 
     public GenerateModelStep(MigrationSpec spec, PrintStream printStream) {
         super("GenerateModelStep", printStream, MetadataInfo.class, Model.class);
-        if(spec == null) {
-            throw new IllegalArgumentException("MigrationSpec cannot be null");
-        }
         this.migrationSpec = spec;
     }
 
     private Model process(MetadataInfo metadataInfo) {
 
         assert llm_key != null : "llm_key is not set";
+
+        if(migrationSpec == null) {
+            throw new IllegalArgumentException("MigrationSpec not provided");
+        }
+
         BEGIN("Generating LLM interface");
         var gpt = new OpenAiChatModel.OpenAiChatModelBuilder()
                 .apiKey(llm_key)
