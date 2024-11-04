@@ -10,6 +10,8 @@ import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +35,7 @@ public class MfRuntimeCompiler extends CodeSession {
 
     public Map<String, Class<?>> compile(Map<String, String> sources, MfCompilerParams compileParams, @Nullable IMfPreCompileAction action) throws Exception {
 
-        System.out.println("Initializing MfRuntimeCompiler");
+        BEGIN("Initializing MfRuntimeCompiler");
 
         BEGIN("Executing pre-compile actions");
         if(action != null) {
@@ -57,6 +59,12 @@ public class MfRuntimeCompiler extends CodeSession {
 
         BEGIN("Getting classpath");
         var classPath = compileParams.getClasspath();
+        BEGIN_SUB("Verifying classpath");
+        for(String path : classPath.split(":")) {
+            if(!Files.exists(Paths.get(path))) {
+                ERROR("Invalid classpath: " + path);
+            }
+        }
         Iterable<String> options = List.of("-classpath", classPath, "--add-exports", "jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED");
 
         INFO(" Using classpath: " + classPath);

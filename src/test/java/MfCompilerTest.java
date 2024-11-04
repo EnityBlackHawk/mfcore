@@ -26,11 +26,27 @@ public class MfCompilerTest {
            }
        }
        """;
+
+        String mongoPOJO = """
+                import lombok.AllArgsConstructor;
+                import lombok.Data;
+                import org.springframework.data.annotation.Id;
+                
+                @Data
+                @AllArgsConstructor
+                public class DocumentTest {
+                    @Id
+                    private String id;
+                    private String name;
+                
+                }
+                """;
+
         var mrc = new MfRuntimeCompiler();
         Map<String, Class<?>> classList = mrc.compile(
-                Map.of("HelloWorld", source),
+                Map.of("HelloWorld", source, "DocumentTest", mongoPOJO),
                 MfCompilerParams.builder()
-                        .classpathBasePath("/home/luan/jars/")
+                        .classpathBasePath(System.getProperty("user.dir") + "/src/main/resources/")
                         .classPath(List.of("lombok.jar", "spring-data-commons-3.3.4.jar", "spring-data-mongodb-4.3.4.jar"))
                         .build(),
                 new MfDefaultPreCompileAction(
