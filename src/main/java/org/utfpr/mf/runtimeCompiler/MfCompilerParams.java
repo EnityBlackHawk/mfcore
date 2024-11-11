@@ -17,8 +17,13 @@ public class MfCompilerParams {
     public String getClasspath() {
         StringBuilder sb = new StringBuilder();
         sb.append(System.getProperty("java.class.path"));
-        for(String path : classPath) {
-            sb.append(File.pathSeparator).append(classpathBasePath);
+
+        if(classPath == null) {
+            return "";
+        }
+
+        for (String path : classPath) {
+            sb.append(File.pathSeparator).append(classpathBasePath != null ? classpathBasePath : "");
             sb.append(path);
         }
         return sb.toString();

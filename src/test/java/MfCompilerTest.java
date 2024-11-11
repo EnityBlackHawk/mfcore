@@ -13,6 +13,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class MfCompilerTest {
 
     @Test
+    void loadJars() throws Exception {
+
+        MfRuntimeCompiler.loadResourceJars();
+
+    }
+
+    @Test
     void compileAndRun() throws Exception {
 
         String source = """
@@ -42,12 +49,13 @@ public class MfCompilerTest {
                 }
                 """;
 
+
+
         var mrc = new MfRuntimeCompiler();
         Map<String, Class<?>> classList = mrc.compile(
                 Map.of("HelloWorld", source, "DocumentTest", mongoPOJO),
                 MfCompilerParams.builder()
-                        .classpathBasePath(System.getProperty("user.dir") + "/src/main/resources/")
-                        .classPath(List.of("lombok.jar", "spring-data-commons-3.3.4.jar", "spring-data-mongodb-4.3.4.jar"))
+                        .classPath(MfRuntimeCompiler.loadResourceJars("lombok.jar", "spring-data-commons-3.3.4.jar", "spring-data-mongodb-4.3.4.jar"))
                         .build(),
                 new MfDefaultPreCompileAction(
                         new MfVerifyImportAction()

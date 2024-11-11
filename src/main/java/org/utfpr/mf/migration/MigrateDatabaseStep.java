@@ -58,10 +58,11 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
 
         BEGIN("Initializing MfRuntimeCompiler");
         MfRuntimeCompiler compiler = new MfRuntimeCompiler(_printStream);
+
         MfCompilerParams params = MfCompilerParams.builder()
-                .classpathBasePath(System.getProperty("user.dir") + "/src/main/resources/")
-                .classPath(List.of("lombok.jar", "spring-data-commons-3.3.4.jar", "spring-data-mongodb-4.3.4.jar"))
+                .classPath( MfRuntimeCompiler.loadResourceJars("lombok.jar", "spring-data-commons-3.3.4.jar", "spring-data-mongodb-4.3.4.jar"))
                 .build();
+
         Map<String, Class<?>> compiledClasses = new HashMap<>();
         IMfPreCompileAction action = new MfDefaultPreCompileAction( new MfVerifyImportAction());
         try {

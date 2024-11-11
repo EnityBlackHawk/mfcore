@@ -8,8 +8,9 @@ import javax.annotation.processing.Processor;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
-import java.io.File;
-import java.io.PrintStream;
+import java.io.*;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -104,5 +105,36 @@ public class MfRuntimeCompiler extends CodeSession {
     public Class<?> compile(String className, String source, @Nullable MfCompilerParams params) throws Exception {
 
         return compile(Map.of(className, source), params, new MfDefaultPreCompileAction()).get(className);
+    }
+
+    public static List<String> loadResourceJars(String... jars){
+
+        ArrayList<String> result = new ArrayList<>();
+        File temp = null;
+        try {
+            temp = Files.createTempDirectory("mf_jars").toFile();
+
+            temp.deleteOnExit();
+
+            for(String jar : jars) {
+                File tmpJarFile = new File(temp, jar);
+                InputStream in = MfRuntimeCompiler.class.getClassLoader().getResourceAsStream(jar);
+                FileOutputStream out = new FileOutputStream(tmpJarFile);
+                assert in != null;
+
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while((bytesRead = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, bytesRead);
+                }
+
+                tmpJarFile.deleteOnExit();
+                result.add(tmpJarFile.toURI().toURL().getPath());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return result;
     }
 }
