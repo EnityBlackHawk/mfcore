@@ -81,19 +81,22 @@ public class PromptData3 extends PromptData2{
         return sb.toString();
     }
 
+    @Deprecated
     public String getSecond() {
 
         return getSecond(sqlTables, framework);
     }
 
+    @Deprecated
     public static String getSecond(String model, Framework framework) {
         String sb = "Generate Java classes this model of MongoDB database: \n" + model + "\n" +
                 "### Java Code Requirements" + "\n" +
                 "- Generate Java classes for the MongoDB model" + "\n" +
                 "- Use Lombok annotations for data classes" + "\n" +
                 "- Use " + framework.getFramework() + " framework for the Java code" + "\n" +
-                "- All classes must have one @Id annotation, even in the inner classes" + "\n" +
+                "- All classes must their id property of type String annotated with @Id annotation, even in the inner classes" + "\n" +
                 "- Timestamp and dates types must be converted to LocalDataTime" + "\n" +
+                "- Add an import statement for all classes and annotations used" + "\n" +
                 // "- Use @DBRef annotation for **referencing documents only**" + "\n" +
                 "### Output format" + "\n" +
                 "- Java code in separate classes for each entity" + "\n" +

@@ -4,6 +4,7 @@ import lombok.Data;
 import org.utfpr.mf.metadata.DbMetadata;
 import org.springframework.data.util.Pair;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -161,5 +162,16 @@ public class PromptData implements Iterator<String> {
 
     public void reset() {
         callCount = 0;
+    }
+
+    public static String extractJson(String resultString, ArrayList<String> objs) {
+        while (true) {
+            int iS = resultString.indexOf("```json");
+            if(iS == -1) return resultString.trim();
+            iS += 7;
+            int iE = resultString.indexOf("```", iS);
+            objs.add(resultString.substring(iS, iE));
+            resultString = resultString.substring(iE + 3);
+        }
     }
 }

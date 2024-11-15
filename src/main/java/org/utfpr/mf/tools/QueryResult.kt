@@ -105,7 +105,8 @@ class QueryResult(private val metadata: DbMetadata?) {
 
             for (i in 0 until columns.size) {
                 val field = runCatching {
-                    clazz.getDeclaredField(columns[i].snakeToCamelCase())
+                    val fieldName = columns[i].snakeToCamelCase()
+                    clazz.getDeclaredField(fieldName)
                 }.getOrNull()
                 if(field == null) continue
                 field.isAccessible = true
@@ -179,8 +180,12 @@ class QueryResult(private val metadata: DbMetadata?) {
     }
 
     fun String.snakeToCamelCase(): String {
-        val pattern = "_[a-z]".toRegex()
-        return replace(pattern) { it.value.last().uppercase() }
+        return this.split('_')
+            .mapIndexed { index, word ->
+                if (index == 0) word.lowercase()
+                else word.replaceFirstChar { it.uppercase() }
+            }
+            .joinToString("")
     }
 
     fun String.repeatList(n : Int) : List<String> {

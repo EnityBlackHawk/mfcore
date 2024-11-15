@@ -113,12 +113,20 @@ public class AcquireMetadataStep extends MfMigrationStepEx<Credentials, Metadata
             if(rel.table_source.equals(rel.table_target)) continue;
 
             Table tSource = metadata.getTables().stream().filter((e) -> Objects.equals(e.name(), rel.table_source))
-                    .findFirst().orElseThrow(RuntimeException::new);
+                    .findFirst().orElse(null);
+
+            if(tSource == null) {
+                ERROR("Unable to find source table " + rel.table_source);
+                notifyError("Unable to find source table " + rel.table_source);
+            }
+
             List<Column.FkInfo> props = tSource.columns().stream().filter((e) -> e.isFk() && Objects.equals(e.fkInfo().pk_tableName(), rel.table_target))
                     .map(Column::fkInfo).toList();
 
-            if(props.isEmpty())
-                throw new RuntimeException("No foreign key found");
+            if(props.isEmpty()) {
+                ERROR("No foreign key found");
+                notifyError("No foreign key found");
+            }
 
             queries.addAll(
                     props.stream().map((e) -> Pair.of(rel, templateString.render(
