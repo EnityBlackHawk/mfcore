@@ -9,5 +9,6 @@ public interface IMfMigrationStep{
     boolean validateOutput(Object output);
     boolean validateInput(Object input);
     boolean wasStopSignCalled();
+    String getState(Object input);
 
 }

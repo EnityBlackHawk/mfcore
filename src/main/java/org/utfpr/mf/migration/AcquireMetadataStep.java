@@ -10,6 +10,7 @@ import org.springframework.data.util.Pair;
 import org.utfpr.mf.MockLayer;
 import org.utfpr.mf.annotarion.Export;
 import org.utfpr.mf.annotarion.Injected;
+import org.utfpr.mf.annotarion.State;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.exceptions.DBConnectionException;
 import org.utfpr.mf.llm.ChatAssistant;
@@ -36,6 +37,7 @@ public class AcquireMetadataStep extends MfMigrationStepEx<Credentials, Metadata
     @Injected(DefaultInjectParams.LLM_KEY)
     private String llm_key;
 
+    @State
     @Export(DefaultInjectParams.DB_METADATA)
     private DbMetadata mdb;
 

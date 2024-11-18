@@ -1,6 +1,7 @@
 package org.utfpr.mf.migration;
 
 import org.utfpr.mf.annotarion.Export;
+import org.utfpr.mf.annotarion.State;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.exceptions.InvalidData;
 import org.utfpr.mf.exceptions.InvalidOutputData;
@@ -8,6 +9,7 @@ import org.utfpr.mf.interfaces.IMfBinder;
 import org.utfpr.mf.interfaces.IMfMigrationStep;
 import org.utfpr.mf.interfaces.IMfStepObserver;
 import org.utfpr.mf.tools.CodeSession;
+import org.utfpr.mf.tools.MfCacheController;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -95,6 +97,7 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
     }
 
 
+
     @Override
     public boolean hasValidOutput(Object selfOutput) {
         return selfOutput == outputType || outputType.isInstance(selfOutput);
@@ -148,4 +151,33 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
         }
     }
 
+    @Override
+    public String getState(Object input) {
+
+        var fields = new ArrayList<>(Arrays.stream(getClass().getDeclaredFields()).filter(f -> f.isAnnotationPresent(State.class)).map((x) -> {
+            try {
+                return x.get(this);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }).toList());
+
+        if(input != null) {
+            fields.add(input);
+        }
+
+        if(fields.isEmpty()) {
+            return "";
+        }
+
+        if(fields.size() == 1) {
+            return MfCacheController.generateMD5(fields);
+        }
+        ArrayList<String> mds = new ArrayList<>();
+        for(var f : fields) {
+           mds.add(MfCacheController.generateMD5(f));
+        }
+
+        return MfCacheController.combineMD5(mds);
+    }
 }
