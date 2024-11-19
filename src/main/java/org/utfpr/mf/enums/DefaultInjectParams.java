@@ -7,6 +7,7 @@ import lombok.Getter;
 public enum DefaultInjectParams {
     UNSET("unset"),
     LLM_KEY("llm_key"),
+    LLM_SERVICE("llm_service"),
     DB_METADATA("dbMetadata"),
     PROMPT_DATA_VERSION("promptDataVersion"),
     MONGO_CREDENTIALS("mongoCredentials"),

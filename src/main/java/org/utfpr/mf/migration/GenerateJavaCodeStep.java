@@ -7,6 +7,7 @@ import org.utfpr.mf.MockLayer;
 import org.utfpr.mf.annotarion.Injected;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.llm.ChatAssistant;
+import org.utfpr.mf.llm.LLMService;
 import org.utfpr.mf.migration.params.GeneratedJavaCode;
 import org.utfpr.mf.migration.params.Model;
 import org.utfpr.mf.prompt.Framework;
@@ -20,6 +21,8 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx<Model, GeneratedJava
     @Injected(DefaultInjectParams.LLM_KEY)
     private String key;
 
+    @Injected(DefaultInjectParams.LLM_SERVICE)
+    private LLMService gptAssistant;
 
     public GenerateJavaCodeStep() {
         this(System.out);
@@ -31,13 +34,7 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx<Model, GeneratedJava
 
     private GeneratedJavaCode process(Model model) {
         BEGIN("Building LLM interface");
-        var gpt = new OpenAiChatModel.OpenAiChatModelBuilder()
-                .apiKey(key)
-                .modelName(OpenAiChatModelName.GPT_4_O_MINI)
-                .maxRetries(1)
-                .temperature(1d)
-                .build();
-        var gptAssistant = AiServices.builder(ChatAssistant.class).chatLanguageModel(gpt).build();
+
         int token = 0;
         String result;
         BEGIN("Building prompt");

@@ -19,7 +19,7 @@ public class MfCacheController {
         out.println(gson.toJson(data));
     }
 
-    public <T> T load(Class<? extends IMfMigrationStep> step, String md5) throws IOException {
+    public <T> T load(Class<?> output, String md5) throws IOException {
         File file = new File(System.getProperty("java.io.tmpdir"), "mf-cache-" + md5 + ".json");
         if(!file.exists()) {
             return null;
@@ -27,7 +27,7 @@ public class MfCacheController {
 
         JsonReader jr = new JsonReader(new FileReader(file));
         Gson gson = new Gson();
-        return gson.fromJson(jr, step);
+        return gson.fromJson(jr, output);
     }
 
 

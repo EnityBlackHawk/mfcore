@@ -1,8 +1,10 @@
 package org.utfpr.mf.migration;
 
+import org.utfpr.mf.descriptor.MfMigratorDesc;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.interfaces.IMfBinder;
 import org.utfpr.mf.interfaces.IMfMigrationStep;
+import org.utfpr.mf.llm.LLMService;
 import org.utfpr.mf.tools.CodeSession;
 import org.utfpr.mf.tools.TemplatedThread;
 
@@ -13,6 +15,7 @@ public class MfMigrator extends CodeSession {
 
     private ArrayList<IMfMigrationStep> steps = new ArrayList<>();
     private IMfBinder binder;
+    private LLMService llmService;
 
     public static class Binder extends MfBinderEx {
 
@@ -22,22 +25,22 @@ public class MfMigrator extends CodeSession {
 
     }
 
-    public MfMigrator(IMfBinder binder, MfMigrationStepFactory factory) {
-        this(binder, factory.getSteps(), System.out);
+    public MfMigrator(MfMigratorDesc desc) {
+        super("MfMigrator", desc.printStream);
+        this.steps = new ArrayList<>(desc.steps);
+        this.binder = desc.binder;
+        this.llmService = new LLMService(desc.llmServiceDesc);
+
+        this.binder.bind( DefaultInjectParams.LLM_SERVICE.getValue(), this.llmService );
+
     }
 
-    public MfMigrator(IMfBinder binder, MfMigrationStepFactory factory, PrintStream printStream) {
-        this(binder, factory.getSteps(), printStream);
-    }
-
-    public MfMigrator(IMfBinder binder, List<IMfMigrationStep> steps) {
-        this(binder, steps, System.out);
-    }
-
-    public MfMigrator(IMfBinder binder, List<IMfMigrationStep> steps, PrintStream printStream) {
+    public MfMigrator(IMfBinder binder, List<IMfMigrationStep> steps, LLMService llmService, PrintStream printStream) {
         super("MfMigrator", printStream);
         this.steps.addAll(steps);
+        this.llmService = llmService;
         this.binder = binder;
+        this.binder.bind( DefaultInjectParams.LLM_SERVICE.getValue(), this.llmService );
     }
 
     public void addStep(IMfMigrationStep step) {

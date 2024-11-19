@@ -14,6 +14,7 @@ import org.utfpr.mf.annotarion.State;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.exceptions.DBConnectionException;
 import org.utfpr.mf.llm.ChatAssistant;
+import org.utfpr.mf.llm.LLMService;
 import org.utfpr.mf.metadata.RelationCardinality;
 import org.utfpr.mf.migration.params.MetadataInfo;
 import org.utfpr.mf.metadata.DbMetadata;
@@ -40,6 +41,9 @@ public class AcquireMetadataStep extends MfMigrationStepEx<Credentials, Metadata
     @State
     @Export(DefaultInjectParams.DB_METADATA)
     private DbMetadata mdb;
+
+    @Injected(DefaultInjectParams.LLM_SERVICE)
+    private LLMService gptAssistant;
 
     public AcquireMetadataStep() {
         this(System.out);
@@ -96,7 +100,7 @@ public class AcquireMetadataStep extends MfMigrationStepEx<Credentials, Metadata
 
         var queries = new ArrayList<Pair<Relations, String>>();
 
-        var rels = getRelations(metadata.toString(), null);
+        var rels = getRelations(metadata.toString());
         //var rels = List.of(new Relations("aircraft", "airline", "many-to-one"));
 
         List<RelationCardinality> rcd = new ArrayList<>();
@@ -155,21 +159,8 @@ public class AcquireMetadataStep extends MfMigrationStepEx<Credentials, Metadata
         return rcd;
     }
 
-    public List<Relations> getRelations(String text, @Nullable ChatAssistant gptAssistant) {
+    public List<Relations> getRelations(String text) {
         BEGIN("Configuring OpenAi API");
-        if(gptAssistant == null)
-        {
-            var gpt = new OpenAiChatModel.OpenAiChatModelBuilder()
-                    .apiKey(llm_key)
-                    .modelName(OpenAiChatModelName.GPT_4_O_MINI)
-                    .maxRetries(1)
-                    .logRequests(true)
-                    .logResponses(true)
-                    //.responseFormat("json_object")
-                    .temperature(0.5)
-                    .build();
-            gptAssistant = AiServices.builder(ChatAssistant.class).chatLanguageModel(gpt).build();
-        }
 
         var q = "Considering this database: \n" + text + " What are the relations between the tables? (Remove duplicates)";
         Type listType = new TypeToken<List<Relations>>() {}.getType();

@@ -8,6 +8,7 @@ import org.utfpr.mf.annotarion.Export;
 import org.utfpr.mf.annotarion.Injected;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.llm.ChatAssistant;
+import org.utfpr.mf.llm.LLMService;
 import org.utfpr.mf.migration.params.MetadataInfo;
 import org.utfpr.mf.migration.params.MigrationSpec;
 import org.utfpr.mf.migration.params.Model;
@@ -37,6 +38,9 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
     @Export(DefaultInjectParams.PROMPT_DATA_VERSION)
     private Integer promptDataVersion;
 
+    @Injected(DefaultInjectParams.LLM_SERVICE)
+    private LLMService gptAssistant;
+
     public GenerateModelStep(){
         this(null, System.out);
     }
@@ -62,14 +66,7 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
             throw new IllegalArgumentException("MigrationSpec not provided");
         }
 
-        BEGIN("Generating LLM interface");
-        var gpt = new OpenAiChatModel.OpenAiChatModelBuilder()
-                .apiKey(llm_key)
-                .modelName(migrationSpec.getLLM())
-                .maxRetries(1)
-                .temperature(1d)
-                .build();
-        var gptAssistant = AiServices.builder(ChatAssistant.class).chatLanguageModel(gpt).build();
+
         BEGIN("Building prompt");
         promptDataVersion = 3;
         INFO("Using PromptData3");
