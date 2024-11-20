@@ -5,7 +5,10 @@ import java.io.PrintStream;
 public class CodeSession implements ISession {
 
     private final String _className;
+    public static PrintStream LastSet;
     protected final PrintStream _printStream;
+
+
 
     public CodeSession(String className) {
         this(className, System.out);
@@ -14,6 +17,7 @@ public class CodeSession implements ISession {
     public CodeSession(String className, PrintStream printStream) {
         this._className = className;
         _printStream = printStream;
+        LastSet = _printStream;
     }
 
     @Override

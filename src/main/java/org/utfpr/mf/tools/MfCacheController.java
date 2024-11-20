@@ -1,17 +1,22 @@
 package org.utfpr.mf.tools;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import org.utfpr.mf.interfaces.IMfMigrationStep;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import static java.lang.Character.getType;
+
 public class MfCacheController {
 
-    public void save(Class<? extends IMfMigrationStep> step, String md5, Object data) throws IOException {
+    public void save(String md5, Object data) throws IOException {
 
         File file = new File(System.getProperty("java.io.tmpdir"), "mf-cache-" + md5 + ".json");
         PrintStream out = new PrintStream(new FileOutputStream(file));
@@ -19,15 +24,17 @@ public class MfCacheController {
         out.println(gson.toJson(data));
     }
 
-    public <T> T load(Class<?> output, String md5) throws IOException {
+    public <T> T load(Class<T> clazz, String md5) throws IOException {
         File file = new File(System.getProperty("java.io.tmpdir"), "mf-cache-" + md5 + ".json");
         if(!file.exists()) {
             return null;
         }
 
         JsonReader jr = new JsonReader(new FileReader(file));
-        Gson gson = new Gson();
-        return gson.fromJson(jr, output);
+        GsonBuilder gsonBuilder = new GsonBuilder();
+
+        Gson gson = gsonBuilder.create();
+        return gson.fromJson(jr, clazz);
     }
 
 
