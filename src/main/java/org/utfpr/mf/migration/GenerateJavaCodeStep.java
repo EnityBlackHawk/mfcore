@@ -19,10 +19,10 @@ import java.io.PrintStream;
 public class GenerateJavaCodeStep extends MfMigrationStepEx<Model, GeneratedJavaCode> {
 
     @Injected(DefaultInjectParams.LLM_KEY)
-    private String key;
+    protected String key;
 
     @Injected(DefaultInjectParams.LLM_SERVICE)
-    private LLMService gptAssistant;
+    protected LLMService gptAssistant;
 
     public GenerateJavaCodeStep() {
         this(System.out);
@@ -32,7 +32,7 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx<Model, GeneratedJava
         super("GenerateJavaCodeStep", printStream, Model.class, GeneratedJavaCode.class);
     }
 
-    private GeneratedJavaCode process(Model model) {
+    protected GeneratedJavaCode process(Model model) {
         BEGIN("Building LLM interface");
 
         int token = 0;

@@ -12,10 +12,7 @@ import org.utfpr.mf.llm.LLMService;
 import org.utfpr.mf.migration.params.MetadataInfo;
 import org.utfpr.mf.migration.params.MigrationSpec;
 import org.utfpr.mf.migration.params.Model;
-import org.utfpr.mf.prompt.Framework;
-import org.utfpr.mf.prompt.MigrationPreferences;
-import org.utfpr.mf.prompt.PromptData3;
-import org.utfpr.mf.prompt.Query;
+import org.utfpr.mf.prompt.*;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -68,9 +65,9 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
 
 
         BEGIN("Building prompt");
-        promptDataVersion = 3;
+        promptDataVersion = 4;
         INFO("Using PromptData3");
-        var prompt = new PromptData3(
+        var prompt = new PromptData4(
                 metadataInfo.getSql(),
                 migrationSpec.getPrioritize_performance() ? MigrationPreferences.PREFER_PERFORMANCE : MigrationPreferences.PREFER_CONSISTENCY,
                 migrationSpec.getAllow_ref(),

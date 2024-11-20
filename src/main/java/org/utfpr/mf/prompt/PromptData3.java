@@ -83,11 +83,10 @@ public class PromptData3 extends PromptData2{
 
     @Deprecated
     public String getSecond() {
-
         return getSecond(sqlTables, framework);
     }
 
-    @Deprecated
+
     public static String getSecond(String model, Framework framework) {
         String sb = "Generate Java classes this model of MongoDB database: \n" + model + "\n" +
                 "### Java Code Requirements" + "\n" +

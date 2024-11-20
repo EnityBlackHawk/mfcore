@@ -23,7 +23,7 @@ public class PromptData4 extends PromptData3 {
         return super.getFirst();
     }
 
-    public String getSecond(String jsonDocuments) {
+    public static String getSecond(String jsonDocuments, @Nullable Framework framework) {
 
         MarkdownContent mc = new MarkdownContent();
         mc.addCodeBlock(jsonDocuments, "json");

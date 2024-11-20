@@ -55,8 +55,8 @@ public class Prompt4 {
         var result = gptAssistant.chat(promptData4.getFirst());
         System.out.print("Result 1: \n" + result.content().text());
 
-        System.out.print("Prompt 2: \n" + promptData4.getSecond(result.content().text()));
-        var result2 = gptAssistant.chat(promptData4.getSecond(result.content().text()));
+        System.out.print("Prompt 2: \n" + PromptData4.getSecond(result.content().text(), null));
+        var result2 = gptAssistant.chat(PromptData4.getSecond(result.content().text(), null));
         System.out.print("Result 2: \n" + result2.content().text());
 
     }

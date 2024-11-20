@@ -45,7 +45,7 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = group as String
             artifactId = "mfcore"
-            version = "1.1-SNAPSHOT"
+            version = version as String
 
             from(components["java"])
         }
