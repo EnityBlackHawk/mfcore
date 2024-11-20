@@ -55,7 +55,7 @@ public class PromptData3 extends PromptData2{
         }
         sb.append( allowReferences ? "- Use references for less frequently accessed data \n" : "");
         sb.append("- ").append( migrationPreference.getDescription()).append("\n");
-        // sb.append("- Convert the primary key to the `_id` field of type string in MongoDB \n");
+        sb.append("- **AWAYS** convert the primary key to the be a string \n");
 
         if(userDefinedPrompts != null) {
             for(var x : userDefinedPrompts)

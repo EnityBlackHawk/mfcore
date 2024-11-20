@@ -66,7 +66,7 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
 
         BEGIN("Building prompt");
         promptDataVersion = 4;
-        INFO("Using PromptData3");
+        INFO("Using PromptData" + promptDataVersion);
         var prompt = new PromptData4(
                 metadataInfo.getSql(),
                 migrationSpec.getPrioritize_performance() ? MigrationPreferences.PREFER_PERFORMANCE : MigrationPreferences.PREFER_CONSISTENCY,

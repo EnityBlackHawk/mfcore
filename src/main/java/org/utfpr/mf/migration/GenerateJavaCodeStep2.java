@@ -1,6 +1,9 @@
 package org.utfpr.mf.migration;
 
 import org.utfpr.mf.MockLayer;
+import org.utfpr.mf.annotarion.Injected;
+import org.utfpr.mf.enums.DefaultInjectParams;
+import org.utfpr.mf.llm.LLMService;
 import org.utfpr.mf.migration.params.GeneratedJavaCode;
 import org.utfpr.mf.migration.params.Model;
 import org.utfpr.mf.prompt.PromptData4;
@@ -11,6 +14,12 @@ import java.io.PrintStream;
 import java.util.HashMap;
 
 public class GenerateJavaCodeStep2 extends GenerateJavaCodeStep {
+
+    @Injected(DefaultInjectParams.LLM_KEY)
+    private String key;
+
+    @Injected(DefaultInjectParams.LLM_SERVICE)
+    private LLMService gptAssistant;
 
     public GenerateJavaCodeStep2(PrintStream printStream) {
         super(printStream);
@@ -31,12 +40,12 @@ public class GenerateJavaCodeStep2 extends GenerateJavaCodeStep {
         BEGIN("Building prompt");
 
         var prompt = PromptData4.getSecond(model.getModel(), null);
-        var res = gptAssistant.chat(prompt);
+        var res = gptAssistant.getJson(prompt);
         result = res.content().text();
         token = res.tokenUsage().totalTokenCount();
 
         MfClassGenerator generator = new MfClassGenerator(result);
-        
+
         try {
             mapResult = generator.generate();
         } catch (ClassNotFoundException e) {

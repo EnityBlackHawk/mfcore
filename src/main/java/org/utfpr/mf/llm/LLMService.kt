@@ -85,4 +85,8 @@ class LLMService(desc: LLMServiceDesc) : CodeSession("LLMService", LastSet), Cha
     override fun chatAsString(userMessage: String): String {
         return process(userMessage, String::class.java, chatAssistant::chatAsString) as String
     }
+
+    override fun getJson(text: String): Response<AiMessage> {
+        return process(text, LLMResponse::class.java, chatAssistant::getJson) as Response<AiMessage>
+    }
 }

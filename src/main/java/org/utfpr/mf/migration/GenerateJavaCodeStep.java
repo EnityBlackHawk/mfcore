@@ -19,10 +19,10 @@ import java.io.PrintStream;
 public class GenerateJavaCodeStep extends MfMigrationStepEx<Model, GeneratedJavaCode> {
 
     @Injected(DefaultInjectParams.LLM_KEY)
-    protected String key;
+    private String key;
 
     @Injected(DefaultInjectParams.LLM_SERVICE)
-    protected LLMService gptAssistant;
+    private LLMService gptAssistant;
 
     public GenerateJavaCodeStep() {
         this(System.out);
