@@ -18,9 +18,66 @@ public class PromptData4 extends PromptData3 {
         super(sqlTables, migrationPreference, allowReferences, framework, cardinalityTable, useMarkdown, queryList, customPrompts);
     }
 
-    @Override
     public String getFirst() {
-        return super.getFirst();
+        StringBuilder sb = new StringBuilder();
+        var infos = getSqlTablesAndQueries();
+        sb.append("You are an expert in database modeling. Your task is to help migrate a relational database to a MongoDB database. " +
+                        "Follow the instructions and details provided below to generate the MongoDB model. " +
+                        "making sure to" +
+                        (migrationPreference == MigrationPreferences.PREFER_CONSISTENCY ? " **use references for less frequently accessed data** as instructed. " : " **embed frequently accessed data** into the main documents for efficiency.") +
+                        "\n")
+                .append("### Task Overview\n")
+                .append("We have a relational database that needs to be migrated to MongoDB. The goal is to create an optimized MongoDB schema based on the usage patterns of the data. \n");
+
+        sb.append("### Relational Database Schema").append("\n");
+        sb.append("Here is the schema of our current relational database:").append("\n");
+        sb.append("```sql").append("\n");
+        sb.append(infos.getFirst()).append("\n");
+        sb.append("```").append("\n");
+
+        sb.append("### MongoDB Model Considerations").append("\n");
+
+        sb.append("-    **Critically ensure** the use of " +
+                (migrationPreference == MigrationPreferences.PREFER_CONSISTENCY
+                        ? "**references (DBRef)** to reduce redundancy."
+                        : "**embedded documents** to optimize read performance.")).append("\n");
+
+        if(queryList != null) {
+            sb.append("-    Optimize for the following frequently used queries:").append("\n");
+            for(var query : queryList) {
+                sb.append("\t- ").append("**Used ").append(query.regularity()).append("% of the time:** ").append(query.query()).append("\n");
+            }
+        }
+        sb.append( allowReferences ? "- Use references for less frequently accessed data \n" : "");
+        sb.append("- ").append( migrationPreference.getDescription()).append("\n");
+        sb.append("- **AWAYS** convert the primary key to the be a string \n");
+
+        if(userDefinedPrompts != null) {
+            for(var x : userDefinedPrompts)
+                sb.append("- ").append(x).append("\n");
+        }
+
+        sb.append("### Output format").append("\n");
+        sb.append("MongoDB models in JSON format as the example:").append("\n");
+        sb.append("```json").append("\n");
+        sb.append("// Aircraft collection");
+        sb.append("""
+                // Aircraft collection
+                {
+                	"id" : {"type" :  "string", "table" : "aircraft", "column" : "id" },
+                	"model" : {"type" :  "string", "table" : "aircraft", "column" : "model" },
+                    "airline": {"type" : "DBRef", "table" : "airline", "column" : "id"},
+                	"manufacturer" : {
+                		"id" : {"type" :  "string", "table" : "manufacturer", "column" : "id" },
+                		"name" : {"type" :  "string", "table" : "manufacturer", "column" : "name" },
+                	}
+                }
+                """).append("\n");
+        sb.append("```").append("\n");
+
+        sb.append("Please generate only the MongoDB model in JSON format based on the provided details. And a little explanation of why you choose this model.").append("\n");
+
+        return sb.toString();
     }
 
     public static String getSecond(String jsonDocuments, @Nullable Framework framework) {

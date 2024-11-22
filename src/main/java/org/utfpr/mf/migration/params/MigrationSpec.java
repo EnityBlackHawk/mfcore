@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.utfpr.mf.annotarion.Optional;
+import org.utfpr.mf.annotation.Optional;
 import org.utfpr.mf.metadata.RelationCardinality;
 import org.utfpr.mf.prompt.Framework;
 

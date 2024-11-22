@@ -1,7 +1,7 @@
 package org.utfpr.mf.migration;
 
-import org.utfpr.mf.annotarion.Export;
-import org.utfpr.mf.annotarion.State;
+import org.utfpr.mf.annotation.Export;
+import org.utfpr.mf.annotation.State;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.exceptions.InvalidData;
 import org.utfpr.mf.exceptions.InvalidOutputData;

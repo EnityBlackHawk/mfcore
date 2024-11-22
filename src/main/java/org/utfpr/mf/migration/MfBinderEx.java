@@ -1,6 +1,6 @@
 package org.utfpr.mf.migration;
 
-import org.utfpr.mf.annotarion.Injected;
+import org.utfpr.mf.annotation.Injected;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.interfaces.IMfBinder;
 

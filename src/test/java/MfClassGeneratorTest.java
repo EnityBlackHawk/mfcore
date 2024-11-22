@@ -5,10 +5,35 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MfClassGeneratorTest {
 
+    private static final String model = """
+            [
+                {
+                    "__collection__": "Alunos",
+                    "fields" : {
+                        "id": {"type" : "string", "column" : "id", "table" : "Alunos"},
+                        "name": {"type" : "string", "column" : "name", "table" : "Alunos"},
+                        "endereco": {
+                            "rua" : {"type" : "string", "column" : "rua", "table" : "Alunos"},
+                            "numero" : {"type" : "string", "column" : "numero", "table" : "Alunos"},
+                            "cidade" : {"type" : "string", "column" : "cidade", "table" : "Alunos"}
+                        }
+                    }
+                },
+                {
+                    "__collection__": "Turma",
+                    "fields" : {
+                        "id": {"type" : "string", "column" : "id", "table" : "Turma"},
+                        "materia": {"type" : "string", "column" : "materia", "table" : "Turma"}
+                    }
+                }
+            ]
+            """;
+
     private static final String json = """
             [
               {
                 "className": "Alunos",
+                "annotations": ["org.springframework.data.mongodb.core.mapping.Document"],
                 "fields": [
                   {
                     "name": "id",
@@ -21,14 +46,36 @@ public class MfClassGeneratorTest {
                     "annotations": []
                   },
                   {
-                    "name": "turmas",
-                    "type": "java.lang.List<Turma>",
+                    "name": "endereco",
+                    "type": "Endereco",
+                    "annotations": []
+                  }
+                ]
+              },
+              {
+                "className": "Endereco",
+                "annotations": [],
+                "fields": [
+                  {
+                    "name": "rua",
+                    "type": "java.lang.String",
+                    "annotations": []
+                  },
+                  {
+                    "name": "numero",
+                    "type": "java.lang.String",
+                    "annotations": []
+                  },
+                  {
+                    "name": "cidade",
+                    "type": "java.lang.String",
                     "annotations": []
                   }
                 ]
               },
               {
                 "className": "Turma",
+                "annotations": ["org.springframework.data.mongodb.core.mapping.Document"],
                 "fields": [
                   {
                     "name": "id",
@@ -39,11 +86,6 @@ public class MfClassGeneratorTest {
                     "name": "materia",
                     "type": "java.lang.String",
                     "annotations": []
-                  },
-                  {
-                    "name": "alunos",
-                    "type": "java.lang.List<Aluno>",
-                    "annotations": []
                   }
                 ]
               }
@@ -52,24 +94,25 @@ public class MfClassGeneratorTest {
 
     @Test
     void Gen() throws ClassNotFoundException {
-        MfClassGenerator generator = new MfClassGenerator(json);
+        MfClassGenerator generator = new MfClassGenerator(json, model);
         var result = generator.generate();
 
-        assertEquals(result.get("Turma"), """
+        assertEquals("""
                 import org.springframework.data.mongodb.core.mapping.Document;
+                import org.utfpr.mf.annotation.FromRDB;
                 
                 @Document()
                 @lombok.Data()
                 public class Turma {
                 
                     @org.springframework.data.annotation.Id()
+                    @FromRDB(type = string, column = id, table = Turma)
                     private java.lang.String id;
                 
+                    @FromRDB(type = string, column = materia, table = Turma)
                     private java.lang.String materia;
-                
-                    private java.lang.List<Aluno> alunos;
                 }
-                """);
+                """, result.get("Turma"));
 
 
 

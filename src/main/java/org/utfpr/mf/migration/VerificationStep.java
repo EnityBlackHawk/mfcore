@@ -1,7 +1,7 @@
 package org.utfpr.mf.migration;
 
 import org.springframework.data.annotation.Id;
-import org.utfpr.mf.annotarion.Injected;
+import org.utfpr.mf.annotation.Injected;
 import org.utfpr.mf.enums.BasicClasses;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.metadata.DbMetadata;

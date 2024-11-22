@@ -1,4 +1,4 @@
-package org.utfpr.mf.annotarion;
+package org.utfpr.mf.annotation;
 
 import org.utfpr.mf.enums.DefaultInjectParams;
 

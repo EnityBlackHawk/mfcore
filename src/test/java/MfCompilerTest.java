@@ -3,9 +3,8 @@ import org.utfpr.mf.runtimeCompiler.MfCompilerParams;
 import org.utfpr.mf.runtimeCompiler.MfDefaultPreCompileAction;
 import org.utfpr.mf.runtimeCompiler.MfRuntimeCompiler;
 import org.utfpr.mf.runtimeCompiler.MfVerifyImportAction;
-import org.utfpr.mf.stream.StringPrintStream;
 
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,15 +23,18 @@ public class MfCompilerTest {
 
         String source = """
        public class HelloWorld {
+           @org.utfpr.mf.annotarion.State
+           private String name = "";
+      \s
            public static class Test {
             private LocalDateTime date;
            }
-       
+      \s
            public String hello() {
                return "Hello, World!";
            }
        }
-       """;
+      \s""";
 
         String mongoPOJO = """
                 import lombok.AllArgsConstructor;
@@ -64,5 +66,7 @@ public class MfCompilerTest {
         String value = (String) classList.get("HelloWorld").getMethod("hello").invoke(instance);
         assertEquals("Hello, World!", value);
 
+        String fieldName = Arrays.stream(classList.get("HelloWorld").getDeclaredFields()).filter((f) -> f.isAnnotationPresent(org.utfpr.mf.annotation.State.class)).findFirst().get().getName();
+        assertEquals("name", fieldName);
     }
 }

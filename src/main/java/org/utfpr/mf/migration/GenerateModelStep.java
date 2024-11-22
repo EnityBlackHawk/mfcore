@@ -1,13 +1,9 @@
 package org.utfpr.mf.migration;
 
-import dev.langchain4j.model.openai.OpenAiChatModel;
-import dev.langchain4j.service.AiServices;
-import kotlin.Metadata;
 import org.utfpr.mf.MockLayer;
-import org.utfpr.mf.annotarion.Export;
-import org.utfpr.mf.annotarion.Injected;
+import org.utfpr.mf.annotation.Export;
+import org.utfpr.mf.annotation.Injected;
 import org.utfpr.mf.enums.DefaultInjectParams;
-import org.utfpr.mf.llm.ChatAssistant;
 import org.utfpr.mf.llm.LLMService;
 import org.utfpr.mf.migration.params.MetadataInfo;
 import org.utfpr.mf.migration.params.MigrationSpec;
@@ -16,7 +12,6 @@ import org.utfpr.mf.prompt.*;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.List;
 
 public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
 

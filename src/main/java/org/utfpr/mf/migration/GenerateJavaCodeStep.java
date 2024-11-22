@@ -1,12 +1,8 @@
 package org.utfpr.mf.migration;
 
-import dev.langchain4j.model.openai.OpenAiChatModel;
-import dev.langchain4j.model.openai.OpenAiChatModelName;
-import dev.langchain4j.service.AiServices;
 import org.utfpr.mf.MockLayer;
-import org.utfpr.mf.annotarion.Injected;
+import org.utfpr.mf.annotation.Injected;
 import org.utfpr.mf.enums.DefaultInjectParams;
-import org.utfpr.mf.llm.ChatAssistant;
 import org.utfpr.mf.llm.LLMService;
 import org.utfpr.mf.migration.params.GeneratedJavaCode;
 import org.utfpr.mf.migration.params.Model;
