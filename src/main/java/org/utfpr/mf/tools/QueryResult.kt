@@ -8,9 +8,10 @@ import java.sql.ResultSet
 import java.util.*
 import java.sql.Connection
 
-class QueryResult(private val metadata: DbMetadata?) {
-    private val columns = mutableListOf<String>()
-    private val rows = mutableListOf<List<String>>()
+open class QueryResult(protected val metadata: DbMetadata?) {
+    protected val columns = mutableListOf<String>()
+    protected open val rows = mutableListOf<List<Any>>()
+
 
     constructor(resultSet: ResultSet, metadata: DbMetadata? = null) : this(metadata) {
 
@@ -18,13 +19,14 @@ class QueryResult(private val metadata: DbMetadata?) {
             columns.add(resultSet.metaData.getColumnName(i + 1))
         }
         while (resultSet.next()) {
-            val row = ArrayList<String>()
+            val row = mutableListOf<Any>()
             for (i in columns.indices) {
                 row.add(resultSet.getString(i + 1))
             }
             require(row.size == columns.size) { "Row length does not match column length" }
             rows.add(row)
         }
+
     }
 
     constructor(vararg columnNames : String) : this(null) {
@@ -42,7 +44,7 @@ class QueryResult(private val metadata: DbMetadata?) {
     fun <T> getAllFromColumn(columnName: String, outputClass : Class<T>): List<T> {
         val columnIndex = columns.indexOf(columnName)
         require(columnIndex != -1) { "Column $columnName not found" }
-        val strings = rows.map { it[columnIndex] }
+        val strings = rows.map { it[columnIndex].toString() }
         return when(outputClass) {
             Integer::class.java -> strings.map { it.toInt() } as List<T>
             Long::class.java -> strings.map { it.toLong() } as List<T>
@@ -57,7 +59,7 @@ class QueryResult(private val metadata: DbMetadata?) {
         var formatSting = ""
         for(i in 0 until  columns.size) {
             formatSting += ("%${
-                (rows.map { it[i] }.maxByOrNull { it: String? -> it?.length ?: 0  }?.length ?: 0).coerceAtLeast(
+                (rows.map { it[i].toString() }.maxByOrNull { it: String? -> it?.length ?: 0  }?.length ?: 0).coerceAtLeast(
                     columns[i].length
                 )
             }s" + if (i + 1 == columns.size) "" else " | ")
@@ -77,7 +79,7 @@ class QueryResult(private val metadata: DbMetadata?) {
         var formatSting = "| "
         for(i in 0 until  columns.size) {
             formatSting += ("%${
-                (rows.map { it[i] }.maxByOrNull { it: String? -> it?.length ?: 0  }?.length ?: 0).coerceAtLeast(
+                (rows.map { it[i].toString() }.maxByOrNull { it: String? -> it?.length ?: 0  }?.length ?: 0).coerceAtLeast(
                     columns[i].length
                 )
             }s" + if(i + 1 == columns.size) " |" else " | ")
@@ -96,7 +98,7 @@ class QueryResult(private val metadata: DbMetadata?) {
     }
 
 
-    fun <T> asObject(clazz : Class<T>) : List<T> {
+    open fun <T> asObject(clazz : Class<T>) : List<T> {
         if(metadata == null)
             throw Exception("Metadata required")
         val res = mutableListOf<T>()
@@ -110,21 +112,22 @@ class QueryResult(private val metadata: DbMetadata?) {
                 }.getOrNull()
                 if(field == null) continue
                 field.isAccessible = true
-                if(row[i] == null || row[i].isEmpty()) continue
+                val rowString = row[i].toString()
+                if(row[i] == null || rowString.isEmpty()) continue
                 when (field.type.name) {
-                    "int", "java.lang.Integer" -> field.set(obj, row[i].toInt())
-                    "long", "java.lang.Long" -> field.set(obj, row[i].toLong())
-                    "float", "java.lang.Float" -> field.set(obj, row[i].toFloat())
-                    "double", "java.lang.Double" -> field.set(obj, row[i].toDouble())
+                    "int", "java.lang.Integer" -> field.set(obj, rowString.toInt())
+                    "long", "java.lang.Long" -> field.set(obj, rowString.toLong())
+                    "float", "java.lang.Float" -> field.set(obj, rowString.toFloat())
+                    "double", "java.lang.Double" -> field.set(obj, rowString.toDouble())
                     "java.lang.String" -> field.set(obj, row[i])
-                    "java.sql.Date" -> field.set(obj, java.sql.Date.valueOf(row[i]))
+                    "java.sql.Date" -> field.set(obj, java.sql.Date.valueOf(rowString))
                     "java.util.Date" -> {
-                        val date = java.text.SimpleDateFormat("yyyy-MM-dd").parse(row[i])
+                        val date = java.text.SimpleDateFormat("yyyy-MM-dd").parse(rowString)
                         field.set(obj, date)
                     }
-                    "java.sql.Timestamp" -> field.set(obj, java.sql.Timestamp.valueOf(row[i]))
-                    "java.sql.Time" -> field.set(obj, java.sql.Time.valueOf(row[i]))
-                    "java.time.LocalDateTime" -> field.set(obj, java.time.LocalDateTime.parse(row[i].replace(" ", "T")))
+                    "java.sql.Timestamp" -> field.set(obj, java.sql.Timestamp.valueOf(rowString))
+                    "java.sql.Time" -> field.set(obj, java.sql.Time.valueOf(rowString))
+                    "java.time.LocalDateTime" -> field.set(obj, java.time.LocalDateTime.parse(rowString.replace(" ", "T")))
                     else -> {
                         val isRef = field.isAnnotationPresent(org.springframework.data.mongodb.core.mapping.DBRef::class.java)
                         val _c = field.type
@@ -172,7 +175,7 @@ class QueryResult(private val metadata: DbMetadata?) {
         for (row in rows) {
             val obj = GenericRegistry()
             for (i in 0 until columns.size) {
-                obj[columns[i]] = row[i] ?: ""
+                obj[columns[i]] = row[i].toString()
             }
             res.add(obj)
         }

@@ -111,6 +111,7 @@ class DataImporter {
                     val res = when(output) {
                         ResultSet::class.java -> rs as T
                         QueryResult::class.java -> QueryResult(rs, this) as T
+                        QueryResult2::class.java -> QueryResult2(rs, this) as T
                         else -> throw IllegalArgumentException("Unsupported output class")
                     }
                     statement.close()

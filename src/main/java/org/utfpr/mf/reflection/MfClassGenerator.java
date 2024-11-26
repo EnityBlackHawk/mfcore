@@ -2,7 +2,11 @@ package org.utfpr.mf.reflection;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.expr.ClassExpr;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.Type;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import javassist.util.proxy.RuntimeSupport;
@@ -92,8 +96,10 @@ public class MfClassGenerator {
 
             Map<String, ?> sf = fields.get(fmd.getName());
 
+            Type classType = new ClassOrInterfaceType(null, className);
             fieldDec.addAndGetAnnotation(FromRDB.class)
                     .addPair("type", sf.get("type").toString())
+                    .addPair("typeClass", new ClassExpr(classType))
                     .addPair("column", sf.get("column").toString())
                     .addPair("table", sf.get("table").toString());
 

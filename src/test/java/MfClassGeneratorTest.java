@@ -103,16 +103,18 @@ public class MfClassGeneratorTest {
                 
                 @Document()
                 @lombok.Data()
-                public class Turma {
+                public class Alunos {
                 
                     @org.springframework.data.annotation.Id()
-                    @FromRDB(type = string, column = id, table = Turma)
+                    @FromRDB(type = string, typeClass = java.lang.String.class, column = id, table = Alunos)
                     private java.lang.String id;
                 
-                    @FromRDB(type = string, column = materia, table = Turma)
-                    private java.lang.String materia;
+                    @FromRDB(type = string, typeClass = java.lang.String.class, column = name, table = Alunos)
+                    private java.lang.String name;
+                
+                    private Endereco endereco;
                 }
-                """, result.get("Turma"));
+                """, result.get("Alunos"));
 
 
 

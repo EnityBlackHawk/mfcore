@@ -70,9 +70,16 @@ public class PromptData4 extends PromptData3 {
                 	"manufacturer" : {
                 		"id" : {"type" :  "string", "table" : "manufacturer", "column" : "id" },
                 		"name" : {"type" :  "string", "table" : "manufacturer", "column" : "name" },
+                	},
+                	"actualFlight": {\s
+                	    "type": "Flight",\s
+                	    "typeClass": "Flight.class",\s
+                	    "table" : "flight",
+                	    "column" : "id",
+                	    "isReference" : true
                 	}
                 }
-                """).append("\n");
+               \s""").append("\n");
         sb.append("```").append("\n");
 
         sb.append("Please generate only the MongoDB model in JSON format based on the provided details. And a little explanation of why you choose this model.").append("\n");
