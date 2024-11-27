@@ -15,7 +15,7 @@ public class MfClassGeneratorTest {
     private static final String json = """
             [
               {
-                "className": "Alunos",
+                "className": "Student",
                 "annotations": ["org.springframework.data.mongodb.core.mapping.Document"],
                 "fields": [
                   {
@@ -29,65 +29,28 @@ public class MfClassGeneratorTest {
                     "annotations": []
                   },
                   {
-                    "name": "endereco",
-                    "type": "Endereco",
+                    "name": "address",
+                    "type": "Address",
                     "annotations": []
-                  },
-                  {
-                    "name" : "tutor",
-                    "type" : "Tutor",
-                    "annotations" : []
                   }
                 ]
               },
               {
-                "className": "Tutor",
+                "className": "Address",
                 "annotations": [],
                 "fields": [
                   {
-                    "name": "id",
-                    "type": "java.lang.String",
-                    "annotations": ["org.springframework.data.annotation.Id"]
-                  },
-                  {
-                    "name": "name",
-                    "type": "java.lang.String",
-                    "annotations": []
-                  }
-                ]
-              },
-              {
-                "className": "Endereco",
-                "annotations": [],
-                "fields": [
-                  {
-                    "name": "rua",
+                    "name": "street",
                     "type": "java.lang.String",
                     "annotations": []
                   },
                   {
-                    "name": "numero",
+                    "name": "city",
                     "type": "java.lang.String",
                     "annotations": []
                   },
                   {
-                    "name": "cidade",
-                    "type": "java.lang.String",
-                    "annotations": []
-                  }
-                ]
-              },
-              {
-                "className": "Turma",
-                "annotations": ["org.springframework.data.mongodb.core.mapping.Document"],
-                "fields": [
-                  {
-                    "name": "id",
-                    "type": "java.lang.String",
-                    "annotations": ["org.springframework.data.annotation.Id"]
-                  },
-                  {
-                    "name": "materia",
+                    "name" : "number",
                     "type": "java.lang.String",
                     "annotations": []
                   }
@@ -99,7 +62,7 @@ public class MfClassGeneratorTest {
     @BeforeAll
     static void prepare() throws IOException {
         File file = new File("json-schemas/student.json");
-        model = Files.readString(file.toPath());
+        model = "[" + Files.readString(file.toPath()) + "]";
 
     }
 
@@ -115,20 +78,19 @@ public class MfClassGeneratorTest {
                 
                 @Document()
                 @lombok.Data()
-                public class Alunos {
+                public class Student {
                 
                     @org.springframework.data.annotation.Id()
-                    @FromRDB(type = string, typeClass = java.lang.String.class, column = id, table = Alunos)
+                    @FromRDB(type = string, typeClass = java.lang.String.class, column = id, table = Students, isReference = false)
                     private java.lang.String id;
                 
-                    @FromRDB(type = string, typeClass = java.lang.String.class, column = name, table = Alunos)
+                    @FromRDB(type = string, typeClass = java.lang.String.class, column = name, table = Students, isReference = false)
                     private java.lang.String name;
                 
-                    private Endereco endereco;
+                    @FromRDB(type = Address, typeClass = Address.class, column = address_id, table = Students, isReference = false, targetTable = Address, targetColumn = id)
+                    private Address address;
                 }
-                """, result.get("Alunos"));
-
-
+                """, result.get("Student"));
 
     }
 

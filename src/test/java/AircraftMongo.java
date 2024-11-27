@@ -9,12 +9,15 @@ public class AircraftMongo {
     private String registry;
     @FromRDB(type = "java.lang.String", typeClass = String.class, column = "max_passengers", table = "aircraft")
     private String max_passengers;
-    @FromRDB(type = "Manufacturer",
-            typeClass = Manufacturer.class,
-            column = "id",
-            table = "manufacturer",
-            isReference = true
+    @FromRDB(type = "java.lang.String",
+            typeClass = String.class,
+            column = "manufacturer",
+            table = "aircraft",
+            isReference = true,
+            targetTable = "manufacturer",
+            targetColumn = "id",
+            projection = "name"
     )
-    private Manufacturer manufacturer;
+    private String marca;
 
 }

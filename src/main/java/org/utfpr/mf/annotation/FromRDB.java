@@ -14,6 +14,9 @@ public @interface FromRDB {
     String table();
     String column();
     boolean isReference() default false;
+    String targetTable() default "";
+    String targetColumn() default "";
+    String projection() default "*";
 
 
 }

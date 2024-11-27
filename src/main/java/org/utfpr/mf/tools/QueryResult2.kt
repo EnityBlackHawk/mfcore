@@ -15,16 +15,32 @@ class QueryResult2(resultSet : ResultSet, metadata: DbMetadata?) : QueryResult(r
             throw Exception("Metadata required")
         val res = mutableListOf<T>()
         for (row in rows) {
+
+            if(clazz.packageName == "java.lang") {
+                val v = clazz.cast(row[0])
+                res.add(v)
+                continue
+            }
+
             val obj = clazz.getDeclaredConstructor().newInstance()
             val fields = clazz.declaredFields
 
             for(field in fields) {
                 field.isAccessible = true
                 val ann = field.getAnnotation(FromRDB::class.java)
+
+                if(ann == null) {
+                    continue
+                }
+
+                if(ann.typeClass.equals(field.type)) {
+                    throw RuntimeException("Type mismatch")
+                }
+
                 val offset = columns.indexOf(ann.column)
 
                 if(ann.isReference) {
-                    val query = "SELECT * FROM ${ann.table} WHERE ${ann.column} = ${row[offset]}"
+                    val query = "SELECT ${ann.projection} FROM ${ann.targetTable} WHERE ${ann.targetColumn} = ${row[offset]}"
                     val res = DataImporter.runQuery(query, metadata, QueryResult2::class.java)
                     val newObj = res.asObject( field.type )
                     field.set(obj, newObj.first())

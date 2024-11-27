@@ -19,9 +19,7 @@
             "type" : "object",
             "column" : "address_id",
             "table" : "Students",
-            "referencedBy" : {
-                "table" : "Students",
-                "column" : "address_id",
+            "referenceTo" : {
                 "targetTable" : "Address",
                 "targetColumn" : "id"
             },
@@ -51,9 +49,7 @@
             "reference" : true,
             "column" : "course_id",
             "table" : "Students",
-            "referencedBy" : {
-                "table" : "Students",
-                "column" : "course_id",
+            "referenceTo" : {
                 "targetTable" : "Courses",
                 "targetColumn" : "id"
             }
