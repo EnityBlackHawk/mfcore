@@ -2,6 +2,7 @@ package org.utfpr.mf.reflection;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.expr.ClassExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
@@ -91,17 +92,20 @@ public class MfClassGenerator {
             if(!className.contains(".")) {
                 var nestedUnit = createClass(className, (Map<String, Map<String, ?>>) fields.get(fmd.getName()));
                 units.addAll(nestedUnit);
-                continue;
             }
 
             Map<String, ?> sf = fields.get(fmd.getName());
 
             Type classType = new ClassOrInterfaceType(null, className);
+
+            Object isReference = sf.get("isReference");
+
             fieldDec.addAndGetAnnotation(FromRDB.class)
                     .addPair("type", sf.get("type").toString())
                     .addPair("typeClass", new ClassExpr(classType))
                     .addPair("column", sf.get("column").toString())
-                    .addPair("table", sf.get("table").toString());
+                    .addPair("table", sf.get("table").toString())
+                    .addPair("isReference", new BooleanLiteralExpr(isReference != null && Boolean.parseBoolean(isReference.toString())));
 
         }
         units.add(unit);

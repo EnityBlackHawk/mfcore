@@ -1,33 +1,16 @@
+import com.github.javaparser.symbolsolver.utils.FileUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.utfpr.mf.reflection.MfClassGenerator;
+
+import java.io.*;
+import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MfClassGeneratorTest {
 
-    private static final String model = """
-            [
-                {
-                    "__collection__": "Alunos",
-                    "fields" : {
-                        "id": {"type" : "string", "column" : "id", "table" : "Alunos"},
-                        "name": {"type" : "string", "column" : "name", "table" : "Alunos"},
-                        "endereco": {
-                            "rua" : {"type" : "string", "column" : "rua", "table" : "Alunos"},
-                            "numero" : {"type" : "string", "column" : "numero", "table" : "Alunos"},
-                            "cidade" : {"type" : "string", "column" : "cidade", "table" : "Alunos"}
-                        }
-                    }
-                },
-                {
-                    "__collection__": "Turma",
-                    "fields" : {
-                        "id": {"type" : "string", "column" : "id", "table" : "Turma"},
-                        "materia": {"type" : "string", "column" : "materia", "table" : "Turma"}
-                    }
-                }
-            ]
-            """;
+    private static String model;
 
     private static final String json = """
             [
@@ -48,6 +31,27 @@ public class MfClassGeneratorTest {
                   {
                     "name": "endereco",
                     "type": "Endereco",
+                    "annotations": []
+                  },
+                  {
+                    "name" : "tutor",
+                    "type" : "Tutor",
+                    "annotations" : []
+                  }
+                ]
+              },
+              {
+                "className": "Tutor",
+                "annotations": [],
+                "fields": [
+                  {
+                    "name": "id",
+                    "type": "java.lang.String",
+                    "annotations": ["org.springframework.data.annotation.Id"]
+                  },
+                  {
+                    "name": "name",
+                    "type": "java.lang.String",
                     "annotations": []
                   }
                 ]
@@ -91,6 +95,14 @@ public class MfClassGeneratorTest {
               }
             ]
             """;
+
+    @BeforeAll
+    static void prepare() throws IOException {
+        File file = new File("json-schemas/student.json");
+        model = Files.readString(file.toPath());
+
+    }
+
 
     @Test
     void Gen() throws ClassNotFoundException {
