@@ -6,6 +6,17 @@ class MarkdownContent {
 
     private val content: StringBuilder = StringBuilder()
 
+    fun addList(list : List<String>) {
+        for (item in list) {
+            content.append("- ").append(item).append("\n")
+        }
+    }
+
+    fun addListItem(item : String) : MarkdownContent {
+        content.append("- ").append(item).append("\n")
+        return this;
+    }
+
     fun addTitle1(text : String) {
         content.append("# ").append(text).append("\n")
     }

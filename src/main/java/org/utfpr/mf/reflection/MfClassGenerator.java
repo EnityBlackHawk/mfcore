@@ -5,6 +5,7 @@ import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.expr.ClassExpr;
 import com.github.javaparser.ast.expr.NormalAnnotationExpr;
+import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.google.gson.Gson;
@@ -13,6 +14,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.utfpr.mf.annotation.FromRDB;
 import org.utfpr.mf.json.JsonSchema;
 import org.utfpr.mf.json.JsonSchemaList;
+import org.utfpr.mf.tools.QueryResult;
+import org.utfpr.mf.tools.TemplatedString;
 
 import java.util.*;
 
@@ -86,26 +89,53 @@ public class MfClassGenerator {
 
             // TODO Tratar classes duplicadas
             if(!className.contains(".")) {
-                var nestedUnit = createClass(className, schema.getProperties().get(fmd.getName()));
+                JsonSchema s = schema.getProperties().get(fmd.getName());
+                if(s == null) {
+                    s = schema.getProperties().get(TemplatedString.camelCaseToSnakeCase(fmd.getName()));
+
+                    if(s == null) {
+                        continue;
+                    }
+                }
+                var nestedUnit = createClass(className, s);
                 units.addAll(nestedUnit);
             }
 
             JsonSchema sf = schema.getProperties().get(fmd.getName());
 
+            if(sf == null) {
+
+                sf = schema.getProperties().get(TemplatedString.camelCaseToSnakeCase(fmd.getName()));
+                if (sf == null) {
+                    //throw new RuntimeException("Field not found: " + fmd.getName() + "\non class: " + cm.getClassName() + "\nschema: " + schema.getTitle());
+                    continue;
+                }
+            }
+
             Type classType = new ClassOrInterfaceType(null, className);
 
             Object isReference = sf.getReference();
             String type = sf.getType().toString();
+
+            ClassExpr classExpr = new ClassExpr(classType);
+            String column = sf.getColumn();
+            String table = sf.getTable();
+            var isRef = new BooleanLiteralExpr(isReference != null && Boolean.parseBoolean(isReference.toString()));
+
+            if(column == null || table == null) {
+                throw new RuntimeException("Column or table not set for field: " + fmd.getName() + "on class: " + cm.getClassName() + " schema: " + schema.getTitle());
+            }
+
             NormalAnnotationExpr fromRDB = fieldDec.addAndGetAnnotation(FromRDB.class)
-                    .addPair("type", Objects.equals(type, "object") ? className : type )
-                    .addPair("typeClass", new ClassExpr(classType))
-                    .addPair("column", sf.getColumn())
-                    .addPair("table", sf.getTable())
-                    .addPair("isReference", new BooleanLiteralExpr(isReference != null && Boolean.parseBoolean(isReference.toString())));
+                    .addPair("type", new StringLiteralExpr( Objects.equals(type, "object") ? className : type ) )
+                    .addPair("typeClass", classExpr)
+                    .addPair("column", new StringLiteralExpr(sf.getColumn()))
+                    .addPair("table", new StringLiteralExpr(sf.getTable()))
+                    .addPair("isReference", isRef);
 
             if(sf.getReferenceTo() != null) {
-                fromRDB.addPair("targetTable", sf.getReferenceTo().getTargetTable())
-                        .addPair("targetColumn", sf.getReferenceTo().getTargetColumn());
+                fromRDB.addPair("targetTable", new StringLiteralExpr( sf.getReferenceTo().getTargetTable() ))
+                        .addPair("targetColumn", new StringLiteralExpr( sf.getReferenceTo().getTargetColumn()));
             }
         }
         units.add(unit);

@@ -39,7 +39,7 @@ class QueryResult2(resultSet : ResultSet, metadata: DbMetadata?) : QueryResult(r
 
                 val offset = columns.indexOf(ann.column)
 
-                if(ann.isReference) {
+                if(ann.isReference || ann.targetColumn.isNotBlank() && ann.targetTable.isNotBlank()) {
                     val query = "SELECT ${ann.projection} FROM ${ann.targetTable} WHERE ${ann.targetColumn} = ${row[offset]}"
                     val res = DataImporter.runQuery(query, metadata, QueryResult2::class.java)
                     val newObj = res.asObject( field.type )

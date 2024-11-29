@@ -55,6 +55,7 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
             result = func.apply(castedInput);
         }catch (Throwable e) {
             ERROR(e.getMessage());
+            e.printStackTrace(_printStream);
             notifyCrash(e);
             return null;
         }

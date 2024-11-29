@@ -4,6 +4,8 @@ import org.utfpr.mf.annotation.Injected;
 import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.interfaces.IMfBinder;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +22,15 @@ public abstract class MfBinderEx implements IMfBinder {
 
     @Override
     public void inject(Object target) {
-        Arrays.stream(target.getClass().getDeclaredFields()).filter(f -> f.isAnnotationPresent(Injected.class)).forEach(f -> {
+        var fields = new ArrayList<Field>(Arrays.stream(target.getClass().getDeclaredFields()).toList());
+
+        var sup = target.getClass().getSuperclass();
+        while (sup != null) {
+            fields.addAll(Arrays.stream(sup.getDeclaredFields()).toList());
+            sup = sup.getSuperclass();
+        }
+
+        fields.stream().filter(f -> f.isAnnotationPresent(Injected.class)).forEach(f -> {
             var an = f.getAnnotation(Injected.class);
             f.setAccessible(true);
             try {

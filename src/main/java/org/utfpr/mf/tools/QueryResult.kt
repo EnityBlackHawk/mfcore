@@ -10,7 +10,7 @@ import java.sql.Connection
 
 open class QueryResult(protected val metadata: DbMetadata?) {
     protected val columns = mutableListOf<String>()
-    protected open val rows = mutableListOf<List<Any>>()
+    protected open val rows = mutableListOf<List<Any?>>()
 
 
     constructor(resultSet: ResultSet, metadata: DbMetadata? = null) : this(metadata) {
@@ -19,9 +19,10 @@ open class QueryResult(protected val metadata: DbMetadata?) {
             columns.add(resultSet.metaData.getColumnName(i + 1))
         }
         while (resultSet.next()) {
-            val row = mutableListOf<Any>()
+            val row = mutableListOf<Any?>()
             for (i in columns.indices) {
-                row.add(resultSet.getString(i + 1))
+                val result = resultSet.getString(i + 1)
+                row.add(result)
             }
             require(row.size == columns.size) { "Row length does not match column length" }
             rows.add(row)

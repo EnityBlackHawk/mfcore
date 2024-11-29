@@ -26,15 +26,15 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
     @Getter
     @Setter
     @Injected(DefaultInjectParams.MONGO_CREDENTIALS)
-    private MongoConnectionCredentials mongoConnectionCredentials;
+    protected MongoConnectionCredentials mongoConnectionCredentials;
 
     @Injected(DefaultInjectParams.MONGO_CONNECTION)
     @Export(DefaultInjectParams.MONGO_CONNECTION)
-    private MongoConnection mongoConnection;
+    protected MongoConnection mongoConnection;
 
     @Injected(DefaultInjectParams.DB_METADATA)
     @Export(DefaultInjectParams.DB_METADATA)
-    private DbMetadata dbMetadata = null;
+    protected DbMetadata dbMetadata = null;
 
     public MigrateDatabaseStep() {
         this((MongoConnectionCredentials) null);
@@ -91,7 +91,7 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
         return executeHelper(this::process, input);
     }
 
-    private Map<String, Integer> makeMigration(DbMetadata dbMetadata, MongoConnection mongoConnection, Map<String, Class<?>> classes) {
+    protected Map<String, Integer> makeMigration(DbMetadata dbMetadata, MongoConnection mongoConnection, Map<String, Class<?>> classes) {
         HashMap<String, Integer> classCount = new HashMap<>();
         for(String className : classes.keySet())
         {
