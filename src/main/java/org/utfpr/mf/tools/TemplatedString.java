@@ -21,8 +21,26 @@ public class TemplatedString {
         return result;
     }
 
+    public static String snakeCaseToCamelCase(String snakeCase) {
+    StringBuilder result = new StringBuilder();
+    boolean toUpperCase = false;
+    for (char c : snakeCase.toCharArray()) {
+        if (c == '_') {
+            toUpperCase = true;
+        } else {
+            result.append(toUpperCase ? Character.toUpperCase(c) : c);
+            toUpperCase = false;
+        }
+    }
+    return result.toString();
+}
+
     public static String camelCaseToSnakeCase(String camelCase) {
         return camelCase.replaceAll("([a-z])([A-Z]+)", "$1_$2").toLowerCase();
+    }
+
+    public static String capitalize(String s) {
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
 }
