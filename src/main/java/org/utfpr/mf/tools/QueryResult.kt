@@ -7,20 +7,27 @@ import org.utfpr.mf.metadata.GenericRegistry
 import java.sql.ResultSet
 import java.util.*
 import java.sql.Connection
+import java.sql.Types
 
 open class QueryResult(protected val metadata: DbMetadata?) {
     protected val columns = mutableListOf<String>()
-    protected open val rows = mutableListOf<List<Any?>>()
-
+    protected val columnTypes = mutableListOf<SqlDataType>()
+    protected open val rows = mutableListOf<List<String?>>()
+    protected lateinit var resultSet : ResultSet
 
     constructor(resultSet: ResultSet, metadata: DbMetadata? = null) : this(metadata) {
 
-        for (i in 0 until resultSet.metaData.columnCount) {
+        val rsMetadata = resultSet.metaData
+        this.resultSet = resultSet
+
+        for (i in 0 until rsMetadata.columnCount) {
             columns.add(resultSet.metaData.getColumnName(i + 1))
+            columnTypes.add(SqlDataType.getByValue(resultSet.metaData.getColumnType(i + 1)))
         }
         while (resultSet.next()) {
-            val row = mutableListOf<Any?>()
+            val row = mutableListOf<String?>()
             for (i in columns.indices) {
+
                 val result = resultSet.getString(i + 1)
                 row.add(result)
             }

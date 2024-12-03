@@ -36,6 +36,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("commons-codec:commons-codec:1.17.1")
     implementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.2")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.0")
 
 
 }

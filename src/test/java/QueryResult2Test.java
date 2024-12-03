@@ -27,5 +27,4 @@ public class QueryResult2Test {
         assertNotNull(list);
 
     }
-
 }

@@ -16,16 +16,22 @@ import static java.lang.Character.getType;
 
 public class MfCacheController {
 
+    private final String cachePath;
+
+    public MfCacheController(String cachePath) {
+        this.cachePath = cachePath.isBlank() ? System.getProperty("java.io.tmpdir") : cachePath;
+    }
+
     public void save(String md5, Object data) throws IOException {
 
-        File file = new File(System.getProperty("java.io.tmpdir"), "mf-cache-" + md5 + ".json");
+        File file = new File(cachePath, "mf-cache-" + md5 + ".json");
         PrintStream out = new PrintStream(new FileOutputStream(file));
         Gson gson = new Gson();
         out.println(gson.toJson(data));
     }
 
     public <T> T load(Class<T> clazz, String md5) throws IOException {
-        File file = new File(System.getProperty("java.io.tmpdir"), "mf-cache-" + md5 + ".json");
+        File file = new File(cachePath, "mf-cache-" + md5 + ".json");
         if(!file.exists()) {
             return null;
         }

@@ -25,9 +25,11 @@ class LLMService(desc: LLMServiceDesc) : CodeSession("LLMService", LastSet), Cha
     private val chatLanguageModel: ChatLanguageModel
     private val chatAssistant: ChatAssistant
     private val cachePolicy: CachePolicy = desc.cachePolicy
-    private val cacheController: MfCacheController = MfCacheController()
+    private val cacheController: MfCacheController
 
     init {
+
+        cacheController = MfCacheController(desc.cacheDir)
         chatLanguageModel = OpenAiChatModel.OpenAiChatModelBuilder()
             .apiKey(desc.llm_key)
             .modelName(desc.model)

@@ -70,15 +70,15 @@ public class MfClassGenerator {
         for(FieldMetadata fmd : cm.getFields()) {
 
             String className = fmd.getType();
-            if(className.contains("<")) {
-
-                String newClass = className.substring(className.indexOf("<") + 1, className.indexOf(">"));
-                className = className.substring(0, className.indexOf("<"));
-
-                var nestedUnit = createClass(list.stream().filter(c -> c.getClassName().equals(newClass)).findFirst().orElseThrow());
-                units.addAll(nestedUnit);
-
-            }
+//            if(className.contains("<")) {
+//
+//                String newClass = className.substring(className.indexOf("<") + 1, className.indexOf(">"));
+//                className = className.substring(0, className.indexOf("<"));
+//
+//                var nestedUnit = createClass(list.stream().filter(c -> c.getClassName().equals(newClass)).findFirst().orElseThrow());
+//                units.addAll(nestedUnit);
+//
+//            }
             unit.addImport(className);
             var fieldDec = classDec.addPrivateField(fmd.getType(), fmd.getName());
 
@@ -86,12 +86,12 @@ public class MfClassGenerator {
                 fieldDec.addAnnotation(ann);
             }
 
-            // TODO Tratar classes duplicadas
-            if(!className.contains(".")) {
-                String newClass = className;
-                var nestedUnit = createClass(list.stream().filter(c -> c.getClassName().equals(newClass)).findFirst().orElseThrow());
-                units.addAll(nestedUnit);
-            }
+//            // TODO Tratar classes duplicadas
+//            if(!className.contains(".")) {
+//                String newClass = className;
+//                var nestedUnit = createClass(list.stream().filter(c -> c.getClassName().equals(newClass)).findFirst().orElseThrow());
+//                units.addAll(nestedUnit);
+//            }
         }
         units.add(unit);
         return units;
@@ -123,12 +123,22 @@ public class MfClassGenerator {
 
         var fields = clazz.getFields();
 
+        var props = schema.getProperties();
+
+        if(props == null) {
+            return;
+        }
+
         for(Map.Entry<String, JsonSchema> eProp : schema.getProperties().entrySet()) {
 
             String propName = TemplatedString.camelCaseToSnakeCase(eProp.getKey());
             JsonSchema sf = eProp.getValue();
 
             FieldDeclaration fieldDec = clazz.getFieldByName(TemplatedString.snakeCaseToCamelCase(propName)).orElse(null);
+
+            if(fieldDec.getAnnotationByName("FromRDB").isPresent()) {
+                continue;
+            }
 
             assert fieldDec != null;
 
@@ -149,7 +159,8 @@ public class MfClassGenerator {
             String table = sf.getTable();
             var isRef = new BooleanLiteralExpr(isReference != null && Boolean.parseBoolean(isReference.toString()));
             if(column == null || table == null) {
-                throw new RuntimeException("Column or table not set for field: " + propName + "on class: " + className + " schema: " + schema.getTitle());
+                //throw new RuntimeException("Column or table not set for field: " + propName + "on class: " + className + " schema: " + schema.getTitle());
+                continue;
             }
 
             NormalAnnotationExpr fromRDB = fieldDec.addAndGetAnnotation(FromRDB.class)

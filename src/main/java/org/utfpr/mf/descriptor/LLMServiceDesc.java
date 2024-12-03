@@ -11,5 +11,6 @@ public class LLMServiceDesc {
     public double temp = 0.5;
     public CachePolicy cachePolicy = CachePolicy.DEFAULT;
     public PrintStream printStream = System.out;
+    public String cacheDir = "";
 
 }

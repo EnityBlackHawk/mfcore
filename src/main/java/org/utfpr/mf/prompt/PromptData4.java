@@ -62,7 +62,7 @@ public class PromptData4 extends PromptData3 {
         }
 
         sb.append("### Output format").append("\n");
-        sb.append("MongoDB models in JSON format as the example:").append("\n");
+        sb.append("MongoDB models in JSON Schema format as the example:").append("\n");
         sb.append("```json").append("\n");
         sb.append("""
                 [
@@ -72,9 +72,9 @@ public class PromptData4 extends PromptData3 {
                     "title": "Student",
                     "properties" : {
                         "id" : {
-                            "type" : "string",      // required
-                            "column" : "id",        // required
-                            "table" : "Students",   // required
+                            "type" : "string",      // required for all properties
+                            "column" : "id",        // required for all properties
+                            "table" : "Students",   // required for all properties
                             "description" : "The unique identifier for a product"
                         },
                         "name" : {
@@ -131,6 +131,7 @@ public class PromptData4 extends PromptData3 {
         sb.append("```").append("\n");
         sb.append("### Instructions").append("\n");
         sb.append("- **All properties must have a `type`, `column`, and `table` fields**. The `column` and the `table` indicates where this values came from on relational database. \n");
+        sb.append("- The fields `column` and `table` **must match** the column and table names in the relational database schema\n");
         sb.append("- If the property is reference (like DBRef), set the `isReference` to true\n");
         sb.append("- To de-reference a property, set the `referenceTo` field with the target table and column\n");
         sb.append("Please generate only the MongoDB model in JSON format based on the provided details. And a little explanation of why you choose this model.").append("\n");
