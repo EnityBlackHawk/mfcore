@@ -12,5 +12,7 @@ public class LLMServiceDesc {
     public CachePolicy cachePolicy = CachePolicy.DEFAULT;
     public PrintStream printStream = System.out;
     public String cacheDir = "";
+    public Boolean logRequest = false;
+    public Boolean logResponses = false;
 
 }

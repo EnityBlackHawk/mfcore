@@ -16,25 +16,31 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.utfpr.mf.annotation.FromRDB;
 import org.utfpr.mf.json.JsonSchema;
 import org.utfpr.mf.json.JsonSchemaList;
+import org.utfpr.mf.tools.CodeSession;
 import org.utfpr.mf.tools.QueryResult;
 import org.utfpr.mf.tools.TemplatedString;
 
+import java.io.PrintStream;
 import java.util.*;
 
-public class MfClassGenerator {
+public class MfClassGenerator extends CodeSession {
 
     private final String classMetadaString;
-    private final String model;
     private final ClassMetadataList list;
     private final JsonSchemaList schemas;
     private HashMap<String, CompilationUnit> classes = new HashMap<>();
 
-    public MfClassGenerator(String classMetadataString, @Nullable String model) {
+    public MfClassGenerator(String classMetadataString, JsonSchemaList model) {
+        this(classMetadataString, model, System.out);
+    }
+
+    public MfClassGenerator(String classMetadataString, JsonSchemaList model, PrintStream printStream) {
+        super("MfClassGenerator", printStream);
+
         this.classMetadaString = classMetadataString;
-        this.model = model;
         Gson gson = new Gson();
         this.list = gson.fromJson(classMetadaString, ClassMetadataList.class);
-        this.schemas = gson.fromJson(model, JsonSchemaList.class);
+        this.schemas = model;
     }
 
     public HashMap<String, String> generate() throws ClassNotFoundException {
@@ -116,6 +122,7 @@ public class MfClassGenerator {
 
         String className = TemplatedString.capitalize(TemplatedString.camelCaseToSnakeCase(schema.getTitle() != null ? schema.getTitle() : name  ));
         var clazz = compilationUnit.getClassByName(className).orElse(null);
+        BEGIN("Annotating class: " + className);
 
         if(clazz == null) {
             throw new RuntimeException("Class not found: " + className);
@@ -126,7 +133,7 @@ public class MfClassGenerator {
         var props = schema.getProperties();
 
         if(props == null) {
-            return;
+            ERROR("No properties found for class: " + className);
         }
 
         for(Map.Entry<String, JsonSchema> eProp : schema.getProperties().entrySet()) {
@@ -136,11 +143,15 @@ public class MfClassGenerator {
 
             FieldDeclaration fieldDec = clazz.getFieldByName(TemplatedString.snakeCaseToCamelCase(propName)).orElse(null);
 
-            if(fieldDec.getAnnotationByName("FromRDB").isPresent()) {
+            if(fieldDec == null) {
+                // TODO Notify (Do Log)
                 continue;
             }
 
-            assert fieldDec != null;
+            if(fieldDec.getAnnotationByName("FromRDB").isPresent()) {
+                INFO("Field already annotated: " + propName);
+            }
+
 
             Type classType = fieldDec.getCommonType();
             ClassExpr classExpr = new ClassExpr(classType);
@@ -160,6 +171,8 @@ public class MfClassGenerator {
             var isRef = new BooleanLiteralExpr(isReference != null && Boolean.parseBoolean(isReference.toString()));
             if(column == null || table == null) {
                 //throw new RuntimeException("Column or table not set for field: " + propName + "on class: " + className + " schema: " + schema.getTitle());
+                ERROR("Column or table not set for field: " + propName + " on class: " + className + " schema: " + schema.getTitle());
+                INFO("Skipping field: " + propName);
                 continue;
             }
 

@@ -16,22 +16,22 @@ import java.util.ArrayList;
 public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
 
     @Injected(DefaultInjectParams.MIGRATION_SPEC)
-    private final MigrationSpec migrationSpec;
+    protected final MigrationSpec migrationSpec;
 
     @Injected(DefaultInjectParams.LLM_KEY)
     private String llm_key;
 
     @Export(DefaultInjectParams.UNSET)
-    private String llm_response;
+    protected String llm_response;
 
     @Export(DefaultInjectParams.UNSET)
-    private String prompt;
+    protected String prompt;
 
     @Export(DefaultInjectParams.PROMPT_DATA_VERSION)
-    private Integer promptDataVersion;
+    protected Integer promptDataVersion;
 
     @Injected(DefaultInjectParams.LLM_SERVICE)
-    private LLMService gptAssistant;
+    protected LLMService gptAssistant;
 
     public GenerateModelStep(){
         this(null, System.out);
@@ -50,7 +50,7 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
         this.migrationSpec = spec;
     }
 
-    private Model process(MetadataInfo metadataInfo) {
+    protected Model process(MetadataInfo metadataInfo) {
 
         assert llm_key != null : "llm_key is not set";
 

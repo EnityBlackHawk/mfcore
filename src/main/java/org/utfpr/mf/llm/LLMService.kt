@@ -1,24 +1,17 @@
 package org.utfpr.mf.llm
 
-import com.google.gson.reflect.TypeToken
 import dev.langchain4j.data.message.AiMessage
 import dev.langchain4j.model.chat.ChatLanguageModel
 import dev.langchain4j.model.openai.OpenAiChatModel
-import dev.langchain4j.model.openai.OpenAiChatModelName
 import dev.langchain4j.model.output.Response
 import dev.langchain4j.service.AiServices
 import org.utfpr.mf.descriptor.CachePolicy
 import org.utfpr.mf.descriptor.LLMServiceDesc
+import org.utfpr.mf.json.JsonSchemaList
 import org.utfpr.mf.tools.CodeSession
 import org.utfpr.mf.tools.MfCacheController
 import java.io.IOException
-import java.io.PrintStream
-import java.lang.reflect.Type
 import java.util.function.Function
-import kotlin.reflect.KClass
-import kotlin.reflect.KType
-import kotlin.reflect.javaType
-import kotlin.reflect.typeOf
 
 class LLMService(desc: LLMServiceDesc) : CodeSession("LLMService", LastSet), ChatAssistant {
 
@@ -34,20 +27,20 @@ class LLMService(desc: LLMServiceDesc) : CodeSession("LLMService", LastSet), Cha
             .apiKey(desc.llm_key)
             .modelName(desc.model)
             .maxRetries(1)
-            .logRequests(true)
-            .logResponses(true)
+            .logRequests(desc.logRequest)
+            .logResponses(desc.logResponses)
             .temperature(desc.temp)
             .build()
         chatAssistant = AiServices.builder(ChatAssistant::class.java).chatLanguageModel(chatLanguageModel).build()
     }
 
-    private fun process(prompt: String, clazz : Class<*>, func: Function<String, *>): Any {
+    private fun <T> process(prompt: String, clazz : Class<T>, func: Function<String, T>): T {
         if (cachePolicy == CachePolicy.NO_CACHE) {
             return func.apply(prompt)
         }
 
         val md5 = MfCacheController.generateMD5(prompt)
-        var result : Any? = null
+        var result : T?
         try {
             result = cacheController.load(clazz, md5)
         } catch (e: IOException) {
@@ -74,21 +67,20 @@ class LLMService(desc: LLMServiceDesc) : CodeSession("LLMService", LastSet), Cha
         return result
     }
 
+    override fun getJsonSchemaList(text: String): LLMResponseJsonSchema {
+        return process(text, LLMResponseJsonSchema::class.java, chatAssistant::getJsonSchemaList)
+    }
 
     override fun chat(text: String): Response<AiMessage> {
-        return process(text, LLMResponse::class.java, chatAssistant::chat) as Response<AiMessage>
+        return process(text, Response::class.java, chatAssistant::chat) as Response<AiMessage>
     }
 
 
     override fun getRelations(text: String): Response<AiMessage> {
-        return process(text, LLMResponse::class.java, chatAssistant::getRelations) as Response<AiMessage>
-    }
-
-    override fun chatAsString(userMessage: String): String {
-        return process(userMessage, String::class.java, chatAssistant::chatAsString) as String
+        return process(text, Response::class.java, chatAssistant::getRelations) as Response<AiMessage>
     }
 
     override fun getJson(text: String): Response<AiMessage> {
-        return process(text, LLMResponse::class.java, chatAssistant::getJson) as Response<AiMessage>
+        return process(text, Response::class.java, chatAssistant::getJson) as Response<AiMessage>
     }
 }

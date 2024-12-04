@@ -42,7 +42,7 @@ public class GenerateJavaCodeStep2 extends GenerateJavaCodeStep {
         result = res.content().text();
         token = res.tokenUsage().totalTokenCount();
 
-        MfClassGenerator generator = new MfClassGenerator(result, model.getModel());
+        MfClassGenerator generator = new MfClassGenerator(result, model.getModels());
 
         try {
             mapResult = generator.generate();

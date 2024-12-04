@@ -4,6 +4,7 @@ import dev.langchain4j.data.message.AiMessage;
 import dev.langchain4j.model.output.Response;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
+import org.utfpr.mf.json.JsonSchemaList;
 
 public interface ChatAssistant {
 
@@ -12,7 +13,9 @@ public interface ChatAssistant {
     Response<AiMessage> chat (String text);
     @UserMessage("Using this JSON format: [{table_source: String, table_target: String, cardinality: String}, ...] \n {{it}}")
     Response<AiMessage> getRelations(String text);
-    String chatAsString(String userMessage);
+
     @SystemMessage("Answer only a plain JSON without Markdown blocks")
     Response<AiMessage> getJson(String text);
+
+    LLMResponseJsonSchema getJsonSchemaList(String text);
 }

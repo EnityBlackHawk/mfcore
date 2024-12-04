@@ -1,6 +1,8 @@
 import com.github.javaparser.symbolsolver.utils.FileUtils;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.utfpr.mf.json.JsonSchemaList;
 import org.utfpr.mf.reflection.MfClassGenerator;
 
 import java.io.*;
@@ -32,6 +34,11 @@ public class MfClassGeneratorTest {
                     "name": "address",
                     "type": "Address",
                     "annotations": []
+                  },
+                  {
+                    "name" : "course",
+                    "type" : "java.lang.String",
+                    "annotations" : []
                   }
                 ]
               },
@@ -69,7 +76,9 @@ public class MfClassGeneratorTest {
 
     @Test
     void Gen() throws ClassNotFoundException {
-        MfClassGenerator generator = new MfClassGenerator(json, model);
+        Gson gson = new Gson();
+
+        MfClassGenerator generator = new MfClassGenerator(json, gson.fromJson(model, JsonSchemaList.class));
         var result = generator.generate();
 
         assertEquals("""
@@ -81,14 +90,17 @@ public class MfClassGeneratorTest {
                 public class Student {
                 
                     @org.springframework.data.annotation.Id()
-                    @FromRDB(type = string, typeClass = java.lang.String.class, column = id, table = Students, isReference = false)
+                    @FromRDB(type = "string", typeClass = java.lang.String.class, column = "id", table = "Students", isReference = false)
                     private java.lang.String id;
                 
-                    @FromRDB(type = string, typeClass = java.lang.String.class, column = name, table = Students, isReference = false)
+                    @FromRDB(type = "string", typeClass = java.lang.String.class, column = "name", table = "Students", isReference = false)
                     private java.lang.String name;
                 
-                    @FromRDB(type = Address, typeClass = Address.class, column = address_id, table = Students, isReference = false, targetTable = Address, targetColumn = id)
+                    @FromRDB(type = "Address", typeClass = Address.class, column = "address_id", table = "Students", isReference = false, targetTable = "Address", targetColumn = "id")
                     private Address address;
+                
+                    @FromRDB(type = "string", typeClass = java.lang.String.class, column = "course_id", table = "Students", isReference = true, targetTable = "Courses", targetColumn = "id")
+                    private java.lang.String course;
                 }
                 """, result.get("Student"));
 

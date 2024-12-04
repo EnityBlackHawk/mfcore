@@ -38,6 +38,8 @@ dependencies {
     implementation("com.github.javaparser:javaparser-symbol-solver-core:3.26.2")
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.0")
 
+    testImplementation("ch.qos.logback:logback-classic:1.5.12")
+
 
 }
 
