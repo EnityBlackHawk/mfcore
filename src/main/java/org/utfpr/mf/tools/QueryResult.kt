@@ -9,14 +9,19 @@ import java.util.*
 import java.sql.Connection
 import java.sql.Types
 
-open class QueryResult(protected val metadata: DbMetadata?) {
+open class QueryResult {
     protected val columns = mutableListOf<String>()
     protected val columnTypes = mutableListOf<SqlDataType>()
     protected open val rows = mutableListOf<List<String?>>()
     protected lateinit var resultSet : ResultSet
+    protected var metadata : DbMetadata? = null
 
-    constructor(resultSet: ResultSet, metadata: DbMetadata? = null) : this(metadata) {
+    constructor(metadata: DbMetadata?) {
+        this.metadata = metadata
+    }
 
+    constructor(resultSet: ResultSet, metadata: DbMetadata? = null) {
+        this.metadata = metadata
         val rsMetadata = resultSet.metaData
         this.resultSet = resultSet
 
@@ -160,14 +165,14 @@ open class QueryResult(protected val metadata: DbMetadata?) {
                         if(tableName.contains("reference")) {
                             tableName = tableName.replace("reference", "")
                         }
-                        val table = metadata.tables.find { it.name == tableName }
+                        val table = metadata!!.tables.find { it.name == tableName }
                         if (table == null)
                             throw Exception("Table $tableName not found")
 
                         val pkName = table.primaryKey.name
 
                         val query = "SELECT * FROM $tableName WHERE $pkName = '${row[i]}'"
-                        val arr = DataImporter.runQuery(query, metadata, QueryResult::class.java).asObject(c)
+                        val arr = DataImporter.runQuery(query, metadata!!, QueryResult::class.java).asObject(c)
                         assert(arr.size == 1) { "No rows resulted for: $query" }
                         arr.firstOrNull()?.let { field.set(obj, it)}
                     }

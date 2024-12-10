@@ -2,6 +2,8 @@ package org.utfpr.mf.migration;
 
 import com.google.gson.Gson;
 import org.utfpr.mf.MockLayer;
+import org.utfpr.mf.annotation.Export;
+import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.json.JsonSchemaList;
 import org.utfpr.mf.llm.LLMResponseJsonSchema;
 import org.utfpr.mf.migration.params.MetadataInfo;
@@ -10,10 +12,20 @@ import org.utfpr.mf.prompt.MigrationPreferences;
 import org.utfpr.mf.prompt.PromptData4;
 import org.utfpr.mf.prompt.Query;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 public class GenerateModelStep2 extends GenerateModelStep{
 
+    @Export(DefaultInjectParams.JSON_SCHEMA_LIST)
+    private JsonSchemaList recipes;
+
+    public GenerateModelStep2() {
+    }
+
+    public GenerateModelStep2(PrintStream printStream) {
+        super(printStream);
+    }
 
     @Override
     protected Model process(MetadataInfo metadataInfo) {
@@ -54,6 +66,7 @@ public class GenerateModelStep2 extends GenerateModelStep{
         Gson gson = new Gson();
         llm_response = gson.toJson(result);
         BEGIN("Finalizing model");
+        recipes = result.getSchemas();
         return new Model(gson.toJson(result.getSchemas()), result.getExplanation(), -1, result.getSchemas());
     }
 }

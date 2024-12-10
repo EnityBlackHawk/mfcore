@@ -53,6 +53,15 @@ public class MfMigrationStepFactory {
         return tmp;
     }
 
+    public IMfMigrationStep createGenerateModelStep2(IMfStepObserver... observers) {
+        var tmp = new GenerateModelStep2(printStream);
+        for (var o : observers) {
+            tmp.addObserver(o);
+        }
+        steps.add(tmp);
+        return tmp;
+    }
+
     public IMfMigrationStep createGenerateJavaCodeStep(IMfStepObserver... observers) {
         var tmp = new GenerateJavaCodeStep(printStream);
         for (var o : observers) {

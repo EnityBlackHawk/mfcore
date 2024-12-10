@@ -17,6 +17,7 @@ public @interface FromRDB {
     String targetTable() default "";
     String targetColumn() default "";
     String projection() default "*";
+    boolean isAbstract() default false;
 
 
 }

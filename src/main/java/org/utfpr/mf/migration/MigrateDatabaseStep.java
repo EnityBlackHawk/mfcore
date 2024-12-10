@@ -25,10 +25,10 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
 
     @Getter
     @Setter
-    @Injected(DefaultInjectParams.MONGO_CREDENTIALS)
+    @Injected(value = DefaultInjectParams.MONGO_CREDENTIALS, required = false)
     protected MongoConnectionCredentials mongoConnectionCredentials;
 
-    @Injected(DefaultInjectParams.MONGO_CONNECTION)
+    @Injected(value = DefaultInjectParams.MONGO_CONNECTION, required = false)
     @Export(DefaultInjectParams.MONGO_CONNECTION)
     protected MongoConnection mongoConnection;
 

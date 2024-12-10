@@ -35,9 +35,17 @@ public abstract class MfBinderEx implements IMfBinder {
             f.setAccessible(true);
             try {
                 f.set(target, bindings.get(an.value() == DefaultInjectParams.UNSET ? f.getName() : an.value().getValue()));
+
+                if(f.get(target) == null && an.required()) {
+                    throw new RuntimeException("Injected field " + f.getName() + " ( " + target.getClass().getName() + " ) is required, but none was provided or exported");
+                }
+
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
+
+
+
         });
     }
 

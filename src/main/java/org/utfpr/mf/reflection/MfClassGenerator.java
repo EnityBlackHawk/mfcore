@@ -53,6 +53,7 @@ public class MfClassGenerator extends CodeSession {
         }
 
         annotateClasses(classes);
+        verifyAnnotations();
         HashMap<String, String> finalClasses = new HashMap<>();
         for(Map.Entry<String, CompilationUnit> e : classes.entrySet()) {
             finalClasses.put(e.getKey(), e.getValue().toString());
@@ -61,7 +62,18 @@ public class MfClassGenerator extends CodeSession {
         return finalClasses;
     }
 
-
+    private void verifyAnnotations() {
+        BEGIN("Verifying classes");
+        for(var clazz : classes.values()) {
+            BEGIN_SUB(clazz.getType(0).getNameAsString());
+            var fields = clazz.getType(0).getFields();
+            for(var field : fields) {
+                if(field.getAnnotationByClass(FromRDB.class).isEmpty()) {
+                    INFO("Field not annotated: " + field.getVariable(0).getNameAsString() + ". This field will be ignored on migration.");
+                }
+            }
+        }
+    }
 
     private List<CompilationUnit> createClass(ClassMetadata cm) {
 
@@ -76,16 +88,11 @@ public class MfClassGenerator extends CodeSession {
         for(FieldMetadata fmd : cm.getFields()) {
 
             String className = fmd.getType();
-//            if(className.contains("<")) {
-//
-//                String newClass = className.substring(className.indexOf("<") + 1, className.indexOf(">"));
-//                className = className.substring(0, className.indexOf("<"));
-//
-//                var nestedUnit = createClass(list.stream().filter(c -> c.getClassName().equals(newClass)).findFirst().orElseThrow());
-//                units.addAll(nestedUnit);
-//
-//            }
-            unit.addImport(className);
+            String pureClassName = className;
+            if(className.contains("<")) {
+                pureClassName = className.substring(0, className.indexOf("<"));
+            }
+            unit.addImport(pureClassName);
             var fieldDec = classDec.addPrivateField(fmd.getType(), fmd.getName());
 
             for(String ann : fmd.getAnnotations()) {
@@ -110,7 +117,7 @@ public class MfClassGenerator extends CodeSession {
             String className = TemplatedString.capitalize(TemplatedString.camelCaseToSnakeCase(schema.getTitle()));
             CompilationUnit unit = classes.get(className);
 
-            annotateClass(schema, unit, null);
+            annotateClass(schema, unit, null, schema.getTitle());
 
         }
 
@@ -118,9 +125,9 @@ public class MfClassGenerator extends CodeSession {
         return classes;
     }
 
-    private void annotateClass(JsonSchema schema, CompilationUnit compilationUnit, @Nullable String name) {
+    private void annotateClass(JsonSchema schema, CompilationUnit compilationUnit, @Nullable String name, String docName) {
 
-        String className = TemplatedString.capitalize(TemplatedString.camelCaseToSnakeCase(schema.getTitle() != null ? schema.getTitle() : name  ));
+        String className = TemplatedString.capitalize(TemplatedString.snakeCaseToCamelCase(schema.getTitle() != null ? schema.getTitle() : name  ));
         var clazz = compilationUnit.getClassByName(className).orElse(null);
         BEGIN("Annotating class: " + className);
 
@@ -128,12 +135,11 @@ public class MfClassGenerator extends CodeSession {
             throw new RuntimeException("Class not found: " + className);
         }
 
-        var fields = clazz.getFields();
-
         var props = schema.getProperties();
 
         if(props == null) {
             ERROR("No properties found for class: " + className);
+            return;
         }
 
         for(Map.Entry<String, JsonSchema> eProp : schema.getProperties().entrySet()) {
@@ -148,8 +154,9 @@ public class MfClassGenerator extends CodeSession {
                 continue;
             }
 
-            if(fieldDec.getAnnotationByName("FromRDB").isPresent()) {
+            if(fieldDec.getAnnotationByClass(FromRDB.class).isPresent()) {
                 INFO("Field already annotated: " + propName);
+                continue;
             }
 
 
@@ -160,7 +167,7 @@ public class MfClassGenerator extends CodeSession {
             // TODO List<Booking> n esta chegando
             if(sf.getType().equals("object") && classes.containsKey(classType.toString())) {
                 var cmp = classes.get(classType.toString());
-                annotateClass( sf, cmp,  classType.toString());
+                annotateClass( sf, cmp,  classType.toString(), docName);
 
             }
 
@@ -168,20 +175,24 @@ public class MfClassGenerator extends CodeSession {
             String type = sf.getType().toString();
             String column = sf.getColumn();
             String table = sf.getTable();
+            Boolean isAbstract = sf.getIsAbstract();
             var isRef = new BooleanLiteralExpr(isReference != null && Boolean.parseBoolean(isReference.toString()));
             if(column == null || table == null) {
                 //throw new RuntimeException("Column or table not set for field: " + propName + "on class: " + className + " schema: " + schema.getTitle());
-                ERROR("Column or table not set for field: " + propName + " on class: " + className + " schema: " + schema.getTitle());
-                INFO("Skipping field: " + propName);
-                continue;
+                INFO("Column or table not set for field: " + propName + " on class: " + className + " schema: " + schema.getTitle());
+                column = "";
+                table = "";
+                isAbstract = true;
             }
 
             NormalAnnotationExpr fromRDB = fieldDec.addAndGetAnnotation(FromRDB.class)
                     .addPair("type", new StringLiteralExpr( Objects.equals(type, "object") ? classType.toString() : type ) )
                     .addPair("typeClass", classExpr)
-                    .addPair("column", new StringLiteralExpr(sf.getColumn()))
-                    .addPair("table", new StringLiteralExpr(sf.getTable()))
-                    .addPair("isReference", isRef);
+                    .addPair("column", new StringLiteralExpr(column))
+                    .addPair("table", new StringLiteralExpr(table))
+                    .addPair("isReference", isRef)
+                    .addPair("isAbstract", new BooleanLiteralExpr(isAbstract))
+                    .addPair("projection", new StringLiteralExpr(sf.getProjection()));
             if(sf.getReferenceTo() != null) {
                 fromRDB.addPair("targetTable", new StringLiteralExpr( sf.getReferenceTo().getTargetTable() ))
                         .addPair("targetColumn", new StringLiteralExpr( sf.getReferenceTo().getTargetColumn()));

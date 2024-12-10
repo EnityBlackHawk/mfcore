@@ -14,18 +14,28 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Description("Customized JSON schema")
 public class JsonSchema {
 
+    @Description("Type of the JSON Schema")
     private String type;
+    @Description("The name of the object")
     private String title;
     private String description;
+    @Description("If this property is a composition of another or this object")
+    private Boolean isAbstract = false;
+    @Description("Describes the custom string type. Example: Date")
     private String format;
-    @Description("Column from RDB")
+    @Description("[REQUIRED If !isAbstract] Column from RDB")
     private String column;
-    @Description("Table from RDB")
+    @Description("[REQUIRED If !isAbstract] Table from RDB")
     private String table;
     private Boolean reference = false;
+    @Description("[REQUIRED IF type = object] Is the properties of the object described by this JSON")
     private HashMap<String, JsonSchema> properties;
+    @Description("[REQUIRED when a JOIN is need to fetch the data]")
     private ReferenceTo referenceTo;
+    @Description("Describes the column from the target table that will be projected into this property")
+    private String projection = "*";
 
 }

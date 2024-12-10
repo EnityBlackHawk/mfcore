@@ -1,15 +1,31 @@
 package org.utfpr.mf.tools
 
-import org.springframework.data.annotation.Id
 import org.utfpr.mf.annotation.FromRDB
 import org.utfpr.mf.metadata.DbMetadata
-import kotlin.reflect.cast
 import java.sql.ResultSet
-import kotlin.reflect.KClass
-import kotlin.reflect.full.memberFunctions
 
-class QueryResult2(resultSet : ResultSet, metadata: DbMetadata?) : QueryResult(resultSet, metadata) {
+class QueryResult2 : QueryResult {
 
+
+    constructor(resultSet : ResultSet, metadata: DbMetadata?) : super(resultSet, metadata)
+    constructor(vararg columnNames : String) : super(*columnNames)
+
+    fun filter(columnName : String, condition : (Any) -> Boolean) : QueryResult2? {
+       val offset = columns.indexOf(columnName)
+        if(offset == -1) {
+            return null;
+        }
+
+        val qr = QueryResult2(*columns.toTypedArray())
+        qr.metadata = this.metadata
+        for(row in rows) {
+            if(condition.invoke(row[offset]!!)) {
+                qr.addRow(*row.map { it.toString() }.toTypedArray())
+            }
+        }
+        return qr
+
+    }
 
     override fun <T> asObject(clazz : Class<T>) : List<T> {
         if(metadata == null)
@@ -37,33 +53,49 @@ class QueryResult2(resultSet : ResultSet, metadata: DbMetadata?) : QueryResult(r
                     continue
                 }
 
-                if(ann.typeClass.equals(field.type)) {
+                if(!ann.typeClass.equals(field.type)) {
                     throw RuntimeException("Type mismatch")
+                }
+
+                if(ann.isAbstract) {
+
+//                    val cols = ann.typeClass.java.declaredFields.map {
+//                        it.getAnnotation(FromRDB::class.java)?.column ?: throw RuntimeException("All props of a composite prop must be annotated ")
+//                    }
+//
+//                    for(col in cols) {
+//                        val offset = columns.indexOf(col)
+//
+//                    }
+
+
+                    val qr = filter(columns.first()) {
+                        it == row[0]
+                    }
+
+                    val result = qr!!.asObject(ann.typeClass.java)
+                    field.set(obj, result.firstOrNull())
+                    continue
                 }
 
                 val offset = columns.indexOf(ann.column)
 
                 if(offset == -1) {
-                    //TODO Report
-                    continue
+                    throw RuntimeException("Column ${ann.column} not found")
                 }
 
                 if(ann.isReference || ann.targetColumn.isNotBlank() && ann.targetTable.isNotBlank()) {
                     val isColumnString = columnTypes[offset] == SqlDataType.VARCHAR
                     val query = "SELECT ${ann.projection} FROM ${ann.targetTable} " +
                             "WHERE ${ann.targetColumn} = ${ if(isColumnString) "'${row[offset]}'" else row[offset]}"
-                    val res = DataImporter.runQuery(query, metadata, QueryResult2::class.java)
+                    val res = DataImporter.runQuery(query, metadata!!, QueryResult2::class.java)
                     val newObj = res.asObject( field.type )
                     field.set(obj, newObj.firstOrNull())
                     continue
                 }
 
-
-
-
                 val v = cast(row[offset], ann.typeClass.java)
                 field.set(obj, v)
-
 
             }
 
@@ -75,13 +107,16 @@ class QueryResult2(resultSet : ResultSet, metadata: DbMetadata?) : QueryResult(r
     private fun <T> cast(value: String?, clazz: Class<T>): T? {
     value?.let {
         val cName = clazz.simpleName
-        // TODO: Ajust PromptData4 to only use one type of date format ask chatGPT what type is better
         return when (cName) {
             "Integer" -> it.toInt() as T
             "Long" -> it.toLong() as T
             "Float" -> it.toFloat() as T
             "Double" -> it.toDouble() as T
             "LocalDateTime" -> java.time.LocalDateTime.parse(it.replace(" ", "T")) as T
+            "ZonedDateTime" -> java.time.ZonedDateTime.parse(it.replace(" ", "T")) as T
+            "LocalDate" -> java.time.LocalDate.parse(it) as T
+            "LocalTime" -> java.time.LocalTime.parse(it) as T
+            "Instant" -> java.time.Instant.parse(it) as T
             "String" -> it as T
             else -> null
         }

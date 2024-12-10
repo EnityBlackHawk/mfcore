@@ -6,12 +6,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.utfpr.mf.annotation.Export;
 import org.utfpr.mf.annotation.Injected;
 import org.utfpr.mf.enums.DefaultInjectParams;
+import org.utfpr.mf.json.JsonSchema;
+import org.utfpr.mf.json.JsonSchemaList;
 import org.utfpr.mf.metadata.DbMetadata;
 import org.utfpr.mf.mongoConnection.MongoConnection;
 import org.utfpr.mf.mongoConnection.MongoConnectionCredentials;
 import org.utfpr.mf.tools.DataImporter;
 import org.utfpr.mf.tools.QueryResult;
 import org.utfpr.mf.tools.QueryResult2;
+import org.utfpr.mf.tools.TemplatedString;
 
 import java.io.PrintStream;
 import java.util.HashMap;
@@ -19,6 +22,9 @@ import java.util.List;
 import java.util.Map;
 
 public class MigrateDatabaseStep2 extends MigrateDatabaseStep{
+
+    @Injected(DefaultInjectParams.JSON_SCHEMA_LIST)
+    private JsonSchemaList recepies;
 
     public MigrateDatabaseStep2(MongoConnectionCredentials connectionCredentials) {
         super(connectionCredentials);
@@ -36,9 +42,12 @@ public class MigrateDatabaseStep2 extends MigrateDatabaseStep{
     protected Map<String, Integer> makeMigration(DbMetadata dbMetadata, MongoConnection mongoConnection, Map<String, Class<?>> classes) {
 
         HashMap<String, Integer> classCount = new HashMap<>();
-        // TODO: Loop based on the recipe
-        for(String className : classes.keySet())
+        // TODO Loop based on the recipe
+        //for(String className : classes.keySet())
+        for(JsonSchema recipe : recepies)
         {
+            String className = TemplatedString.capitalize(TemplatedString.camelCaseToSnakeCase(recipe.getTitle()));
+
             BEGIN_SUB("Querying data from " + className);
             QueryResult2 qr = DataImporter.Companion.runQuery(String.format("SELECT * FROM %s", className), dbMetadata, QueryResult2.class);
             BEGIN_SUB("Converting data: " + className);

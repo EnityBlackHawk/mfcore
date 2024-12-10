@@ -9,6 +9,7 @@ public class LLMResponseJsonSchema {
 
     @Description("Logic explanation of why this model was chosen")
     private String explanation;
+    @Description("A **List** of JsonSchema objects")
     private JsonSchemaList schemas;
 
 }

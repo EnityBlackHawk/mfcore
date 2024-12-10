@@ -136,7 +136,14 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
 
     @Override
     public void export(IMfBinder binder) {
-        var fields = Arrays.stream(getClass().getDeclaredFields()).filter(f -> f.isAnnotationPresent(Export.class)).toList();
+        var fields = new ArrayList<>(
+                  Arrays.stream(getClass().getDeclaredFields()).filter(f -> f.isAnnotationPresent(Export.class)).toList()
+        );
+        var sup = getClass().getSuperclass();
+        while (sup != null) {
+            fields.addAll(Arrays.stream(sup.getDeclaredFields()).filter(f -> f.isAnnotationPresent(Export.class)).toList());
+            sup = sup.getSuperclass();
+        }
         for(var f : fields) {
             var an = f.getAnnotation(Export.class);
             if(!an.override() && binder.has(an.value().getValue())) {

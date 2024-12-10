@@ -84,8 +84,8 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
         }
         else {
             var result = gptAssistant.chat(p);
-            tokens = result.tokenUsage().totalTokenCount();
-            resultString = result.content().text();
+            tokens = -1;
+            resultString = result;
         }
         llm_response = resultString;
         BEGIN("Extracting JSON objects");

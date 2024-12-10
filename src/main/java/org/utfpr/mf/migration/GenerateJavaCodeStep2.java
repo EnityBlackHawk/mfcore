@@ -39,8 +39,8 @@ public class GenerateJavaCodeStep2 extends GenerateJavaCodeStep {
 
         var prompt = PromptData4.getSecond(model.getModel(), null);
         var res = gptAssistant.getJson(prompt);
-        result = res.content().text();
-        token = res.tokenUsage().totalTokenCount();
+        result = res;
+        token = -1;
 
         MfClassGenerator generator = new MfClassGenerator(result, model.getModels());
 

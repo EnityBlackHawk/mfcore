@@ -30,6 +30,7 @@ class LLMService(desc: LLMServiceDesc) : CodeSession("LLMService", LastSet), Cha
             .logRequests(desc.logRequest)
             .logResponses(desc.logResponses)
             .temperature(desc.temp)
+            .strictJsonSchema(true)
             .build()
         chatAssistant = AiServices.builder(ChatAssistant::class.java).chatLanguageModel(chatLanguageModel).build()
     }
@@ -55,8 +56,19 @@ class LLMService(desc: LLMServiceDesc) : CodeSession("LLMService", LastSet), Cha
         if (cachePolicy == CachePolicy.CACHE_ONLY) {
             throw RuntimeException("No cache found, but CACHE_ONLY")
         }
+        var count = 0;
+        do {
+            result = try {
+                func.apply(prompt)
+            } catch (e : Exception) {
+                count++;
+                null
+            }
+        }while (result == null && count < 3)
 
-        result = func.apply(prompt)
+        if(result == null) {
+            throw RuntimeException("Unable do parse LLM response. Tried $count times")
+        }
 
         try {
             cacheController.save(md5, result)
@@ -71,16 +83,16 @@ class LLMService(desc: LLMServiceDesc) : CodeSession("LLMService", LastSet), Cha
         return process(text, LLMResponseJsonSchema::class.java, chatAssistant::getJsonSchemaList)
     }
 
-    override fun chat(text: String): Response<AiMessage> {
-        return process(text, Response::class.java, chatAssistant::chat) as Response<AiMessage>
+    override fun chat(text: String): String {
+        return process(text, String::class.java, chatAssistant::chat)
     }
 
 
-    override fun getRelations(text: String): Response<AiMessage> {
-        return process(text, Response::class.java, chatAssistant::getRelations) as Response<AiMessage>
+    override fun getRelations(text: String): String {
+        return process(text, String::class.java, chatAssistant::getRelations)
     }
 
-    override fun getJson(text: String): Response<AiMessage> {
-        return process(text, Response::class.java, chatAssistant::getJson) as Response<AiMessage>
+    override fun getJson(text: String): String {
+        return process(text, String::class.java, chatAssistant::getJson)
     }
 }

@@ -2,6 +2,7 @@ package org.utfpr.mf.tools;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonIOException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import org.utfpr.mf.interfaces.IMfMigrationStep;
@@ -40,7 +41,13 @@ public class MfCacheController {
         GsonBuilder gsonBuilder = new GsonBuilder();
 
         Gson gson = gsonBuilder.create();
-        return gson.fromJson(jr, clazz);
+        T result = null;
+        try {
+            result = gson.fromJson(jr, clazz);
+        } catch (Exception e) {
+            throw new RuntimeException("Error loading cache file: " + file.getPath() + "\n" + e.getMessage());
+        }
+        return result;
     }
 
 

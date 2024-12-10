@@ -12,6 +12,7 @@ public enum DefaultInjectParams {
     PROMPT_DATA_VERSION("promptDataVersion"),
     MONGO_CREDENTIALS("mongoCredentials"),
     MIGRATION_SPEC("migrationSpec"),
+    JSON_SCHEMA_LIST("jsonSchemaList"),
     MONGO_CONNECTION("mongoConnection");
 
 

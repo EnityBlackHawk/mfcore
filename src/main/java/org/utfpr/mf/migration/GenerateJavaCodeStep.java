@@ -40,8 +40,8 @@ public class GenerateJavaCodeStep extends MfMigrationStepEx<Model, GeneratedJava
         else {
             var prompt = PromptData3.getSecond(model.getModel(), Framework.SPRING_DATA);
             var res = gptAssistant.chat(prompt);
-            result = res.content().text();
-            token = res.tokenUsage().totalTokenCount();
+            result = res;
+            token = -1;
         }
         BEGIN("Parsing response");
         var mapResult = ConvertToJavaFile.toMap(result);

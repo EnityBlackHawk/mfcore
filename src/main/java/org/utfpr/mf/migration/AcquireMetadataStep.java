@@ -168,7 +168,7 @@ public class AcquireMetadataStep extends MfMigrationStepEx<Credentials, Metadata
         }
         else {
             var result = gptAssistant.getRelations(q);
-            response = result.content().text();
+            response = result;
         }
         String responseCode = extractTextMarkdownCode(response, "json");
         Gson gson = new Gson();

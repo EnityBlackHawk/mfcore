@@ -61,6 +61,8 @@ public class Prompt4 {
         LLMServiceDesc desc = new LLMServiceDesc();
         desc.llm_key = "demo";
         desc.cachePolicy = CachePolicy.NO_CACHE;
+        desc.logRequest = true;
+        desc.logResponses = true;
 
         LLMService service = new LLMService(desc);
         var l = service.getJsonSchemaList(promptData4.getFirst());
