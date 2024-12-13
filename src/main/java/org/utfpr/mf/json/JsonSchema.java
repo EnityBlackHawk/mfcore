@@ -23,19 +23,21 @@ public class JsonSchema {
     private String title;
     private String description;
     @Description("If this property is a composition of another or this object")
-    private Boolean isAbstract = false;
+    private Boolean isAbstract;
     @Description("Describes the custom string type. Example: Date")
     private String format;
     @Description("[REQUIRED If !isAbstract] Column from RDB")
     private String column;
     @Description("[REQUIRED If !isAbstract] Table from RDB")
     private String table;
-    private Boolean reference = false;
+    private Boolean reference;
     @Description("[REQUIRED IF type = object] Is the properties of the object described by this JSON")
     private HashMap<String, JsonSchema> properties;
     @Description("[REQUIRED when a JOIN is need to fetch the data]")
     private ReferenceTo referenceTo;
-    @Description("Describes the column from the target table that will be projected into this property")
-    private String projection = "*";
+    @Description("[REQUIRED IF type != object and referenceTo != null] Describes the what column from the target table will be projected into this property")
+    private String projection;
+    @Description("[REQUIRED IF type = array] Describes the items of the array")
+    private JsonSchema items;
 
 }

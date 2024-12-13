@@ -229,7 +229,8 @@ public class PromptData4 extends PromptData3 {
                           "referenceTo": {
                             "targetTable": "Album",
                             "targetColumn": "AlbumId"
-                          }
+                          },
+                          "projection" : "Name"
                         },
                         "mediaType": {
                           "type": "string",
@@ -255,6 +256,9 @@ public class PromptData4 extends PromptData3 {
         sb.append("- The fields `column` and `table` **must match** the column and table names in the relational database schema\n");
         sb.append("- If the property is reference (like DBRef), set the `isReference` to true\n");
         sb.append("- To de-reference a property, set the `referenceTo` field with the target table and column\n");
+        sb.append("- If the property is a composition of another object, set the `properties` field with the object properties\n");
+        sb.append("- If the property is an array, set the `items` field with the array items\n");
+        sb.append("- If the property references is a foreign key and the type is not 'object', set the `projection` field with the column name to be projected\n");
         sb.append("Please generate only the MongoDB model in JSON format based on the provided details. And a little explanation of why you choose this model.").append("\n");
 
         return sb.toString();

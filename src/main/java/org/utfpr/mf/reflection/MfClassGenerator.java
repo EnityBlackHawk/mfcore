@@ -12,6 +12,7 @@ import com.github.javaparser.ast.type.Type;
 import com.google.gson.Gson;
 import kotlin.Pair;
 import org.jetbrains.annotations.Nullable;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.utfpr.mf.annotation.FromRDB;
 import org.utfpr.mf.json.JsonSchema;
@@ -99,12 +100,6 @@ public class MfClassGenerator extends CodeSession {
                 fieldDec.addAnnotation(ann);
             }
 
-//            // TODO Tratar classes duplicadas
-//            if(!className.contains(".")) {
-//                String newClass = className;
-//                var nestedUnit = createClass(list.stream().filter(c -> c.getClassName().equals(newClass)).findFirst().orElseThrow());
-//                units.addAll(nestedUnit);
-//            }
         }
         units.add(unit);
         return units;
@@ -171,12 +166,13 @@ public class MfClassGenerator extends CodeSession {
 
             }
 
-            Object isReference = sf.getReference();
+            Boolean isReference = Objects.requireNonNullElse(sf.getReference(), false);
             String type = sf.getType().toString();
             String column = sf.getColumn();
             String table = sf.getTable();
             Boolean isAbstract = sf.getIsAbstract();
-            var isRef = new BooleanLiteralExpr(isReference != null && Boolean.parseBoolean(isReference.toString()));
+
+            var isRef = new BooleanLiteralExpr(Boolean.parseBoolean(isReference.toString()));
             if(column == null || table == null) {
                 //throw new RuntimeException("Column or table not set for field: " + propName + "on class: " + className + " schema: " + schema.getTitle());
                 INFO("Column or table not set for field: " + propName + " on class: " + className + " schema: " + schema.getTitle());
@@ -185,14 +181,26 @@ public class MfClassGenerator extends CodeSession {
                 isAbstract = true;
             }
 
+            if(isReference) {
+                fieldDec.addAnnotation(DBRef.class);
+            }
+
+            String classStringName = classExpr.toString();
+
+            if(classStringName.contains("<")) {
+                String tmp = classStringName.substring(classStringName.indexOf(">") + 1);
+                classStringName = classStringName.substring(0, classStringName.indexOf("<")).concat(tmp);
+
+            }
+
             NormalAnnotationExpr fromRDB = fieldDec.addAndGetAnnotation(FromRDB.class)
                     .addPair("type", new StringLiteralExpr( Objects.equals(type, "object") ? classType.toString() : type ) )
-                    .addPair("typeClass", classExpr)
+                    .addPair("typeClass", classStringName)
                     .addPair("column", new StringLiteralExpr(column))
                     .addPair("table", new StringLiteralExpr(table))
                     .addPair("isReference", isRef)
-                    .addPair("isAbstract", new BooleanLiteralExpr(isAbstract))
-                    .addPair("projection", new StringLiteralExpr(sf.getProjection()));
+                    .addPair("isAbstract", new BooleanLiteralExpr(Objects.requireNonNullElse(isAbstract, false)))
+                    .addPair("projection", new StringLiteralExpr(Objects.requireNonNullElse(sf.getProjection(), "*")));
             if(sf.getReferenceTo() != null) {
                 fromRDB.addPair("targetTable", new StringLiteralExpr( sf.getReferenceTo().getTargetTable() ))
                         .addPair("targetColumn", new StringLiteralExpr( sf.getReferenceTo().getTargetColumn()));

@@ -82,7 +82,6 @@ public class MfClassGeneratorTest {
         var result = generator.generate();
 
         assertEquals("""
-                import org.springframework.data.mongodb.core.mapping.Document;
                 import org.utfpr.mf.annotation.FromRDB;
                 
                 @Document()
@@ -90,18 +89,19 @@ public class MfClassGeneratorTest {
                 public class Student {
                 
                     @org.springframework.data.annotation.Id()
-                    @FromRDB(type = "string", typeClass = java.lang.String.class, column = "id", table = "Students", isReference = false)
+                    @FromRDB(type = "string", typeClass = java.lang.String.class, column = "id", table = "Students", isReference = false, isAbstract = false, projection = "*")
                     private java.lang.String id;
                 
-                    @FromRDB(type = "string", typeClass = java.lang.String.class, column = "name", table = "Students", isReference = false)
+                    @FromRDB(type = "string", typeClass = java.lang.String.class, column = "name", table = "Students", isReference = false, isAbstract = false, projection = "*")
                     private java.lang.String name;
                 
-                    @FromRDB(type = "Address", typeClass = Address.class, column = "address_id", table = "Students", isReference = false, targetTable = "Address", targetColumn = "id")
+                    @FromRDB(type = "Address", typeClass = Address.class, column = "address_id", table = "Students", isReference = false, isAbstract = false, projection = "*", targetTable = "Address", targetColumn = "id")
                     private Address address;
                 
-                    @FromRDB(type = "string", typeClass = java.lang.String.class, column = "course_id", table = "Students", isReference = true, targetTable = "Courses", targetColumn = "id")
+                    @FromRDB(type = "string", typeClass = java.lang.String.class, column = "course_id", table = "Students", isReference = true, isAbstract = false, projection = "*", targetTable = "Courses", targetColumn = "id")
                     private java.lang.String course;
                 }
+                
                 """, result.get("Student"));
 
     }

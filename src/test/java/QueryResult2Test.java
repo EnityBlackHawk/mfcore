@@ -21,7 +21,7 @@ public class QueryResult2Test {
                 "admin");
         DbMetadata db = new DbMetadata(credentials, null);
 
-        QueryResult2 result = DataImporter.Companion.runQuery("SELECT * FROM flight", db, QueryResult2.class);
+        QueryResult2 result = DataImporter.Companion.runQuery("SELECT * FROM aircraft", db, QueryResult2.class);
         List<AircraftMongo> list = result.asObject(AircraftMongo.class);
 
         assertNotNull(list);

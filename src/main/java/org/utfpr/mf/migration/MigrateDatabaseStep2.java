@@ -42,8 +42,7 @@ public class MigrateDatabaseStep2 extends MigrateDatabaseStep{
     protected Map<String, Integer> makeMigration(DbMetadata dbMetadata, MongoConnection mongoConnection, Map<String, Class<?>> classes) {
 
         HashMap<String, Integer> classCount = new HashMap<>();
-        // TODO Loop based on the recipe
-        //for(String className : classes.keySet())
+
         for(JsonSchema recipe : recepies)
         {
             String className = TemplatedString.capitalize(TemplatedString.camelCaseToSnakeCase(recipe.getTitle()));

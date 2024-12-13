@@ -2,6 +2,7 @@ package org.utfpr.mf.tools
 
 import org.utfpr.mf.annotation.FromRDB
 import org.utfpr.mf.metadata.DbMetadata
+import java.lang.reflect.ParameterizedType
 import java.sql.ResultSet
 
 class QueryResult2 : QueryResult {
@@ -27,6 +28,17 @@ class QueryResult2 : QueryResult {
 
     }
 
+    private fun populateListObject(ptype : ParameterizedType) : List<Any> {
+        if(metadata == null)
+            throw Exception("Metadata required")
+
+        val obj = ArrayList<Any>()
+        val parClass = ptype.actualTypeArguments[0] as Class<*>
+        val values = asObject(parClass)
+        obj.addAll(values)
+        return obj
+    }
+
     override fun <T> asObject(clazz : Class<T>) : List<T> {
         if(metadata == null)
             throw Exception("Metadata required")
@@ -37,12 +49,17 @@ class QueryResult2 : QueryResult {
         for (row in rows) {
 
             if(clazz.packageName == "java.lang") {
+
+                // TODO Try to get ID first
                 val v = cast(row[0], clazz)
                 v?.let { res.add(it) }
                 continue
             }
 
-            val obj = clazz.getDeclaredConstructor().newInstance()
+
+            val obj = ( if (clazz.isInterface) getConcreteTypeClass(clazz) else clazz).getDeclaredConstructor().newInstance() as T
+
+
             val fields = clazz.declaredFields
 
             for(field in fields) {
@@ -53,7 +70,7 @@ class QueryResult2 : QueryResult {
                     continue
                 }
 
-                if(!ann.typeClass.equals(field.type)) {
+                if(ann.typeClass.javaObjectType != field.type) {
                     throw RuntimeException("Type mismatch")
                 }
 
@@ -83,14 +100,15 @@ class QueryResult2 : QueryResult {
                 if(offset == -1) {
                     throw RuntimeException("Column ${ann.column} not found")
                 }
-
+                // TODO Tratar Json Loop
                 if(ann.isReference || ann.targetColumn.isNotBlank() && ann.targetTable.isNotBlank()) {
                     val isColumnString = columnTypes[offset] == SqlDataType.VARCHAR
                     val query = "SELECT ${ann.projection} FROM ${ann.targetTable} " +
                             "WHERE ${ann.targetColumn} = ${ if(isColumnString) "'${row[offset]}'" else row[offset]}"
+
                     val res = DataImporter.runQuery(query, metadata!!, QueryResult2::class.java)
-                    val newObj = res.asObject( field.type )
-                    field.set(obj, newObj.firstOrNull())
+                    val newObj = if (ann.type == "array") res.populateListObject(field.genericType as ParameterizedType) else  res.asObject( field.type )
+                    field.set(obj, if (ann.type == "array") newObj else newObj.firstOrNull())
                     continue
                 }
 
@@ -102,6 +120,14 @@ class QueryResult2 : QueryResult {
             res.add(obj)
         }
         return res;
+    }
+
+    private fun getConcreteTypeClass(clazz : Class<*>) : Class<*> {
+        if(clazz == java.util.List::class.java) {
+            return java.util.ArrayList::class.java
+        }
+
+        return clazz
     }
 
     private fun <T> cast(value: String?, clazz: Class<T>): T? {
