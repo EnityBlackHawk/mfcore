@@ -91,6 +91,7 @@ class QueryResult2 : QueryResult {
                     }
 
                     val result = qr!!.asObject(ann.typeClass.java)
+                    println(result)
                     field.set(obj, result.firstOrNull())
                     continue
                 }

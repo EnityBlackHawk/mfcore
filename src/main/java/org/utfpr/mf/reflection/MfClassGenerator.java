@@ -2,6 +2,7 @@ package org.utfpr.mf.reflection;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.expr.ClassExpr;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.utfpr.mf.annotation.FromRDB;
+import org.utfpr.mf.annotation.ListOf;
 import org.utfpr.mf.json.JsonSchema;
 import org.utfpr.mf.json.JsonSchemaList;
 import org.utfpr.mf.tools.CodeSession;
@@ -155,11 +157,11 @@ public class MfClassGenerator extends CodeSession {
             }
 
 
-            Type classType = fieldDec.getCommonType();
+            ClassOrInterfaceType classType = fieldDec.getCommonType().asClassOrInterfaceType();
+            Optional<NodeList<Type>> typeArgs = classType.getTypeArguments();
             ClassExpr classExpr = new ClassExpr(classType);
 
             // TODO Tratar repeticoes
-            // TODO List<Booking> n esta chegando
             if(sf.getType().equals("object") && classes.containsKey(classType.toString())) {
                 var cmp = classes.get(classType.toString());
                 annotateClass( sf, cmp,  classType.toString(), docName);
@@ -190,7 +192,13 @@ public class MfClassGenerator extends CodeSession {
             if(classStringName.contains("<")) {
                 String tmp = classStringName.substring(classStringName.indexOf(">") + 1);
                 classStringName = classStringName.substring(0, classStringName.indexOf("<")).concat(tmp);
+            }
 
+            if(typeArgs.isPresent()) {
+                ClassExpr argEx = new ClassExpr(typeArgs.get().get(0));
+                var cmp = classes.get(typeArgs.get().get(0).asString());
+                annotateClass(sf.getItems(), cmp, typeArgs.get().get(0).asString(), docName);
+                fieldDec.addAndGetAnnotation(ListOf.class).addPair("value", argEx);
             }
 
             NormalAnnotationExpr fromRDB = fieldDec.addAndGetAnnotation(FromRDB.class)
