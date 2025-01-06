@@ -90,7 +90,14 @@ class QueryResult2 : QueryResult {
                             }.forEach { column = it.name }
                         }
                     }
-                    val offset = columns.indexOf(annList.column);
+                    // TODO if the value is not in this current table (if it is in another table, make a SQL query)
+                    var offset = columns.indexOf(annList.column)
+                    if(offset == -1) {
+                        // Gets the PK
+                        metadata!!.tables.filter { it.name == ann.table }.first().columns.filter { it.isPk }.first().let {
+                            offset = columns.indexOf(it.name)
+                        }
+                    }
                     val isString = columnTypes[offset] == SqlDataType.VARCHAR
                     val query = "SELECT * FROM $table WHERE $column = ${if (isString) "'${row[offset]}'" else row[offset]}"
                     val qr = DataImporter.runQuery(query, metadata!!, QueryResult2::class.java)
