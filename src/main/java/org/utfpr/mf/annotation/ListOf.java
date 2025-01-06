@@ -10,5 +10,8 @@ import java.lang.annotation.Target;
 public @interface ListOf {
 
     Class<?> value();
-
+    String table();
+    String column();
+    String targetTable();
+    String targetColumn();
 }

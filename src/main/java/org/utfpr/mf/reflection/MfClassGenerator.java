@@ -19,6 +19,7 @@ import org.utfpr.mf.annotation.FromRDB;
 import org.utfpr.mf.annotation.ListOf;
 import org.utfpr.mf.json.JsonSchema;
 import org.utfpr.mf.json.JsonSchemaList;
+import org.utfpr.mf.json.Reference;
 import org.utfpr.mf.tools.CodeSession;
 import org.utfpr.mf.tools.QueryResult;
 import org.utfpr.mf.tools.TemplatedString;
@@ -195,10 +196,24 @@ public class MfClassGenerator extends CodeSession {
             }
 
             if(typeArgs.isPresent()) {
+
+                Reference ref = sf.getReferenceTo();
+
+                if(ref == null) {
+                    ERROR("ReferencedBy not set for field: " + propName + "on class: " + className + " schema: " + schema.getTitle());
+                    INFO("Setting this relation to $auto");
+                    ref = new Reference("$auto", "$auto");
+                }
+
                 ClassExpr argEx = new ClassExpr(typeArgs.get().get(0));
                 var cmp = classes.get(typeArgs.get().get(0).asString());
                 annotateClass(sf.getItems(), cmp, typeArgs.get().get(0).asString(), docName);
-                fieldDec.addAndGetAnnotation(ListOf.class).addPair("value", argEx);
+                fieldDec.addAndGetAnnotation(ListOf.class)
+                        .addPair("value", argEx)
+                        .addPair("table", new StringLiteralExpr(table))
+                        .addPair("column", new StringLiteralExpr(column))
+                        .addPair("targetTable", new StringLiteralExpr(ref.getTargetTable()))
+                        .addPair("targetColumn", new StringLiteralExpr(ref.getTargetColumn()));
             }
 
             NormalAnnotationExpr fromRDB = fieldDec.addAndGetAnnotation(FromRDB.class)

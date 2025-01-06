@@ -66,189 +66,79 @@ public class PromptData4 extends PromptData3 {
         sb.append("```json").append("\n");
         sb.append("""
                 {
-                  "explanation": "The MongoDB model embeds frequently accessed data such as Albums and Customers for performance optimization. Less accessed data like Tracks, MediaType, and Genre are referenced to avoid data duplication and maintain scalability.",
-                  "schemas": [
-                    {
-                      "$schema": "http://json-schema.org/draft-07/schema#",
-                      "type": "object",
-                      "title": "Album",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "column": "AlbumId",
-                          "table": "Album",
-                          "description": "The unique identifier for an album"
+                    "$schema": "http://json-schema.org/draft-07/schema#",
+                    "type": "object",
+                    "title": "Student",
+                    "properties" : {
+                        "id" : {
+                            "type" : "string",
+                            "column" : "id",
+                            "table" : "Students",
+                            "description" : "The unique identifier for a product"
                         },
-                        "title": {
-                          "type": "string",
-                          "column": "Title",
-                          "table": "Album",
-                          "description": "The title of the album"
+                        "name" : {
+                            "type" : "string",
+                            "column" : "name",
+                            "table" : "Students",
+                            "description" : "Name of the student"
                         },
-                        "artist": {
-                          "type": "object",
-                          "column": "ArtistId",
-                          "table": "Album",
-                          "referenceTo": {
-                            "targetTable": "Artist",
-                            "targetColumn": "ArtistId"
-                          },
-                          "properties": {
-                            "id": {
-                              "type": "string",
-                              "column": "ArtistId",
-                              "table": "Artist",
-                              "description": "The unique identifier for an artist"
+                        "address" : {
+                            "type" : "object",
+                            "column" : "address_id",
+                            "table" : "Students",
+                            "referenceTo" : {
+                                "targetTable" : "Address",
+                                "targetColumn" : "id"
                             },
-                            "name": {
-                              "type": "string",
-                              "column": "Name",
-                              "table": "Artist",
-                              "description": "The name of the artist"
+                            "properties": {
+                                "street" : {
+                                    "type" : "string",
+                                    "column" : "street",
+                                    "table" : "Address",
+                                    "description" : "Street name"
+                                },
+                                "city" : {
+                                    "type" : "string",
+                                    "column" : "city",
+                                    "table" : "Address",
+                                    "description" : "City name"
+                                },
+                                "number" : {
+                                    "type" : "string",
+                                    "column" : "number",
+                                    "table" : "Address",
+                                    "description" : "House number"
+                                }
                             }
-                          }
-                        }
-                      }
-                    },
-                    {
-                      "$schema": "http://json-schema.org/draft-07/schema#",
-                      "type": "object",
-                      "title": "Customer",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "column": "CustomerId",
-                          "table": "Customer",
-                          "description": "The unique identifier for a customer"
                         },
-                        "firstName": {
-                          "type": "string",
-                          "column": "FirstName",
-                          "table": "Customer",
-                          "description": "Customer's first name"
-                        },
-                        "lastName": {
-                          "type": "string",
-                          "column": "LastName",
-                          "table": "Customer",
-                          "description": "Customer's last name"
-                        },
-                        "contactInfo": {
-                          "type": "object",
-                          "properties": {
-                            "phone": {
-                              "type": "string",
-                              "column": "Phone",
-                              "table": "Customer",
-                              "description": "Customer's phone number"
+                        "course" : {
+                            "type" : "array",
+                            "column" : "course_id",
+                            "table" : "Students",
+                            "referencedBy" : {
+                                "targetTable" : "Courses",
+                                "targetColumn" : "id"
                             },
-                            "email": {
-                              "type": "string",
-                              "column": "Email",
-                              "table": "Customer",
-                              "description": "Customer's email address"
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "id" : {
+                                        "type" : "string",
+                                        "column" : "id",
+                                        "table" : "Courses",
+                                        "description" : "The unique identifier for a course"
+                                    },
+                                    "name" : {
+                                        "type" : "string",
+                                        "column" : "name",
+                                        "table" : "Courses",
+                                        "description" : "Name of the course"
+                                    }
+                                }
                             }
-                          }
-                        },
-                        "supportRep": {
-                          "type": "object",
-                          "column": "SupportRepId",
-                          "table": "Customer",
-                          "referenceTo": {
-                            "targetTable": "Employee",
-                            "targetColumn": "EmployeeId"
-                          },
-                          "properties": {
-                            "id": {
-                              "type": "string",
-                              "column": "EmployeeId",
-                              "table": "Employee",
-                              "description": "The unique identifier for an employee"
-                            },
-                            "name": {
-                              "type": "string",
-                              "column": "FirstName",
-                              "table": "Employee",
-                              "description": "Employee's first name"
-                            }
-                          }
                         }
-                      }
-                    },
-                    {
-                      "$schema": "http://json-schema.org/draft-07/schema#",
-                      "type": "object",
-                      "title": "Invoice",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "column": "InvoiceId",
-                          "table": "Invoice",
-                          "description": "The unique identifier for an invoice"
-                        },
-                        "customer": {
-                          "type": "string",
-                          "isReference": true,
-                          "column": "CustomerId",
-                          "table": "Invoice",
-                          "referenceTo": {
-                            "targetTable": "Customer",
-                            "targetColumn": "CustomerId"
-                          }
-                        },
-                        "total": {
-                          "type": "number",
-                          "column": "Total",
-                          "table": "Invoice",
-                          "description": "Total amount for the invoice"
-                        }
-                      }
-                    },
-                    {
-                      "$schema": "http://json-schema.org/draft-07/schema#",
-                      "type": "object",
-                      "title": "Track",
-                      "properties": {
-                        "id": {
-                          "type": "string",
-                          "column": "TrackId",
-                          "table": "Track",
-                          "description": "The unique identifier for a track"
-                        },
-                        "name": {
-                          "type": "string",
-                          "column": "Name",
-                          "table": "Track",
-                          "description": "The name of the track"
-                        },
-                        "album": {
-                          "type": "string",
-                          "isReference": true,
-                          "column": "AlbumId",
-                          "table": "Track",
-                          "referenceTo": {
-                            "targetTable": "Album",
-                            "targetColumn": "AlbumId"
-                          },
-                          "projection" : "Name"
-                        },
-                        "mediaType": {
-                          "type": "string",
-                          "isReference": true,
-                          "column": "MediaTypeId",
-                          "projection" : "Name",
-                          "table": "Track",
-                          "referenceTo": {
-                            "targetTable": "MediaType",
-                            "targetColumn": "MediaTypeId"
-                          }
-                        }
-                      }
-                    },
-                    ...
-                  ]
+                    }
                 }
-                
                 """).append("\n");
         sb.append("```").append("\n");
         sb.append("### Instructions").append("\n");

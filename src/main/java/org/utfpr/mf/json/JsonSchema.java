@@ -4,12 +4,8 @@ import dev.langchain4j.model.output.structured.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.utfpr.mf.json.JsonType;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,10 +27,12 @@ public class JsonSchema {
     @Description("[REQUIRED If !isAbstract] Table from RDB")
     private String table;
     private Boolean reference;
-    @Description("[REQUIRED IF type = object] Is the properties of the object described by this JSON")
+    @Description("[REQUIRED IF type = object] The properties of the object described by this JSON")
     private HashMap<String, JsonSchema> properties;
     @Description("[REQUIRED when a JOIN is need to fetch the data]")
-    private ReferenceTo referenceTo;
+    private Reference referenceTo;
+    @Description("[REQUIRED when objects inside an array] Describes how to select the data from the target table")
+    private Reference referencedBy;
     @Description("[REQUIRED IF type != object and referenceTo != null] Describes the what column from the target table will be projected into this property")
     private String projection;
     @Description("[REQUIRED IF type = array] Describes the items of the array")

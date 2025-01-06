@@ -1,6 +1,7 @@
 package org.utfpr.mf.tools
 
 import org.utfpr.mf.annotation.FromRDB
+import org.utfpr.mf.annotation.ListOf
 import org.utfpr.mf.metadata.DbMetadata
 import java.lang.reflect.ParameterizedType
 import java.sql.ResultSet
@@ -64,14 +65,38 @@ class QueryResult2 : QueryResult {
 
             for(field in fields) {
                 field.isAccessible = true
-                val ann = field.getAnnotation(FromRDB::class.java)
-
-                if(ann == null) {
-                    continue
-                }
+                val ann = field.getAnnotation(FromRDB::class.java) ?: continue
 
                 if(ann.typeClass.javaObjectType != field.type) {
                     throw RuntimeException("Type mismatch")
+                }
+
+                val annList = field.getAnnotation(ListOf::class.java)
+
+                if(annList != null) {
+
+                    var table : String = annList.targetTable
+                    if(table == "\$auto") {
+                        //TODO Convert to snake case
+                        table = annList.value.simpleName!!.lowercase()
+                    }
+                    //TODO Support multiple PKs (column as List<String>)
+                    var column = annList.targetColumn;
+                    if(column == "\$auto") {
+                        metadata!!.tables.filter { it.name == table }.forEach { it ->
+                            it.columns.filter { it.isFk }.filter {
+                                //TODO Test error cases (error if is abstract)
+                                it.fkInfo?.pk_tableName == ann.table
+                            }.forEach { column = it.name }
+                        }
+                    }
+                    val offset = columns.indexOf(annList.column);
+                    val isString = columnTypes[offset] == SqlDataType.VARCHAR
+                    val query = "SELECT * FROM $table WHERE $column = ${if (isString) "'${row[offset]}'" else row[offset]}"
+                    val qr = DataImporter.runQuery(query, metadata!!, QueryResult2::class.java)
+                    val result = qr.asObject(annList.value.java)
+                    field.set(obj, result)
+                    continue
                 }
 
                 if(ann.isAbstract) {
@@ -89,6 +114,7 @@ class QueryResult2 : QueryResult {
                     val qr = filter(columns.first()) {
                         it == row[0]
                     }
+
 
                     val result = qr!!.asObject(ann.typeClass.java)
                     println(result)

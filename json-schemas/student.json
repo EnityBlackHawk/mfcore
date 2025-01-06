@@ -45,13 +45,29 @@
             }
         },
         "course" : {
-            "type" : "string",
-            "reference" : true,
+            "type" : "array",
             "column" : "course_id",
             "table" : "Students",
-            "referenceTo" : {
+            "referencedBy" : {
                 "targetTable" : "Courses",
                 "targetColumn" : "id"
+            },
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id" : {
+                        "type" : "string",
+                        "column" : "id",
+                        "table" : "Courses",
+                        "description" : "The unique identifier for a course"
+                    },
+                    "name" : {
+                        "type" : "string",
+                        "column" : "name",
+                        "table" : "Courses",
+                        "description" : "Name of the course"
+                    }
+                }
             }
         }
     }

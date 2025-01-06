@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReferenceTo {
+public class Reference {
 
     @Description("Table from where this property's value points to")
     private String targetTable = "";
