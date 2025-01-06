@@ -83,7 +83,7 @@ class QueryResult2 : QueryResult {
                     //TODO Support multiple PKs (column as List<String>)
                     var column = annList.targetColumn;
                     if(column == "\$auto") {
-                        metadata!!.tables.filter { it.name == table }.forEach { it ->
+                        metadata!!.tables.filter { it.name.lowercase() == table }.forEach { it ->
                             it.columns.filter { it.isFk }.filter {
                                 //TODO Test error cases (error if is abstract)
                                 it.fkInfo?.pk_tableName == ann.table
