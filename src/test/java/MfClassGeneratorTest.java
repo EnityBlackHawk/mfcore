@@ -70,7 +70,6 @@ public class MfClassGeneratorTest {
     static void prepare() throws IOException {
         File file = new File("json-schemas/student.json");
         model = "[" + Files.readString(file.toPath()) + "]";
-
     }
 
 

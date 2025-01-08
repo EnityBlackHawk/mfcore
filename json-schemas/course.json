@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Course",
+  "properties": {
+    "id": {
+      "type": "string",
+      "column": "id",
+      "table": "courses",
+      "description": "The unique identifier for a class"
+    },
+    "name": {
+      "type": "string",
+      "column": "name",
+      "table": "course",
+      "description": "Name of the class"
+    }
+  }
+}

@@ -2,70 +2,93 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
     "title": "Student",
-    "properties" : {
-        "id" : {
-            "type" : "string",
-            "column" : "id",
-            "table" : "Students",
-            "description" : "The unique identifier for a product"
+    "properties": {
+        "id": {
+            "type": "string",
+            "column": "id",
+            "table": "Students",
+            "description": "The unique identifier for a product"
         },
-        "name" : {
-            "type" : "string",
-            "column" : "name",
-            "table" : "Students",
-            "description" : "Name of the student"
+        "name": {
+            "type": "string",
+            "column": "name",
+            "table": "Students",
+            "description": "Name of the student"
         },
-        "address" : {
-            "type" : "object",
-            "column" : "address_id",
-            "table" : "Students",
-            "referenceTo" : {
-                "targetTable" : "Address",
-                "targetColumn" : "id"
+        "address": {
+            "type": "object",
+            "column": "address_id",
+            "table": "Students",
+            "referenceTo": {
+                "targetTable": "Address",
+                "targetColumn": "id"
             },
             "properties": {
-                "street" : {
-                    "type" : "string",
-                    "column" : "street",
-                    "table" : "Address",
-                    "description" : "Street name"
+                "street": {
+                    "type": "string",
+                    "column": "street",
+                    "table": "Address",
+                    "description": "Street name"
                 },
-                "city" : {
-                    "type" : "string",
-                    "column" : "city",
-                    "table" : "Address",
-                    "description" : "City name"
+                "city": {
+                    "type": "string",
+                    "column": "city",
+                    "table": "Address",
+                    "description": "City name"
                 },
-                "number" : {
-                    "type" : "string",
-                    "column" : "number",
-                    "table" : "Address",
-                    "description" : "House number"
+                "number": {
+                    "type": "string",
+                    "column": "number",
+                    "table": "Address",
+                    "description": "House number"
                 }
             }
         },
-        "course" : {
-            "type" : "array",
-            "column" : "course_id",
-            "table" : "Students",
-            "referencedBy" : {
-                "targetTable" : "Courses",
-                "targetColumn" : "id"
+        "course": {
+            "type": "array",
+            "column": "course_id",
+            "table": "Students",
+            "referencedBy": {
+                "targetTable": "Courses",
+                "targetColumn": "id"
             },
             "items": {
                 "type": "object",
                 "properties": {
-                    "id" : {
-                        "type" : "string",
-                        "column" : "id",
-                        "table" : "Courses",
-                        "description" : "The unique identifier for a course"
+                    "id": {
+                        "type": "string",
+                        "column": "id",
+                        "table": "Courses",
+                        "description": "The unique identifier for a course"
                     },
-                    "name" : {
-                        "type" : "string",
-                        "column" : "name",
-                        "table" : "Courses",
-                        "description" : "Name of the course"
+                    "name": {
+                        "type": "string",
+                        "column": "name",
+                        "table": "Courses",
+                        "description": "Name of the course"
+                    },
+                    "teacher": {
+                        "type": "object",
+                        "column": "teacher_id",
+                        "table": "Courses",
+                        "referenceTo": {
+                            "targetTable": "Teachers",
+                            "targetColumn": "id"
+                        },
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "column": "id",
+                                "table": "Teachers",
+                                "description": "The unique identifier for a teacher"
+                            },
+                            "name": {
+                                "type": "string",
+                                "column": "name",
+                                "table": "Teachers",
+                                "description": "Name of the teacher"
+                            }
+                        }
                     }
                 }
             }
