@@ -108,20 +108,9 @@ class QueryResult2 : QueryResult {
 
                 if(ann.isAbstract) {
 
-//                    val cols = ann.typeClass.java.declaredFields.map {
-//                        it.getAnnotation(FromRDB::class.java)?.column ?: throw RuntimeException("All props of a composite prop must be annotated ")
-//                    }
-//
-//                    for(col in cols) {
-//                        val offset = columns.indexOf(col)
-//
-//                    }
-
-
                     val qr = filter(columns.first()) {
                         it == row[0]
                     }
-
 
                     val result = qr!!.asObject(ann.typeClass.java)
                     println(result)
