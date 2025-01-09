@@ -15,6 +15,7 @@ import kotlin.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.utfpr.mf.annotation.FromRDB;
 import org.utfpr.mf.annotation.ListOf;
 import org.utfpr.mf.json.JsonSchema;
@@ -173,7 +174,7 @@ public class MfClassGenerator extends CodeSession {
             String type = sf.getType().toString();
             String column = sf.getColumn();
             String table = sf.getTable();
-            Boolean isAbstract = sf.getIsAbstract();
+            Boolean isAbstract = Objects.requireNonNullElse(sf.getIsAbstract(), false);
 
             var isRef = new BooleanLiteralExpr(Boolean.parseBoolean(isReference.toString()));
             if(column == null || table == null) {
@@ -185,7 +186,18 @@ public class MfClassGenerator extends CodeSession {
             }
 
             if(isReference) {
-                fieldDec.addAnnotation(DBRef.class);
+                if(isAbstract) {
+                    ERROR("Cant set reference to abstract fields. Field: " + propName + " on class: " + className + " schema: " + schema.getTitle());
+                }
+                else {
+                    var refClazz = classes.get(classType.toString().toLowerCase());
+                    if(refClazz == null) {
+                        ERROR("Field: " + propName + " referencing a uncreated class: " + classType);
+                        INFO("Skipping this field");
+                        continue;
+                    }
+                    fieldDec.addAnnotation(DBRef.class);
+                }
             }
 
             String classStringName = classExpr.toString();

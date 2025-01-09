@@ -27,6 +27,8 @@ public class JsonSchema {
     @Description("[REQUIRED If !isAbstract] Table from RDB")
     private String table;
     private Boolean reference;
+    @Description("[REQUIRED If reference] The name of the collection that this property references")
+    private String docReferenceTo;
     @Description("[REQUIRED IF type = object] The properties of the object described by this JSON")
     private HashMap<String, JsonSchema> properties;
     @Description("[REQUIRED when a JOIN is need to fetch the data]")

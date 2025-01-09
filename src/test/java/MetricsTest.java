@@ -34,10 +34,25 @@ public class MetricsTest {
     @Test
     void colDepth() {
         int result = Metrics.colDepth(schema.get(0));
-        assertEquals(1, result);
+        assertEquals(2, result);
 
         result = Metrics.colDepth(schema.get(1));
         assertEquals(0, result);
+    }
+
+    @Test
+    void globalDepth() {
+        int result = Metrics.globalDepth(schema);
+        assertEquals(2, result);
+    }
+
+    @Test
+    void docWidth() {
+        int result = Metrics.docWidth(schema.get(0));
+        assertEquals(7, result);
+
+        result = Metrics.docWidth(schema.get(1));
+        assertEquals(3, result);
     }
 
 }

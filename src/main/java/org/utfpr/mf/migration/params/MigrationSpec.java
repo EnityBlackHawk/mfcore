@@ -26,6 +26,7 @@ public class MigrationSpec {
     private String LLM;
     @Optional(overriddenBy = MetadataInfo.class)
     private List<RelationCardinality> cardinality;
+    private Boolean reference_only = false;
 
     @Builder
     @AllArgsConstructor
