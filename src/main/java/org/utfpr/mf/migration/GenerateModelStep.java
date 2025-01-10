@@ -9,6 +9,7 @@ import org.utfpr.mf.migration.params.MetadataInfo;
 import org.utfpr.mf.migration.params.MigrationSpec;
 import org.utfpr.mf.migration.params.Model;
 import org.utfpr.mf.prompt.*;
+import org.utfpr.mf.prompt.desc.PromptData4Desc;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -62,17 +63,17 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
         BEGIN("Building prompt");
         promptDataVersion = 4;
         INFO("Using PromptData" + promptDataVersion);
-        var prompt = new PromptData4(
-                metadataInfo.getSql(),
-                migrationSpec.getPrioritize_performance() ? MigrationPreferences.PREFER_PERFORMANCE : MigrationPreferences.PREFER_CONSISTENCY,
-                migrationSpec.getAllow_ref(),
-                migrationSpec.getFramework(),
-                metadataInfo.getRelations().toString(),
-                true,
-                migrationSpec.getWorkload() != null ? migrationSpec.getWorkload().stream().map(Query::new).toList() : new ArrayList<>(),
-                migrationSpec.getCustom_prompt() != null ? migrationSpec.getCustom_prompt() : new ArrayList<>()
+        var promptDesc = new PromptData4Desc();
+        promptDesc.sqlTables = metadataInfo.getSql();
+        promptDesc.migrationPreference = migrationSpec.getPrioritize_performance() ? MigrationPreferences.PREFER_PERFORMANCE : MigrationPreferences.PREFER_CONSISTENCY;
+        promptDesc.allowReferences = migrationSpec.getAllow_ref();
+        promptDesc.framework = migrationSpec.getFramework();
+        promptDesc.cardinalityTable = metadataInfo.getRelations().toString();
+        promptDesc.useMarkdown = true;
+        promptDesc.queryList = migrationSpec.getWorkload() != null ? migrationSpec.getWorkload().stream().map(Query::new).toList() : new ArrayList<>();
+        promptDesc.customPrompts = migrationSpec.getCustom_prompt() != null ? migrationSpec.getCustom_prompt() : new ArrayList<>();
 
-        );
+        var prompt = new PromptData4(promptDesc);
         var p = prompt.next();
         this.prompt = p;
         int tokens = 0;

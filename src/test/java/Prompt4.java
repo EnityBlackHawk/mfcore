@@ -13,6 +13,7 @@ import org.utfpr.mf.llm.LLMService;
 import org.utfpr.mf.prompt.Framework;
 import org.utfpr.mf.prompt.MigrationPreferences;
 import org.utfpr.mf.prompt.PromptData4;
+import org.utfpr.mf.prompt.desc.PromptData4Desc;
 
 import java.util.List;
 
@@ -43,16 +44,17 @@ public class Prompt4 {
     @Test
     void testGetFirst() {
 
-        PromptData4 promptData4 = new PromptData4(
-                sqlTables,
-                MigrationPreferences.PREFER_PERFORMANCE,
-                true,
-                Framework.SPRING_DATA,
-                null,
-                true,
-                List.of(),
-                List.of()
-        );
+        var promptDesc = new PromptData4Desc();
+        promptDesc.sqlTables = sqlTables;
+        promptDesc.migrationPreference = MigrationPreferences.PREFER_PERFORMANCE;
+        promptDesc.allowReferences = true;
+        promptDesc.framework = Framework.SPRING_DATA;
+        promptDesc.cardinalityTable = null;
+        promptDesc.useMarkdown = true;
+        promptDesc.queryList = List.of();
+        promptDesc.customPrompts = List.of();
+
+        PromptData4 promptData4 = new PromptData4(promptDesc);
 
         System.out.print("Prompt 1: \n" + promptData4.getFirst());
 

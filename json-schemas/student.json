@@ -71,6 +71,7 @@
                         "type": "object",
                         "column": "teacher_id",
                         "table": "Courses",
+                        "reference": true,
                         "referenceTo": {
                             "targetTable": "Teachers",
                             "targetColumn": "id"

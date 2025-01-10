@@ -26,6 +26,7 @@ public class JsonSchema {
     private String column;
     @Description("[REQUIRED If !isAbstract] Table from RDB")
     private String table;
+    @Description("If this property is a reference to another document")
     private Boolean reference;
     @Description("[REQUIRED If reference] The name of the collection that this property references")
     private String docReferenceTo;

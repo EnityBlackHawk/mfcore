@@ -3,6 +3,7 @@ package org.utfpr.mf.prompt;
 import org.jetbrains.annotations.Nullable;
 import org.utfpr.mf.markdown.MarkdownContent;
 import org.utfpr.mf.metadata.DbMetadata;
+import org.utfpr.mf.prompt.desc.PromptData4Desc;
 
 import javax.naming.OperationNotSupportedException;
 import java.io.File;
@@ -13,13 +14,15 @@ import java.util.List;
 
 public class PromptData4 extends PromptData3 {
 
+    private Boolean referenceOnly = false;
 
     public PromptData4(DbMetadata dbMetadata, MigrationPreferences migrationPreference, Boolean allowReferences, Framework framework, @Nullable String cardinalityTable, Boolean useMarkdown, List<Query> queryList, List<String> remarks) {
         super(dbMetadata, migrationPreference, allowReferences, framework, cardinalityTable, useMarkdown, queryList, remarks);
     }
 
-    public PromptData4(String sqlTables, MigrationPreferences migrationPreference, Boolean allowReferences, Framework framework, @Nullable String cardinalityTable, Boolean useMarkdown, List<Query> queryList, List<String> customPrompts) {
-        super(sqlTables, migrationPreference, allowReferences, framework, cardinalityTable, useMarkdown, queryList, customPrompts);
+    public PromptData4(PromptData4Desc desc) {
+        super(desc.sqlTables, desc.migrationPreference, desc.allowReferences, desc.framework, desc.cardinalityTable, desc.useMarkdown, desc.queryList, desc.customPrompts);
+        this.referenceOnly = desc.referenceOnly;
     }
 
     public String getFirst() {
@@ -28,7 +31,7 @@ public class PromptData4 extends PromptData3 {
         sb.append("You are an expert in database modeling. Your task is to help migrate a relational database to a MongoDB database. " +
                         "Follow the instructions and details provided below to generate the MongoDB model. " +
                         "making sure to" +
-                        (migrationPreference == MigrationPreferences.PREFER_CONSISTENCY ? " **use references for less frequently accessed data** as instructed. " : " **embed frequently accessed data** into the main documents for efficiency.") +
+                        (migrationPreference == MigrationPreferences.PREFER_CONSISTENCY ? " **use references for the most number of relationships** as instructed. " : " **embed frequently accessed data** into the main documents for efficiency.") +
                         "\n")
                 .append("### Task Overview\n")
                 .append("We have a relational database that needs to be migrated to MongoDB. The goal is to create an optimized MongoDB schema based on the usage patterns of the data. \n");
@@ -54,6 +57,7 @@ public class PromptData4 extends PromptData3 {
         }
         sb.append( allowReferences ? "- Use references for less frequently accessed data \n" : "");
         sb.append("- ").append( migrationPreference.getDescription()).append("\n");
+        sb.append("- ").append(referenceOnly ? "- Do not embedded documents, use reference **ONLY** \n" : migrationPreference.getDescription()).append("\n");
         sb.append("- **AWAYS** convert the primary key to the be a string \n");
 
         if(userDefinedPrompts != null) {
@@ -69,82 +73,107 @@ public class PromptData4 extends PromptData3 {
                     "$schema": "http://json-schema.org/draft-07/schema#",
                     "type": "object",
                     "title": "Student",
-                    "properties" : {
-                        "id" : {
-                            "type" : "string",
-                            "column" : "id",
-                            "table" : "Students",
-                            "description" : "The unique identifier for a product"
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "column": "id",
+                            "table": "Students",
+                            "description": "The unique identifier for a product"
                         },
-                        "name" : {
-                            "type" : "string",
-                            "column" : "name",
-                            "table" : "Students",
-                            "description" : "Name of the student"
+                        "name": {
+                            "type": "string",
+                            "column": "name",
+                            "table": "Students",
+                            "description": "Name of the student"
                         },
-                        "address" : {
-                            "type" : "object",
-                            "column" : "address_id",
-                            "table" : "Students",
-                            "referenceTo" : {
-                                "targetTable" : "Address",
-                                "targetColumn" : "id"
+                        "address": {
+                            "type": "object",
+                            "column": "address_id",
+                            "table": "Students",
+                            "referenceTo": {
+                                "targetTable": "Address",
+                                "targetColumn": "id"
                             },
                             "properties": {
-                                "street" : {
-                                    "type" : "string",
-                                    "column" : "street",
-                                    "table" : "Address",
-                                    "description" : "Street name"
+                                "street": {
+                                    "type": "string",
+                                    "column": "street",
+                                    "table": "Address",
+                                    "description": "Street name"
                                 },
-                                "city" : {
-                                    "type" : "string",
-                                    "column" : "city",
-                                    "table" : "Address",
-                                    "description" : "City name"
+                                "city": {
+                                    "type": "string",
+                                    "column": "city",
+                                    "table": "Address",
+                                    "description": "City name"
                                 },
-                                "number" : {
-                                    "type" : "string",
-                                    "column" : "number",
-                                    "table" : "Address",
-                                    "description" : "House number"
+                                "number": {
+                                    "type": "string",
+                                    "column": "number",
+                                    "table": "Address",
+                                    "description": "House number"
                                 }
                             }
                         },
-                        "course" : {
-                            "type" : "array",
-                            "column" : "course_id",
-                            "table" : "Students",
-                            "referencedBy" : {
-                                "targetTable" : "Courses",
-                                "targetColumn" : "id"
+                        "course": {
+                            "type": "array",
+                            "column": "course_id",
+                            "table": "Students",
+                            "referencedBy": {
+                                "targetTable": "Courses",
+                                "targetColumn": "id"
                             },
                             "items": {
                                 "type": "object",
                                 "properties": {
-                                    "id" : {
-                                        "type" : "string",
-                                        "column" : "id",
-                                        "table" : "Courses",
-                                        "description" : "The unique identifier for a course"
+                                    "id": {
+                                        "type": "string",
+                                        "column": "id",
+                                        "table": "Courses",
+                                        "description": "The unique identifier for a course"
                                     },
-                                    "name" : {
-                                        "type" : "string",
-                                        "column" : "name",
-                                        "table" : "Courses",
-                                        "description" : "Name of the course"
+                                    "name": {
+                                        "type": "string",
+                                        "column": "name",
+                                        "table": "Courses",
+                                        "description": "Name of the course"
+                                    },
+                                    "teacher": {
+                                        "type": "object",
+                                        "column": "teacher_id",
+                                        "table": "Courses",
+                                        "reference": true,
+                                        "referenceTo": {
+                                            "targetTable": "Teachers",
+                                            "targetColumn": "id"
+                                        },
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "column": "id",
+                                                "table": "Teachers",
+                                                "description": "The unique identifier for a teacher"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "column": "name",
+                                                "table": "Teachers",
+                                                "description": "Name of the teacher"
+                                            }
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
+                
                 """).append("\n");
         sb.append("```").append("\n");
         sb.append("### Instructions").append("\n");
         sb.append("- **All properties must have a `type`, `column`, and `table` fields**. The `column` and the `table` indicates where this values came from on relational database. \n");
         sb.append("- The fields `column` and `table` **must match** the column and table names in the relational database schema\n");
-        sb.append("- If the property is reference (like DBRef), set the `isReference` to true\n");
+        sb.append("- If the property is reference (like DBRef), set the `reference` to true\n");
         sb.append("- To de-reference a property, set the `referenceTo` field with the target table and column\n");
         sb.append("- If the property is a composition of another object, set the `properties` field with the object properties\n");
         sb.append("- If the property is an array, set the `items` field with the array items\n");

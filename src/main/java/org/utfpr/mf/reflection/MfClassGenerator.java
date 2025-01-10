@@ -190,7 +190,7 @@ public class MfClassGenerator extends CodeSession {
                     ERROR("Cant set reference to abstract fields. Field: " + propName + " on class: " + className + " schema: " + schema.getTitle());
                 }
                 else {
-                    var refClazz = classes.get(classType.toString().toLowerCase());
+                    var refClazz = classes.get(classType.toString());
                     if(refClazz == null) {
                         ERROR("Field: " + propName + " referencing a uncreated class: " + classType);
                         INFO("Skipping this field");
