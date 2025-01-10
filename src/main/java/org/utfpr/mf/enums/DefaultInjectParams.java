@@ -13,7 +13,9 @@ public enum DefaultInjectParams {
     MONGO_CREDENTIALS("mongoCredentials"),
     MIGRATION_SPEC("migrationSpec"),
     JSON_SCHEMA_LIST("jsonSchemaList"),
-    MONGO_CONNECTION("mongoConnection");
+    MONGO_CONNECTION("mongoConnection"),
+    METRICS_RESULT("metricsResult"),
+    ;
 
 
     private final String value;

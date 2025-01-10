@@ -8,6 +8,7 @@ import org.utfpr.mf.migration.params.MetadataInfo;
 import org.utfpr.mf.migration.params.MigrationSpec;
 import org.utfpr.mf.migration.params.Model;
 import org.utfpr.mf.mongoConnection.MongoConnectionCredentials;
+import org.utfpr.mf.scorus.ScorusStep;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -56,6 +57,15 @@ public class MfMigrationStepFactory {
             default -> new GenerateModelStep2(printStream);
         };
 
+        for (var o : observers) {
+            tmp.addObserver(o);
+        }
+        steps.add(tmp);
+        return tmp;
+    }
+
+    public IMfMigrationStep createScorusStep(IMfStepObserver... observers) {
+        var tmp = new ScorusStep(printStream);
         for (var o : observers) {
             tmp.addObserver(o);
         }

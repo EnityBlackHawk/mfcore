@@ -197,6 +197,7 @@ public class MfClassGenerator extends CodeSession {
                         continue;
                     }
                     fieldDec.addAnnotation(DBRef.class);
+                    sf.setDocReferenceTo(refClazz.getType(0).getNameAsString());
                 }
             }
 

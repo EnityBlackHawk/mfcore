@@ -61,7 +61,7 @@ public class Metrics {
         .map(JsonSchema::getProperties)
         .filter(Objects::nonNull)
         .flatMap(props -> props.values().stream())
-        .filter(prop -> prop.getReference() && prop.getDocReferenceTo().equalsIgnoreCase(docName))
+        .filter(prop -> Objects.requireNonNullElse(prop.getReference(), false) && prop.getDocReferenceTo().equalsIgnoreCase(docName))
         .count();
     }
 

@@ -143,6 +143,7 @@ public class PromptData4 extends PromptData3 {
                                         "column": "teacher_id",
                                         "table": "Courses",
                                         "reference": true,
+                                        "docReferenceTo" : "Teachers",
                                         "referenceTo": {
                                             "targetTable": "Teachers",
                                             "targetColumn": "id"
@@ -174,6 +175,7 @@ public class PromptData4 extends PromptData3 {
         sb.append("- **All properties must have a `type`, `column`, and `table` fields**. The `column` and the `table` indicates where this values came from on relational database. \n");
         sb.append("- The fields `column` and `table` **must match** the column and table names in the relational database schema\n");
         sb.append("- If the property is reference (like DBRef), set the `reference` to true\n");
+        sb.append("- If the property is a reference, set the `docReferenceTo` field with the target collection name\n");
         sb.append("- To de-reference a property, set the `referenceTo` field with the target table and column\n");
         sb.append("- If the property is a composition of another object, set the `properties` field with the object properties\n");
         sb.append("- If the property is an array, set the `items` field with the array items\n");
