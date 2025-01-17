@@ -42,6 +42,12 @@ public class PromptData4 extends PromptData3 {
         sb.append(infos.getFirst()).append("\n");
         sb.append("```").append("\n");
 
+        sb.append("### Relational Database cardinality").append("\n");
+        sb.append("Here is the cardinality of the tables in the relational database:").append("\n");
+        sb.append("```json").append("\n");
+        sb.append(cardinalityTable).append("\n");
+        sb.append("```").append("\n");
+
         sb.append("### MongoDB Model Considerations").append("\n");
 
         sb.append("-    **Critically ensure** the use of " +

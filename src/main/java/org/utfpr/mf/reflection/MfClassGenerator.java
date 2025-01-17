@@ -146,15 +146,17 @@ public class MfClassGenerator extends CodeSession {
             String propName = TemplatedString.camelCaseToSnakeCase(eProp.getKey());
             JsonSchema sf = eProp.getValue();
 
-            FieldDeclaration fieldDec = clazz.getFieldByName(TemplatedString.snakeCaseToCamelCase(propName)).orElse(null);
+            FieldDeclaration fieldDec = clazz.getFieldByName(TemplatedString.snakeCaseToCamelCase(propName)).orElseGet(() -> {
+                return clazz.getFieldByName(propName).orElse(null);
+            });
 
             if(fieldDec == null) {
-                // TODO Notify (Do Log)
+                ERROR("Field not found: " + propName + " on class: " + className);
                 continue;
             }
 
             if(fieldDec.getAnnotationByClass(FromRDB.class).isPresent()) {
-                INFO("Field already annotated: " + propName);
+                // INFO("Field already annotated: " + propName);
                 continue;
             }
 

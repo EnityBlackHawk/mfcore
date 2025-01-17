@@ -31,6 +31,10 @@ public class Metrics {
             }
         }
 
+        if(props == null) {
+            return -1;
+        }
+
         ArrayList<Integer> accs = new ArrayList<>();
         for(var prop : props.values().stream().filter(Metrics::isObject).toList()) {
             accs.add(colDepth(prop) + 1);

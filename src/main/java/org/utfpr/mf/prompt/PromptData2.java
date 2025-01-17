@@ -8,8 +8,8 @@ import java.util.List;
 
 public class PromptData2 extends PromptData {
 
-    private final Boolean useMarkdown;
-    private final String cardinalityTable;
+    protected final Boolean useMarkdown;
+    protected final String cardinalityTable;
 
     public PromptData2(DbMetadata dbMetadata, MigrationPreferences migrationPreference, Boolean allowReferences, Framework framework, @Nullable String cardinalityTable, Boolean useMarkdown, List<Query> queryList, List<String> remarks) {
         super(dbMetadata, migrationPreference, allowReferences, framework, queryList, remarks);
