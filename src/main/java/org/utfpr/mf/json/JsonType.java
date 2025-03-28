@@ -10,7 +10,9 @@ public enum JsonType {
 
     OBJECT("object"),
     ARRAY("array"),
-    STRING("string");
+    STRING("string"),
+    NUMBER("number"),
+    INTEGER("integer");
 
     private final String value;
 

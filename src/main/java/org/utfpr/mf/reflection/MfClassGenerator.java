@@ -48,6 +48,18 @@ public class MfClassGenerator extends CodeSession {
         this.schemas = model;
     }
 
+    public MfClassGenerator(ClassMetadataList metadataList, JsonSchemaList model) {
+        this("MfClassGenerator", model, System.out);
+    }
+
+    public MfClassGenerator(ClassMetadataList metadataList, JsonSchemaList model, PrintStream printStream) {
+        super("MfClassGenerator", printStream);
+
+        this.classMetadaString = "";
+        this.list = metadataList;
+        this.schemas = model;
+    }
+
     public HashMap<String, String> generate() throws ClassNotFoundException {
 
         for(ClassMetadata cm : list) {

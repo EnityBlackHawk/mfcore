@@ -34,7 +34,7 @@ public class PromptData4 extends PromptData3 {
                         (migrationPreference == MigrationPreferences.PREFER_CONSISTENCY ? " **use references for the most number of relationships** as instructed. " : " **embed frequently accessed data** into the main documents for efficiency.") +
                         "\n")
                 .append("### Task Overview\n")
-                .append("We have a relational database that needs to be migrated to MongoDB. The goal is to create an optimized MongoDB schema based on the usage patterns of the data. \n");
+                .append("I have a relational database that needs to be migrated to MongoDB. The goal is to create an optimized MongoDB schema based on the usage patterns of the data. \n");
 
         sb.append("### Relational Database Schema").append("\n");
         sb.append("Here is the schema of our current relational database:").append("\n");
@@ -50,10 +50,10 @@ public class PromptData4 extends PromptData3 {
 
         sb.append("### MongoDB Model Considerations").append("\n");
 
-        sb.append("-    **Critically ensure** the use of " +
-                (migrationPreference == MigrationPreferences.PREFER_CONSISTENCY
-                        ? "**references (DBRef)** to reduce redundancy."
-                        : "**embedded documents** to optimize read performance.")).append("\n");
+        sb.append("- **Critically ensure** the use of ")
+                .append(migrationPreference == MigrationPreferences.PREFER_CONSISTENCY
+                ? "**references (DBRef)** to reduce redundancy."
+                : "**embedded documents** to optimize read performance.").append("\n");
 
         if(queryList != null) {
             sb.append("-    Optimize for the following frequently used queries:").append("\n");
@@ -72,6 +72,7 @@ public class PromptData4 extends PromptData3 {
         }
 
         sb.append("### Output format").append("\n");
+        sb.append("A list of JSON Schemas, each one representing a collection of models").append("\n");
         sb.append("MongoDB models in JSON Schema **MUST FOLLOW** the format:").append("\n");
         sb.append("```json").append("\n");
         sb.append("""

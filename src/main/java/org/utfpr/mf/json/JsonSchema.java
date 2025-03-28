@@ -10,11 +10,13 @@ import java.util.HashMap;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Description("Customized JSON schema")
+@Description("Customized JSON Schema describing a single JSON collection")
 public class JsonSchema {
 
     @Description("Type of the JSON Schema")
-    private String type;
+    private JsonType type;
+    @Description("If this property is the ID of the object")
+    private Boolean isId;
     @Description("The name of the object")
     private String title;
     private String description;
