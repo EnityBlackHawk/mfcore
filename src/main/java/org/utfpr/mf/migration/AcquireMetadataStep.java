@@ -31,14 +31,14 @@ import java.util.Objects;
 public class AcquireMetadataStep extends MfMigrationStepEx<Credentials, MetadataInfo> {
 
     @Injected(DefaultInjectParams.LLM_KEY)
-    private String llm_key;
+    protected String llm_key;
 
     @State
     @Export(DefaultInjectParams.DB_METADATA)
-    private DbMetadata mdb;
+    protected DbMetadata mdb;
 
     @Injected(DefaultInjectParams.LLM_SERVICE)
-    private LLMService gptAssistant;
+    protected LLMService gptAssistant;
 
     public AcquireMetadataStep() {
         this(System.out);
@@ -91,7 +91,7 @@ public class AcquireMetadataStep extends MfMigrationStepEx<Credentials, Metadata
         return executeHelper(this::process, input);
     }
 
-    public List<RelationCardinality> getRelationsCardinality(DbMetadata metadata) {
+    private List<RelationCardinality> getRelationsCardinality(DbMetadata metadata) {
 
         var queries = new ArrayList<Pair<Relations, String>>();
 
@@ -125,8 +125,8 @@ public class AcquireMetadataStep extends MfMigrationStepEx<Credentials, Metadata
                     .map(Column::fkInfo).toList();
 
             if(props.isEmpty()) {
-                ERROR("No foreign key found");
-                notifyError("No foreign key found");
+                ERROR("No foreign key found for " + rel.table_source + " -> " + rel.table_target);
+                notifyError("No foreign key found for " + rel.table_source + " -> " + rel.table_target);
             }
 
             queries.addAll(
@@ -154,7 +154,7 @@ public class AcquireMetadataStep extends MfMigrationStepEx<Credentials, Metadata
         return rcd;
     }
 
-    public List<Relations> getRelations(String text) {
+    protected List<Relations> getRelations(String text) {
         BEGIN("Configuring OpenAi API");
 
         var q = "Considering this database: \n" + text + " What are the relations between the tables? (Remove duplicates)";

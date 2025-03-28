@@ -196,7 +196,7 @@ public class PromptData4 extends PromptData3 {
         MarkdownContent mc = new MarkdownContent();
         mc.addCodeBlock(jsonDocuments, "json");
         mc.addPlainText("Analyze the provided JSON schema and generate a mapping in the following format:", '\n');
-        mc.addPlainText("""
+        mc.addCodeBlock("""
             [
               {
                 "className": "Student",
@@ -241,14 +241,12 @@ public class PromptData4 extends PromptData3 {
                 ]
               }
             ]
-            """, '\n');
+            """, "json");
         mc.addTitle3("Instructions");
         mc.addListItem("Ensure all fields in the JSON schema are accurately mapped to their corresponding Java data types.");
         mc.addListItem("Include relevant annotations (e.g., @Id, @NotNull, etc.) for the fields where applicable, based on the context provided in the schema.");
         mc.addListItem("The output should strictly follow the given structure.");
         mc.addListItem("If the field type is a custom class (e.g., Address), ensure that the class is also included in the mapping.");
-
-
 
         return mc.toString();
     }

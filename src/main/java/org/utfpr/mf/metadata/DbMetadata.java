@@ -30,15 +30,23 @@ public class DbMetadata {
             ArrayList<Column> columnArrayList = new ArrayList<>();
             ArrayList<String> pk_names = new ArrayList<>();
             HashMap<String, Column.FkInfo> fks_info = new HashMap<>();
+            ArrayList<String> unique_cols = new ArrayList<>();
             String tb_name = tbs.getString("TABLE_NAME");
             ResultSet cls = _metadata.getColumns(null, null, tb_name, null);
             ResultSet pks = _metadata.getPrimaryKeys(null, null, tb_name);
             ResultSet fks = _metadata.getImportedKeys(null, null, tb_name);
+            ResultSet uniques = _metadata.getIndexInfo(null, null, tb_name, true, false);
 
             while(pks.next())
             {
                 String columnName = pks.getString("COLUMN_NAME");
                 pk_names.add(columnName);
+            }
+
+            while(uniques.next())
+            {
+                String columnName = uniques.getString("COLUMN_NAME");
+                unique_cols.add(columnName);
             }
 
             while (fks.next())
@@ -64,7 +72,8 @@ public class DbMetadata {
                         new Column(columnName,
                                 SqlDataType.getByValue(Integer.parseInt(datatype)),
                                 pk_names.contains(columnName),
-                                fks_info.getOrDefault(columnName, null)
+                                fks_info.getOrDefault(columnName, null),
+                                unique_cols.contains(columnName)
                         )
                 );
 
@@ -102,15 +111,23 @@ public class DbMetadata {
             ArrayList<Column> columnArrayList = new ArrayList<>();
             ArrayList<String> pk_names = new ArrayList<>();
             HashMap<String, Column.FkInfo> fks_info = new HashMap<>();
+            ArrayList<String> unique_cols = new ArrayList<>();
             String tb_name = tbs.getString("TABLE_NAME");
             ResultSet cls = _metadata.getColumns(null, null, tb_name, null);
             ResultSet pks = _metadata.getPrimaryKeys(null, null, tb_name);
             ResultSet fks = _metadata.getImportedKeys(null, null, tb_name);
+            ResultSet uniques = _metadata.getIndexInfo(null, null, tb_name, true, false);
 
             while(pks.next())
             {
                 String columnName = pks.getString("COLUMN_NAME");
                 pk_names.add(columnName);
+            }
+
+            while(uniques.next())
+            {
+                String columnName = uniques.getString("COLUMN_NAME");
+                unique_cols.add(columnName);
             }
 
             while (fks.next())
@@ -136,7 +153,8 @@ public class DbMetadata {
                         new Column(columnName,
                                 SqlDataType.getByValue(Integer.parseInt(datatype)),
                                 pk_names.contains(columnName),
-                                fks_info.getOrDefault(columnName, null)
+                                fks_info.getOrDefault(columnName, null),
+                                unique_cols.contains(columnName)
                         )
                 );
 

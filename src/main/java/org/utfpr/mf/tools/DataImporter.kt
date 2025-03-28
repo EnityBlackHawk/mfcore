@@ -13,48 +13,6 @@ class DataImporter {
 
     companion object{
 
-//        fun importAirlines(filePath: String, airlineRepository: AirlineRepository?) {
-//            val jsonFile = File(filePath)
-//            val jsonString = jsonFile.readText();
-//            val gson = Gson();
-//            val itemType = object : TypeToken<List<AirlineJson>>() {}.type
-//            val airlineJson = gson.fromJson<List<AirlineJson>>(jsonString, itemType)
-//
-//            airlineRepository?.apply {
-//                saveAll(
-//                        airlineJson.map { it ->
-//                            Airline.builder()
-//                                    .id(it.id)
-//                                    .iata(it.iata)
-//                                    .icao(it.icao)
-//                                    .name(it.name)
-//                                    .build()
-//                        }
-//                )
-//            }
-//        }
-//
-//        fun importAirports(filePath : String, airportRepository: AirportRepository?) : String {
-//            val jsonFile = File(filePath)
-//            val jsonString = jsonFile.readText();
-//            val gson = Gson();
-//            val itemType = object  : TypeToken<List<AirportJson>>() {}.type
-//            val airportJson = gson.fromJson<List<AirportJson>>(jsonString, itemType)
-//
-//           airportRepository?.apply {
-//               saveAll(
-//                       airportJson.map {it ->
-//                           Airport.builder()
-//                                   .id(it.iata_code)
-//                                   .city(it.city)
-//                                   .country(it.country)
-//                                   .name(it.name)
-//                                   .build()
-//                       }
-//               )
-//           }
-//           return airportJson[0].iata_code
-//        }
         fun runSQLFromFile(path : String, connection : Connection) {
             ScriptUtils.executeSqlScript(
                 connection,

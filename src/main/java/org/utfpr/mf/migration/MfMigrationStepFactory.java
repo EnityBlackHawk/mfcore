@@ -43,7 +43,10 @@ public class MfMigrationStepFactory {
     }
 
     public IMfMigrationStep createAcquireMetadataStep(IMfStepObserver... observer) {
-        var tmp = new AcquireMetadataStep(printStream);
+        var tmp = switch (version) {
+            case 1 -> new AcquireMetadataStep(printStream);
+            default -> new AcquireMetadataStep2(printStream);
+        };
         for (var o : observer) {
             tmp.addObserver(o);
         }

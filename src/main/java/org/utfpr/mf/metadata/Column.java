@@ -3,7 +3,7 @@ package org.utfpr.mf.metadata;
 import org.jetbrains.annotations.Nullable;
 import org.utfpr.mf.tools.SqlDataType;
 
-public record Column(String name, SqlDataType dataType, Boolean isPk, @Nullable FkInfo fkInfo) {
+public record Column(String name, SqlDataType dataType, Boolean isPk, @Nullable FkInfo fkInfo, Boolean isUnique) {
 
 
     public boolean isFk() {
@@ -28,6 +28,12 @@ public record Column(String name, SqlDataType dataType, Boolean isPk, @Nullable 
 
     @Override
     public String toString() {
+
+        if(dataType == null) {
+            System.out.println("Data type is null here");
+            return "";
+        }
+
         return name + " " + dataType.name() + (isPk ? " PRIMARY KEY" : "" ) + (isFk() ? fkInfo.toString() : "") ;
     }
 }
