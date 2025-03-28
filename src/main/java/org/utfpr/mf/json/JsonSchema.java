@@ -32,7 +32,7 @@ public class JsonSchema {
     private Boolean reference;
     @Description("[REQUIRED If reference] The name of the collection that this property references")
     private String docReferenceTo;
-    @Description("[REQUIRED IF type = object] The properties of the object described by this JSON")
+    @Description("[REQUIRED IF type == object] The properties of the object described by this JSON")
     private HashMap<String, JsonSchema> properties;
     @Description("[REQUIRED when a JOIN is need to fetch the data]")
     private Reference referenceTo;
@@ -40,7 +40,7 @@ public class JsonSchema {
     private Reference referencedBy;
     @Description("[REQUIRED IF type != object and referenceTo != null] Describes the what column from the target table will be projected into this property")
     private String projection;
-    @Description("[REQUIRED IF type = array] Describes the items of the array")
+    @Description("[REQUIRED IF type == array] Describes the items of the array")
     private JsonSchema items;
 
 }

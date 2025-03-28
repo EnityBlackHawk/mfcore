@@ -6,6 +6,7 @@
         "id": {
             "type": "string",
             "column": "id",
+            "isId" : true,
             "table": "Students",
             "description": "The unique identifier for a product"
         },
