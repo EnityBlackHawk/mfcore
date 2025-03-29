@@ -18,7 +18,11 @@ public enum JsonType {
     @SerializedName("number")
     NUMBER("number"),
     @SerializedName("integer")
-    INTEGER("integer");
+    INTEGER("integer"),
+    @SerializedName("boolean")
+    BOOLEAN("boolean"),
+    @SerializedName("null")
+    NULL("null");
 
     private final String value;
 

@@ -14,14 +14,14 @@ import java.util.HashMap;
 public class JsonSchema {
 
     @Description("Type of the JSON Schema")
-    private JsonType type;
+    private JsonType type = JsonType.NULL;
     @Description("If this property is the ID of the object")
     private Boolean isId;
     @Description("The name of the object")
     private String title;
     private String description;
     @Description("If this property is a composition of another or this object")
-    private Boolean isAbstract;
+    private Boolean isAbstract = false;
     @Description("Describes the custom string type. Example: Date")
     private String format;
     @Description("[REQUIRED If !isAbstract] Column from RDB")

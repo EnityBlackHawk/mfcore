@@ -119,15 +119,23 @@ class QueryResult2 : QueryResult {
                 }
 
                 val offset = columns.indexOf(ann.column)
+                var targetColumn = ann.targetColumn
 
                 if(offset == -1) {
                     throw RuntimeException("Column ${ann.column} not found")
                 }
+
+                if(ann.targetColumn == "\$auto") {
+                    metadata!!.tables.first { it.name == ann.targetTable }.columns.first { it.isPk }.let {
+                        targetColumn = it.name
+                    }
+                }
+
                 // TODO Tratar Json Loop
-                if(ann.isReference || ann.targetColumn.isNotBlank() && ann.targetTable.isNotBlank()) {
+                if(ann.isReference || targetColumn.isNotBlank() && ann.targetTable.isNotBlank()) {
                     val isColumnString = columnTypes[offset] == SqlDataType.VARCHAR
                     val query = "SELECT ${ann.projection} FROM ${ann.targetTable} " +
-                            "WHERE ${ann.targetColumn} = ${ if(isColumnString) "'${row[offset]}'" else row[offset]}"
+                            "WHERE $targetColumn = ${ if(isColumnString) "'${row[offset]}'" else row[offset]}"
 
                     val res = DataImporter.runQuery(query, metadata!!, QueryResult2::class.java)
                     val newObj = if (ann.type == "array") res.populateListObject(field.genericType as ParameterizedType) else  res.asObject( field.type )

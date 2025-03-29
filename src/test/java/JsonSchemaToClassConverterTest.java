@@ -5,7 +5,10 @@ import org.utfpr.mf.json.JsonSchemaList;
 import org.utfpr.mf.orms.ORMTable;
 import org.utfpr.mf.prompt.Framework;
 import org.utfpr.mf.reflection.ClassMetadata;
+import org.utfpr.mf.reflection.ClassMetadataList;
 import org.utfpr.mf.reflection.JsonSchemaToClassConverter;
+import org.utfpr.mf.reflection.MfClassGenerator;
+import org.utfpr.mf.runtimeCompiler.MfRuntimeCompiler;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,16 +31,16 @@ public class JsonSchemaToClassConverterTest {
 
 
     @Test
-    void ConversionTest()  {
+    void ConversionTest() throws ClassNotFoundException {
 
         JsonSchemaToClassConverter converter = new JsonSchemaToClassConverter(
                 ORMTable.getOrmAnnotations(Framework.SPRING_DATA)
         );
 
-        ClassMetadata classMetadata = converter.convert(schema.get(0), "Student");
+        ClassMetadataList classMetadata = converter.convertMany(schema);
 
-        System.out.println(classMetadata);
-
+        MfClassGenerator generator = new MfClassGenerator(classMetadata, schema);
+        var classes = generator.generate();
     }
 
 }

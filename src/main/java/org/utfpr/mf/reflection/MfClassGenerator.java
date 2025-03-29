@@ -1,13 +1,12 @@
 package org.utfpr.mf.reflection;
 
+import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.expr.BooleanLiteralExpr;
-import com.github.javaparser.ast.expr.ClassExpr;
-import com.github.javaparser.ast.expr.NormalAnnotationExpr;
-import com.github.javaparser.ast.expr.StringLiteralExpr;
+import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.google.gson.Gson;
@@ -20,6 +19,7 @@ import org.utfpr.mf.annotation.FromRDB;
 import org.utfpr.mf.annotation.ListOf;
 import org.utfpr.mf.json.JsonSchema;
 import org.utfpr.mf.json.JsonSchemaList;
+import org.utfpr.mf.json.JsonType;
 import org.utfpr.mf.json.Reference;
 import org.utfpr.mf.tools.CodeSession;
 import org.utfpr.mf.tools.QueryResult;
@@ -49,7 +49,7 @@ public class MfClassGenerator extends CodeSession {
     }
 
     public MfClassGenerator(ClassMetadataList metadataList, JsonSchemaList model) {
-        this("MfClassGenerator", model, System.out);
+        this(metadataList, model, System.out);
     }
 
     public MfClassGenerator(ClassMetadataList metadataList, JsonSchemaList model, PrintStream printStream) {
@@ -99,6 +99,7 @@ public class MfClassGenerator extends CodeSession {
         CompilationUnit unit = new CompilationUnit();
 
         var classDec = unit.addClass(cm.getClassName(), Modifier.Keyword.PUBLIC);
+        //TODO: Verificar se realmente e um documento
         classDec.addAnnotation(Document.class);
         classDec.addAnnotation("lombok.Data");
 
@@ -125,7 +126,7 @@ public class MfClassGenerator extends CodeSession {
 
         for(JsonSchema schema : schemas) {
 
-            String className = TemplatedString.capitalize(TemplatedString.camelCaseToSnakeCase(schema.getTitle()));
+            String className = TemplatedString.capitalize(schema.getTitle());
             CompilationUnit unit = classes.get(className);
 
             annotateClass(schema, unit, null, schema.getTitle());
@@ -177,8 +178,8 @@ public class MfClassGenerator extends CodeSession {
             Optional<NodeList<Type>> typeArgs = classType.getTypeArguments();
             ClassExpr classExpr = new ClassExpr(classType);
 
-            // TODO Tratar repeticoes
-            if(sf.getType().equals("object") && classes.containsKey(classType.toString())) {
+
+            if(sf.getType().equals(JsonType.OBJECT) && classes.containsKey(classType.toString())) {
                 var cmp = classes.get(classType.toString());
                 annotateClass( sf, cmp,  classType.toString(), docName);
 
@@ -210,7 +211,12 @@ public class MfClassGenerator extends CodeSession {
                         INFO("Skipping this field");
                         continue;
                     }
-                    fieldDec.addAnnotation(DBRef.class);
+                    var hasDbRef = fieldDec.getAnnotations().stream()
+                            .anyMatch((x) ->
+                                    x.getName().getTokenRange().isPresent() && x.getName().getTokenRange().get().toString().equals("org.springframework.data.mongodb.core.mapping.DBRef"));
+                    if(!hasDbRef) {
+                        fieldDec.addAnnotation(DBRef.class);
+                    }
                     sf.setDocReferenceTo(refClazz.getType(0).getNameAsString());
                 }
             }
@@ -227,14 +233,18 @@ public class MfClassGenerator extends CodeSession {
                 Reference ref = sf.getReferenceTo();
 
                 if(ref == null) {
-                    ERROR("ReferencedBy not set for field: " + propName + "on class: " + className + " schema: " + schema.getTitle());
+                    ERROR("ReferencedBy not set for field: " + propName + " on class: " + className + " schema: " + schema.getTitle());
                     INFO("Setting this relation to $auto");
                     ref = new Reference("$auto", "$auto");
                 }
 
                 ClassExpr argEx = new ClassExpr(typeArgs.get().get(0));
                 var cmp = classes.get(typeArgs.get().get(0).asString());
-                annotateClass(sf.getItems(), cmp, typeArgs.get().get(0).asString(), docName);
+
+                if(cmp != null) {
+                    annotateClass(sf.getItems(), cmp, typeArgs.get().get(0).asString(), docName);
+                }
+
                 fieldDec.addAndGetAnnotation(ListOf.class)
                         .addPair("value", argEx)
                         .addPair("table", new StringLiteralExpr(table))

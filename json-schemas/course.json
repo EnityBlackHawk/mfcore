@@ -20,6 +20,10 @@
       "column" : "id",
       "table" : "Course",
       "items": {"type": "string"},
+      "referenceTo": {
+        "targetTable": "Teachers",
+        "targetColumn": "name"
+      },
       "referencedBy" : {
         "targetTable": "Teachers",
         "targetColumn": "id"

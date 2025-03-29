@@ -17,7 +17,7 @@ import java.util.List;
 public class MfMigrationStepFactory {
 
 
-    public static final Integer CURRENT_VERSION = 2;
+    public static final Integer CURRENT_VERSION = 3;
 
     @Getter
     private List<IMfMigrationStep> steps = new ArrayList<>();
@@ -79,7 +79,8 @@ public class MfMigrationStepFactory {
     public IMfMigrationStep createGenerateJavaCodeStep(IMfStepObserver... observers) {
         var tmp = switch (version) {
             case 1 -> new GenerateJavaCodeStep(printStream);
-            default -> new GenerateJavaCodeStep2(printStream);
+            case 2 -> new GenerateJavaCodeStep2(printStream);
+            default -> new GenerateJavaCodeStep3(printStream);
         };
         for (var o : observers) {
             tmp.addObserver(o);
