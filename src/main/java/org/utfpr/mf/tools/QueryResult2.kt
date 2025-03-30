@@ -29,6 +29,23 @@ class QueryResult2 : QueryResult {
 
     }
 
+    fun split(n : Int) : List<QueryResult2> {
+
+        val res = mutableListOf<QueryResult2>()
+
+        for(i in 0 until n) {
+            val qr = QueryResult2(*columns.toTypedArray())
+            qr.metadata = this.metadata
+            for(j in 0 until rows.size) {
+                if(j % n == i) {
+                    qr.addRow(*(rows[j].toTypedArray() as Array<String>))
+                }
+            }
+            res.add(qr)
+        }
+        return res
+    }
+
     private fun populateListObject(ptype : ParameterizedType) : List<Any> {
         if(metadata == null)
             throw Exception("Metadata required")
@@ -38,6 +55,21 @@ class QueryResult2 : QueryResult {
         val values = asObject(parClass)
         obj.addAll(values)
         return obj
+    }
+
+    fun <T> asObjectAsync(clazz: Class<T>, nThreads : Int) : List<TemplatedThread<List<T>>> {
+
+        val qrs = split(nThreads)
+        val rets = mutableListOf<TemplatedThread<List<T>>>()
+
+        for(i in 0 until nThreads) {
+            val t = TemplatedThread<List<T>> {
+                qrs[i].asObject(clazz)
+            }
+            t.runAsync()
+            rets.add(t)
+        }
+        return rets
     }
 
     override fun <T> asObject(clazz : Class<T>) : List<T> {
@@ -121,14 +153,14 @@ class QueryResult2 : QueryResult {
                 val offset = columns.indexOf(ann.column)
                 var targetColumn = ann.targetColumn
 
-                if(offset == -1) {
-                    throw RuntimeException("Column ${ann.column} not found")
-                }
-
                 if(ann.targetColumn == "\$auto") {
                     metadata!!.tables.first { it.name == ann.targetTable }.columns.first { it.isPk }.let {
                         targetColumn = it.name
                     }
+                }
+
+                if(offset == -1) {
+                    throw RuntimeException("Column ${ann.column} not found")
                 }
 
                 // TODO Tratar Json Loop
@@ -175,7 +207,11 @@ class QueryResult2 : QueryResult {
             "LocalTime" -> java.time.LocalTime.parse(it) as T
             "Instant" -> java.time.Instant.parse(it) as T
             "String" -> it as T
-            else -> null
+            "Boolean" -> (it == "t") as T
+            else -> {
+                println("Unsupported type: $cName")
+                return null
+        }
         }
     }
     return null

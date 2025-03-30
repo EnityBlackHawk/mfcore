@@ -17,6 +17,7 @@ import org.utfpr.mf.tools.QueryResult2;
 import org.utfpr.mf.tools.TemplatedString;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ public class MigrateDatabaseStep2 extends MigrateDatabaseStep{
             QueryResult2 qr = DataImporter.Companion.runQuery(String.format("SELECT * FROM %s", className), dbMetadata, QueryResult2.class);
             BEGIN_SUB("Converting data: " + className);
             List<?> objects = qr.asObject(classes.get(className));
+
             BEGIN_SUB("Persisting data: " + className);
             MongoTemplate mTemplate = mongoConnection.getTemplate();
             int count = 0;

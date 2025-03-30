@@ -29,15 +29,12 @@ public class JsonSchemaToClassConverter {
         return new ClassMetadataList(classes.values());
     }
 
-    private FieldMetadata createObjectField( Map.Entry<String, JsonSchema> field) {
+    private FieldMetadata createObjectField(JsonSchema parent, Map.Entry<String, JsonSchema> field) {
 
         JsonSchema value = field.getValue();
 
-        if(value.getIsAbstract()) {
-            value.setReferenceTo(new Reference(value.getTable(), "$auto"));
-        }
 
-        else if(value.getReferenceTo() == null || value.getReferenceTo().getTargetTable() == null) {
+        if(!value.getIsAbstract() && (value.getReferenceTo() == null || value.getReferenceTo().getTargetTable() == null)) {
 
             var firstChild = value.getProperties().entrySet().stream().findFirst();
 
@@ -53,7 +50,12 @@ public class JsonSchemaToClassConverter {
             );
         }
 
-        String innerClassName = TemplatedString.capitalize(value.getReferenceTo().getTargetTable());
+        String innerClassName = TemplatedString.capitalize(
+                // TODO: Check here if the parent is abstract
+                !value.getIsAbstract()
+                        ? value.getReferenceTo().getTargetTable()
+                        : Objects.requireNonNullElse(parent.getTitle(), parent.getTable()) + TemplatedString.capitalize(field.getKey())
+        );
         ClassMetadata innerClass;
         if(classes.containsKey(innerClassName)) {
             checkAndAppend(value, classes.get(innerClassName));
@@ -114,7 +116,7 @@ public class JsonSchemaToClassConverter {
         for(var field : root.getProperties().entrySet()) {
 
             if(field.getValue().getType() == JsonType.OBJECT) {
-                fields.add(createObjectField(field));
+                fields.add(createObjectField(root, field));
                 continue;
             }
 

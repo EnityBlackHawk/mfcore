@@ -46,6 +46,7 @@ open class QueryResult {
         this.columns.addAll(columnNames)
     }
 
+    
     fun addRow(vararg row: String): QueryResult {
         require(row.size == columns.size) { "Row length does not match column length" }
         val r = mutableListOf<String>()

@@ -195,9 +195,8 @@ public class MfClassGenerator extends CodeSession {
             if(column == null || table == null) {
                 //throw new RuntimeException("Column or table not set for field: " + propName + "on class: " + className + " schema: " + schema.getTitle());
                 INFO("Column or table not set for field: " + propName + " on class: " + className + " schema: " + schema.getTitle());
-                column = "";
-                table = "";
-                isAbstract = true;
+                column = "$auto";
+                table = "$auto";
             }
 
             if(isReference) {
