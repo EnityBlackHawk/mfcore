@@ -84,6 +84,7 @@ public class PromptData4 extends PromptData3 {
                         "id": {
                             "type": "string",
                             "column": "id",
+                            "isId" : true,
                             "table": "Students",
                             "description": "The unique identifier for a product"
                         },
@@ -126,7 +127,7 @@ public class PromptData4 extends PromptData3 {
                             "type": "array",
                             "column": "course_id",
                             "table": "Students",
-                            "referencedBy": {
+                            "referenceTo": {
                                 "targetTable": "Courses",
                                 "targetColumn": "id"
                             },
@@ -160,7 +161,8 @@ public class PromptData4 extends PromptData3 {
                                                 "type": "string",
                                                 "column": "id",
                                                 "table": "Teachers",
-                                                "description": "The unique identifier for a teacher"
+                                                "description": "The unique identifier for a teacher",
+                                                "isId" : true
                                             },
                                             "name": {
                                                 "type": "string",

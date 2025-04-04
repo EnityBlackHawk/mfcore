@@ -98,11 +98,11 @@ public class JsonSchemaToClassConverter {
             if(field.getValue().getItems().getType() == JsonType.OBJECT) {
                 String className = TemplatedString.capitalize(field.getKey()) + "Items";
                 ClassMetadata innerClass = convert(field.getValue().getItems(), className);
-                return new FieldMetadata(field.getKey(), "java.utils.List<" + className + ">", List.of());
+                return new FieldMetadata(field.getKey(), "java.util.List<" + className + ">", List.of());
             }
 
             FieldMetadata fmd = createField(Map.entry(field.getKey(), field.getValue().getItems()));
-            return new FieldMetadata(field.getKey(), "java.utils.List<" + fmd.getType() + ">", List.of());
+            return new FieldMetadata(field.getKey(), "java.util.List<" + fmd.getType() + ">", List.of());
         }
 
         throw new RuntimeException("Type not defined");

@@ -15,7 +15,7 @@ public class JsonSchema {
 
     @Description("Type of the JSON Schema")
     private JsonType type = JsonType.NULL;
-    @Description("If this property is the ID of the object")
+    @Description("[REQUIRED one per object] If this property is the ID of the object")
     private Boolean isId;
     @Description("The name of the object")
     private String title;

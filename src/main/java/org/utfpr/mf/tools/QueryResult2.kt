@@ -123,7 +123,7 @@ class QueryResult2 : QueryResult {
                         }
                     }
                     // TODO if the value is not in this current table (if it is in another table, make a SQL query)
-                    var offset = columns.indexOf(annList.column)
+                    var offset = columns.indexOf(column)
                     if(offset == -1) {
                         // Gets the PK
                         metadata!!.tables.filter { it.name == ann.table }.first().columns.filter { it.isPk }.first().let {
