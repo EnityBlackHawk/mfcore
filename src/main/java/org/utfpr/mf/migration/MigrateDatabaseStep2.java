@@ -44,14 +44,14 @@ public class MigrateDatabaseStep2 extends MigrateDatabaseStep{
 
         HashMap<String, Integer> classCount = new HashMap<>();
 
-        for(JsonSchema recipe : recepies)
+        for(Map.Entry<String, Class<?>> clazz : classes.entrySet())
         {
-            String className = TemplatedString.capitalize(TemplatedString.camelCaseToSnakeCase(recipe.getTitle()));
+            String className = clazz.getKey();
 
             BEGIN_SUB("Querying data from " + className);
             QueryResult2 qr = DataImporter.Companion.runQuery(String.format("SELECT * FROM %s", className), dbMetadata, QueryResult2.class);
             BEGIN_SUB("Converting data: " + className);
-            List<?> objects = qr.asObject(classes.get(className));
+            List<?> objects = qr.asObject(clazz.getValue());
 
             BEGIN_SUB("Persisting data: " + className);
             MongoTemplate mTemplate = mongoConnection.getTemplate();

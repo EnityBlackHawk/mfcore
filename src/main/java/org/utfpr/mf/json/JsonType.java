@@ -2,7 +2,6 @@ package org.utfpr.mf.json;
 
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 @Getter

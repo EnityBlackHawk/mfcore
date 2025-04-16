@@ -1,20 +1,16 @@
 package org.utfpr.mf.reflection;
 
-import com.github.javaparser.TokenRange;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.AnnotationDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.Type;
 import com.google.gson.Gson;
-import kotlin.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 import org.utfpr.mf.annotation.FromRDB;
 import org.utfpr.mf.annotation.ListOf;
 import org.utfpr.mf.json.JsonSchema;
@@ -22,7 +18,6 @@ import org.utfpr.mf.json.JsonSchemaList;
 import org.utfpr.mf.json.JsonType;
 import org.utfpr.mf.json.Reference;
 import org.utfpr.mf.tools.CodeSession;
-import org.utfpr.mf.tools.QueryResult;
 import org.utfpr.mf.tools.TemplatedString;
 
 import java.io.PrintStream;

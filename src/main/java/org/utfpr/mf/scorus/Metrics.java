@@ -1,6 +1,5 @@
 package org.utfpr.mf.scorus;
 
-import dev.ai4j.openai4j.Json;
 import org.utfpr.mf.json.JsonSchema;
 import org.utfpr.mf.json.JsonSchemaList;
 

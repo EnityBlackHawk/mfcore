@@ -1,5 +1,6 @@
 package org.utfpr.mf.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import dev.langchain4j.model.output.structured.Description;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,12 +12,13 @@ import java.util.HashMap;
 @AllArgsConstructor
 @Data
 @Description("Customized JSON Schema describing a single JSON collection")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class JsonSchema {
 
     @Description("Type of the JSON Schema")
     private JsonType type = JsonType.NULL;
-    @Description("[REQUIRED one per object] If this property is the ID of the object")
-    private Boolean isId;
+    @Description("[REQUIRED IF type == object] If this property is the ID of the object - All objects must have an id = true")
+    private Boolean isId = false;
     @Description("The name of the object")
     private String title;
     private String description;
@@ -34,7 +36,7 @@ public class JsonSchema {
     private String docReferenceTo;
     @Description("[REQUIRED IF type == object] The properties of the object described by this JSON")
     private HashMap<String, JsonSchema> properties;
-    @Description("[REQUIRED when a JOIN is need to fetch the data]")
+    @Description("[REQUIRED when column is a FK] Specifies the table and Column to be joined")
     private Reference referenceTo;
     @Description("[REQUIRED when objects inside an array] Describes how to select the data from the target table")
     private Reference referencedBy;

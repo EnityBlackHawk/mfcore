@@ -84,7 +84,7 @@ public class PromptData4 extends PromptData3 {
                         "id": {
                             "type": "string",
                             "column": "id",
-                            "isId" : true,
+                            "isId" : true, // All objects must be one id
                             "table": "Students",
                             "description": "The unique identifier for a product"
                         },
