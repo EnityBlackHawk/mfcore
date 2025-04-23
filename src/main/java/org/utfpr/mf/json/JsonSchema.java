@@ -16,7 +16,7 @@ import java.util.HashMap;
 public class JsonSchema {
 
     @Description("Type of the JSON Schema")
-    private JsonType type = JsonType.NULL;
+    private String type = "";
     @Description("[REQUIRED IF type == object] If this property is the ID of the object - All objects must have an id = true")
     private Boolean isId = false;
     @Description("The name of the object")
@@ -31,7 +31,7 @@ public class JsonSchema {
     @Description("[REQUIRED If !isAbstract] Table from RDB")
     private String table;
     @Description("If this property is a reference to another document")
-    private Boolean reference;
+    private Boolean reference = false;
     @Description("[REQUIRED If reference] The name of the collection that this property references")
     private String docReferenceTo;
     @Description("[REQUIRED IF type == object] The properties of the object described by this JSON")
@@ -41,7 +41,7 @@ public class JsonSchema {
     @Description("[REQUIRED when objects inside an array] Describes how to select the data from the target table")
     private Reference referencedBy;
     @Description("[REQUIRED IF type != object and referenceTo != null] Describes the what column from the target table will be projected into this property")
-    private String projection;
+    private String projection = "*";
     @Description("[REQUIRED IF type == array] Describes the items of the array")
     private JsonSchema items;
 

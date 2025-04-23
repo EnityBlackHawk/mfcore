@@ -201,7 +201,7 @@ public class MfClassGenerator extends CodeSession {
                 else {
                     var refClazz = classes.get(classType.toString());
                     if(refClazz == null) {
-                        ERROR("Field: " + propName + " referencing a uncreated class: " + classType);
+                        ERROR("Field: " + propName + " referencing an uncreated class: " + classType);
                         INFO("Skipping this field");
                         continue;
                     }

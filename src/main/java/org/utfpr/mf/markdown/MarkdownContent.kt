@@ -17,6 +17,11 @@ class MarkdownContent {
         return this;
     }
 
+    fun addListItem(item : MarkdownContent) : MarkdownContent {
+        content.append("- ").append(item.get()).append("\n")
+        return this
+    }
+
     fun addTitle1(text : String) {
         content.append("# ").append(text).append("\n")
     }

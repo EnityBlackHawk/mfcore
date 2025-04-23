@@ -19,8 +19,8 @@ dependencies {
     api("org.springframework.data:spring-data-mongodb:4.3.4")
     api("org.mongodb:mongodb-driver-sync:5.1.4")
     implementation("org.springframework:spring-jdbc:6.1.13")
-    implementation("dev.langchain4j:langchain4j:0.34.0")
-    implementation("dev.langchain4j:langchain4j-open-ai:0.34.0")
+    implementation("dev.langchain4j:langchain4j:1.0.0-beta3")
+    implementation("dev.langchain4j:langchain4j-open-ai:1.0.0-beta3")
 
     // Dev tools
     testCompileOnly ("org.projectlombok:lombok:1.18.34")

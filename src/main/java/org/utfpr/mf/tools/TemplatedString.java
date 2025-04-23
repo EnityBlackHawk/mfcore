@@ -43,4 +43,16 @@ public class TemplatedString {
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
+    public static String toSingular(String name) {
+        if(name.endsWith("ies")) {
+            return name.substring(0, name.length() - 3) + "y";
+        }
+
+        if(name.endsWith("s")) {
+            return name.substring(0, name.length() - 1);
+        }
+
+        return name;
+    }
+
 }

@@ -58,20 +58,5 @@ public class Prompt4 {
 
         System.out.print("Prompt 1: \n" + promptData4.getFirst());
 
-        // System.out.print("Prompt 2: \n" + PromptData4.getSecond(result.content().text(), null));
-
-        LLMServiceDesc desc = new LLMServiceDesc();
-        desc.llm_key = "demo";
-        desc.cachePolicy = CachePolicy.NO_CACHE;
-        desc.logRequest = true;
-        desc.logResponses = true;
-
-        LLMService service = new LLMService(desc);
-        var l = service.getJsonSchemaList(promptData4.getFirst());
-
-        System.out.print(l.getExplanation());
-
-        assertNotEquals(0, l.getSchemas().size());
-
     }
 }

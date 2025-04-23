@@ -9,18 +9,18 @@ import java.util.*
 import java.sql.Connection
 import java.sql.Types
 
-open class QueryResult {
+open class QueryResult : CodeSession{
     protected val columns = mutableListOf<String>()
     protected val columnTypes = mutableListOf<SqlDataType>()
     protected open val rows = mutableListOf<List<String?>>()
     protected lateinit var resultSet : ResultSet
     protected var metadata : DbMetadata? = null
 
-    constructor(metadata: DbMetadata?) {
+    constructor(metadata: DbMetadata?) : super("QueryResult", LastSet) {
         this.metadata = metadata
     }
 
-    constructor(resultSet: ResultSet, metadata: DbMetadata? = null) {
+    constructor(resultSet: ResultSet, metadata: DbMetadata? = null) : super("QueryResult", LastSet) {
         this.metadata = metadata
         val rsMetadata = resultSet.metaData
         this.resultSet = resultSet

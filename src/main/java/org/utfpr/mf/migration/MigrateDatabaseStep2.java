@@ -1,5 +1,6 @@
 package org.utfpr.mf.migration;
 
+import com.mongodb.client.model.ValidationOptions;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -11,10 +12,7 @@ import org.utfpr.mf.json.JsonSchemaList;
 import org.utfpr.mf.metadata.DbMetadata;
 import org.utfpr.mf.mongoConnection.MongoConnection;
 import org.utfpr.mf.mongoConnection.MongoConnectionCredentials;
-import org.utfpr.mf.tools.DataImporter;
-import org.utfpr.mf.tools.QueryResult;
-import org.utfpr.mf.tools.QueryResult2;
-import org.utfpr.mf.tools.TemplatedString;
+import org.utfpr.mf.tools.*;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -44,25 +42,45 @@ public class MigrateDatabaseStep2 extends MigrateDatabaseStep{
 
         HashMap<String, Integer> classCount = new HashMap<>();
 
-        for(Map.Entry<String, Class<?>> clazz : classes.entrySet())
+        ArrayList<TemplatedThread> threads = new ArrayList<>();
+
+        for(JsonSchema recipe : recepies)
         {
-            String className = clazz.getKey();
 
-            BEGIN_SUB("Querying data from " + className);
-            QueryResult2 qr = DataImporter.Companion.runQuery(String.format("SELECT * FROM %s", className), dbMetadata, QueryResult2.class);
-            BEGIN_SUB("Converting data: " + className);
-            List<?> objects = qr.asObject(clazz.getValue());
+            TemplatedThread<Void> thread = new TemplatedThread<>(() -> {
+                String className = TemplatedString.capitalize(recipe.getTitle());
 
-            BEGIN_SUB("Persisting data: " + className);
-            MongoTemplate mTemplate = mongoConnection.getTemplate();
-            int count = 0;
-            for(var obj : objects)
-            {
-                mTemplate.insert(obj);
-                count++;
-            }
-            classCount.put(className, count);
+                BEGIN_SUB("Querying data from " + className);
+                QueryResult2 qr = DataImporter.Companion.runQuery(
+                        String.format("SELECT * FROM %s", dbMetadata.checkTableNameAndTryFix(className)),
+                        dbMetadata,
+                        QueryResult2.class
+                );
+                BEGIN_SUB("Converting data: " + className);
+                List<?> objects = qr.asObject(classes.get(className));
+
+                BEGIN_SUB("Persisting data: " + className);
+                MongoTemplate mTemplate = mongoConnection.getTemplate();
+                int count = 0;
+                for(var obj : objects)
+                {
+                    mTemplate.insert(obj);
+                    count++;
+                }
+                classCount.put(className, count);
+                return null;
+            });
+            threads.add(thread);
         }
+
+        for (TemplatedThread thread : threads) {
+            thread.runAsync();
+        }
+
+        for (TemplatedThread thread : threads) {
+            thread.await();
+        }
+
         return classCount;
     }
 }

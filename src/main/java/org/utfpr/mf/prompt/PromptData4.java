@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class PromptData4 extends PromptData3 {
 
@@ -26,172 +27,94 @@ public class PromptData4 extends PromptData3 {
     }
 
     public String getFirst() {
-        StringBuilder sb = new StringBuilder();
-        var infos = getSqlTablesAndQueries();
-        sb.append("You are an expert in database modeling. Your task is to help migrate a relational database to a MongoDB database. " +
-                        "Follow the instructions and details provided below to generate the MongoDB model. " +
-                        "making sure to" +
-                        (migrationPreference == MigrationPreferences.PREFER_CONSISTENCY ? " **use references for the most number of relationships** as instructed. " : " **embed frequently accessed data** into the main documents for efficiency.") +
-                        "\n")
-                .append("### Task Overview\n")
-                .append("I have a relational database that needs to be migrated to MongoDB. The goal is to create an optimized MongoDB schema based on the usage patterns of the data. \n");
+        MarkdownContent c = new MarkdownContent();
 
-        sb.append("### Relational Database Schema").append("\n");
-        sb.append("Here is the schema of our current relational database:").append("\n");
-        sb.append("```sql").append("\n");
-        sb.append(infos.getFirst()).append("\n");
-        sb.append("```").append("\n");
+        c.addPlainText("You are an expert in database modeling. Your task is to help migrate a relational database to MongoDB by generating a custom JSON Schema for each collection, optimized for access patterns and document modeling best practices.", '\n');
 
-        sb.append("### Relational Database cardinality").append("\n");
-        sb.append("Here is the cardinality of the tables in the relational database:").append("\n");
-        sb.append("```json").append("\n");
-        sb.append(cardinalityTable).append("\n");
-        sb.append("```").append("\n");
+        c.addTitle3("Goal");
+        c.addPlainText("Generate an optimized MongoDB schema based on:", '\n');
+        c.addListItem("The relational schema and its relationships");
+        c.addListItem("Cardinality information");
+        c.addListItem("Frequently used queries");
+        c.addListItem("Data access frequency (embed vs reference)");
+        c.addListItem("A custom JSON Schema output format");
 
-        sb.append("### MongoDB Model Considerations").append("\n");
+        c.addTitle3("Input: Relational Schema");
+        c.addCodeBlock(sqlTables, "sql");
 
-        sb.append("- **Critically ensure** the use of ")
-                .append(migrationPreference == MigrationPreferences.PREFER_CONSISTENCY
-                ? "**references (DBRef)** to reduce redundancy."
-                : "**embedded documents** to optimize read performance.").append("\n");
+        c.addTitle3("Input: Cardinality Information");
+        c.addCodeBlock(Objects.requireNonNullElse(cardinalityTable, ""), "json");
 
-        if(queryList != null) {
-            sb.append("-    Optimize for the following frequently used queries:").append("\n");
-            for(var query : queryList) {
-                sb.append("\t- ").append("**Used ").append(query.regularity()).append("% of the time:** ").append(query.query()).append("\n");
+        if(queryList != null && !queryList.isEmpty()) {
+            c.addTitle3("Input: Workload");
+            for (Query query : queryList) {
+                c.addListItem(String.format("**Used %s%% of the time:**", query.regularity()));
+                c.addCodeBlock(query.query(), "sql");
+                c.addPlainText("", '\n');
             }
         }
-        sb.append( allowReferences ? "- Use references for less frequently accessed data \n" : "");
-        sb.append("- ").append( migrationPreference.getDescription()).append("\n");
-        sb.append("- ").append(referenceOnly ? "- Do not embedded documents, use reference **ONLY** \n" : migrationPreference.getDescription()).append("\n");
-        sb.append("- **AWAYS** convert the primary key to the be a string \n");
 
-        if(userDefinedPrompts != null) {
-            for(var x : userDefinedPrompts)
-                sb.append("- ").append(x).append("\n");
-        }
+        c.addTitle3("Modeling Guidelines");
+        c.addListItem("Modeling Guidelines");
+        c.addListItem("Use embedded documents for data that is frequently accessed together.");
+        c.addListItem("Use references (DBRef style) for data that is less frequently accessed.");
+        c.addListItem("Use cardinality to guide decisions (e.g. high cardinality suggests using references).");
+        c.addListItem("Model to optimize the frequently used queries above.");
 
-        sb.append("### Output format").append("\n");
-        sb.append("A list of JSON Schemas, each one representing a collection of models").append("\n");
-        sb.append("MongoDB models in JSON Schema **MUST FOLLOW** the format:").append("\n");
-        sb.append("```json").append("\n");
-        sb.append("""
-                {
+        c.addTitle3("Output Format");
+        c.addPlainText("Generate a list of JSON Schemas, one for each MongoDB collection. Use the format below (no comments in output!)", '\n');
+        c.addCodeBlock("""
+                [
+                  {
                     "$schema": "http://json-schema.org/draft-07/schema#",
                     "type": "object",
-                    "title": "Student",
+                    "title": "TableName",
+                    "description": "Description of the collection",
                     "properties": {
-                        "id": {
-                            "type": "string",
-                            "column": "id",
-                            "isId" : true, // All objects must be one id
-                            "table": "Students",
-                            "description": "The unique identifier for a product"
+                      "id": {
+                        "type": "string",
+                        "column": "id",
+                        "isId": true,
+                        "table": "TableName",
+                        "description": "Primary key"
+                      },
+                      "property_name": {
+                        "type": "object | string | number | boolean | array",
+                        "column": "column_name",
+                        "table": "TableName",
+                        "description": "Describe the field",
+                        "reference": true | false,
+                        "docReferenceTo": "TargetCollectionName",
+                        "referenceTo": {
+                          "targetTable": "ForeignTableName",
+                          "targetColumn": "PrimaryKey"
                         },
-                        "name": {
-                            "type": "string",
-                            "column": "name",
-                            "table": "Students",
-                            "description": "Name of the student"
-                        },
-                        "address": {
-                            "type": "object",
-                            "column": "address_id",
-                            "table": "Students",
-                            "referenceTo": {
-                                "targetTable": "Address",
-                                "targetColumn": "id"
-                            },
-                            "properties": {
-                                "street": {
-                                    "type": "string",
-                                    "column": "street",
-                                    "table": "Address",
-                                    "description": "Street name"
-                                },
-                                "city": {
-                                    "type": "string",
-                                    "column": "city",
-                                    "table": "Address",
-                                    "description": "City name"
-                                },
-                                "number": {
-                                    "type": "string",
-                                    "column": "number",
-                                    "table": "Address",
-                                    "description": "House number"
-                                }
-                            }
-                        },
-                        "course": {
-                            "type": "array",
-                            "column": "course_id",
-                            "table": "Students",
-                            "referenceTo": {
-                                "targetTable": "Courses",
-                                "targetColumn": "id"
-                            },
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "id": {
-                                        "type": "string",
-                                        "column": "id",
-                                        "table": "Courses",
-                                        "description": "The unique identifier for a course"
-                                    },
-                                    "name": {
-                                        "type": "string",
-                                        "column": "name",
-                                        "table": "Courses",
-                                        "description": "Name of the course"
-                                    },
-                                    "teacher": {
-                                        "type": "object",
-                                        "column": "teacher_id",
-                                        "table": "Courses",
-                                        "reference": true,
-                                        "docReferenceTo" : "Teachers",
-                                        "referenceTo": {
-                                            "targetTable": "Teachers",
-                                            "targetColumn": "id"
-                                        },
-                                        "properties": {
-                                            "id": {
-                                                "type": "string",
-                                                "column": "id",
-                                                "table": "Teachers",
-                                                "description": "The unique identifier for a teacher",
-                                                "isId" : true
-                                            },
-                                            "name": {
-                                                "type": "string",
-                                                "column": "name",
-                                                "table": "Teachers",
-                                                "description": "Name of the teacher"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        "properties": { ... },   // required if embedded
+                        "items": { ... },        // required if array
+                        "projection": "column"   // required if simple reference
+                      }
                     }
-                }
-                
-                """).append("\n");
-        sb.append("```").append("\n");
-        sb.append("### Instructions").append("\n");
-        sb.append("- **All properties must have a `type`, `column`, and `table` fields**. The `column` and the `table` indicates where this values came from on relational database. \n");
-        sb.append("- The fields `column` and `table` **must match** the column and table names in the relational database schema\n");
-        sb.append("- If the property is reference (like DBRef), set the `reference` to true\n");
-        sb.append("- If the property is a reference, set the `docReferenceTo` field with the target collection name\n");
-        sb.append("- To de-reference a property, set the `referenceTo` field with the target table and column\n");
-        sb.append("- If the property is a composition of another object, set the `properties` field with the object properties\n");
-        sb.append("- If the property is an array, set the `items` field with the array items\n");
-        sb.append("- If the property references is a foreign key and the type is not 'object', set the `projection` field with the column name to be projected\n");
-        sb.append("Please generate only the MongoDB model in JSON format based on the provided details. And a little explanation of why you choose this model.").append("\n");
+                  }
+                ]
+                """, "json");
 
-        return sb.toString();
+        c.addTitle3("Important Constraints");
+        c.addListItem("All fields must have: type, column, table.");
+        c.addListItem("All foreign keys must use referenceTo.");
+        c.addListItem("All objects must have one isId: true field.");
+        c.addListItem("Embedded documents: reference: false and must include properties.");
+        c.addListItem("References: reference: true with docReferenceTo.");
+        c.addListItem("If a structure does not exist in the relational schema, add `\"isAbstract\": true.`");
+        c.addListItem("For arrays, use `\"type\": \"array\"` and include items.");
+
+        c.addTitle3("Instructions");
+        c.addListItem("Analyze the access patterns and cardinality to decide what to embed and what to reference.");
+        c.addListItem("Match field and table names exactly as they appear in the schema.");
+        c.addListItem("Output only the valid JSON list of schemas (no Markdown, no explanations, no comments).");
+        c.addListItem("After the JSON, include a short explanation (2–3 sentences) about why the schema was modeled that way.");
+
+
+        return c.get();
     }
 
     public static String getSecond(String jsonDocuments, @Nullable Framework framework) {

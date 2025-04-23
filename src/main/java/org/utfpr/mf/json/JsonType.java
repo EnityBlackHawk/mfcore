@@ -4,25 +4,14 @@ import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
-public enum JsonType {
+public class JsonType {
 
-    @SerializedName("object")
-    OBJECT("object"),
-    @SerializedName("array")
-    ARRAY("array"),
-    @SerializedName("string")
-    STRING("string"),
-    @SerializedName("number")
-    NUMBER("number"),
-    @SerializedName("integer")
-    INTEGER("integer"),
-    @SerializedName("boolean")
-    BOOLEAN("boolean"),
-    @SerializedName("null")
-    NULL("null");
-
-    private final String value;
+    public static final String OBJECT = "object";
+    public static final String ARRAY = "array";
+    public static final String STRING = "string";
+    public static final String NUMBER = "number";
+    public static final String INTEGER = "integer";
+    public static final String BOOLEAN = "boolean";
+    public static final String NULL = "null";
 
 }

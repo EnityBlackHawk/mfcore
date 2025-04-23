@@ -111,6 +111,7 @@ class QueryResult2 : QueryResult {
                     if(table == "\$auto") {
                         //TODO Convert to snake case
                         table = annList.value.simpleName!!.lowercase()
+                        //TODO Check if table exists
                     }
                     //TODO Support multiple PKs (column as List<String>)
                     var column = annList.targetColumn;
@@ -132,6 +133,14 @@ class QueryResult2 : QueryResult {
                     }
                     val isString = columnTypes[offset] == SqlDataType.VARCHAR
                     val query = "SELECT * FROM $table WHERE $column = ${if (isString) "'${row[offset]}'" else row[offset]}"
+
+                    if(query.contains("$")) {
+                        ERROR("Some \$auto vales could not be resolved on query: $query")
+                        ERROR("Skipping Field: ${field.name} - Column: ${clazz.simpleName}")
+                        INFO("Maybe the JSON Schema provided lacks of a referentTo on a property mapped to an fk")
+                        continue
+                    }
+
                     val qr = DataImporter.runQuery(query, metadata!!, QueryResult2::class.java)
                     val result = qr.asObject(annList.value.java)
                     field.set(obj, result)
@@ -145,7 +154,6 @@ class QueryResult2 : QueryResult {
                     }
 
                     val result = qr!!.asObject(ann.typeClass.java)
-                    println(result)
                     field.set(obj, result.firstOrNull())
                     continue
                 }
@@ -160,7 +168,9 @@ class QueryResult2 : QueryResult {
                 }
 
                 if(offset == -1) {
-                    throw RuntimeException("Column ${ann.column} not found")
+                    ERROR("Column ${ann.column} not found on table ${ann.table}")
+                    ERROR("Skipping Field: ${field.name} - Column: ${field.name}")
+                    continue
                 }
 
                 // TODO Tratar Json Loop

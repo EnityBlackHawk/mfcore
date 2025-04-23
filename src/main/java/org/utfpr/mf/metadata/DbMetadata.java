@@ -178,6 +178,32 @@ public class DbMetadata {
         }
     }
 
+    public boolean isTableExists(String tableName) {
+        return tables.stream().anyMatch(table -> table.name().equalsIgnoreCase(tableName));
+    }
+
+    public String checkTableNameAndTryFix(String tableName) {
+        if(isTableExists(tableName)) {
+            return tableName;
+        }
+
+        if(tableName.endsWith("ies")) {
+            String fixedName = tableName.substring(0, tableName.length() - 3) + "y";
+            if(isTableExists(fixedName)) {
+                return fixedName;
+            }
+        }
+
+        if(tableName.charAt(tableName.length() - 1) == 's') {
+            String fixedName = tableName.substring(0, tableName.length() - 1);
+            if(isTableExists(fixedName)) {
+                return fixedName;
+            }
+        }
+
+        return tableName;
+    }
+
     public boolean isConnected() {
         try {
             return _connection != null && !_connection.isClosed();
