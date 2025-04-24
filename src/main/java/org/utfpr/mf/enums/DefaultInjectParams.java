@@ -15,6 +15,7 @@ public enum DefaultInjectParams {
     JSON_SCHEMA_LIST("jsonSchemaList"),
     MONGO_CONNECTION("mongoConnection"),
     METRICS_RESULT("metricsResult"),
+    REPORT_PATH("reportPath"),
     ;
 
 

@@ -31,6 +31,7 @@ class LLMService(desc: LLMServiceDesc) : CodeSession("LLMService", LastSet), Cha
     private val chatAssistant: ChatAssistant
     private val cachePolicy: CachePolicy = desc.cachePolicy
     private val cacheController: MfCacheController
+    private val description : LLMServiceDesc
 
     init {
 
@@ -45,6 +46,11 @@ class LLMService(desc: LLMServiceDesc) : CodeSession("LLMService", LastSet), Cha
             .temperature(desc.temp)
             .build()
         chatAssistant = AiServices.builder(ChatAssistant::class.java).chatLanguageModel(chatLanguageModel).build()
+        description = desc
+    }
+
+    fun getDescription() : LLMServiceDesc {
+        return description
     }
 
     private fun <T> process(prompt: String, clazz : Class<T>, func: Function<String, T>): T {

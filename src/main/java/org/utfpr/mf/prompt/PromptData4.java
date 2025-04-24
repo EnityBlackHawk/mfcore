@@ -1,6 +1,8 @@
 package org.utfpr.mf.prompt;
 
 import org.jetbrains.annotations.Nullable;
+import org.utfpr.mf.annotation.Export;
+import org.utfpr.mf.enums.DefaultInjectParams;
 import org.utfpr.mf.markdown.MarkdownContent;
 import org.utfpr.mf.metadata.DbMetadata;
 import org.utfpr.mf.prompt.desc.PromptData4Desc;
@@ -17,6 +19,9 @@ public class PromptData4 extends PromptData3 {
 
     private Boolean referenceOnly = false;
 
+    @Export(DefaultInjectParams.UNSET)
+    private PromptData4Desc promptData4Desc;
+
     public PromptData4(DbMetadata dbMetadata, MigrationPreferences migrationPreference, Boolean allowReferences, Framework framework, @Nullable String cardinalityTable, Boolean useMarkdown, List<Query> queryList, List<String> remarks) {
         super(dbMetadata, migrationPreference, allowReferences, framework, cardinalityTable, useMarkdown, queryList, remarks);
     }
@@ -24,6 +29,7 @@ public class PromptData4 extends PromptData3 {
     public PromptData4(PromptData4Desc desc) {
         super(desc.sqlTables, desc.migrationPreference, desc.allowReferences, desc.framework, desc.cardinalityTable, desc.useMarkdown, desc.queryList, desc.customPrompts);
         this.referenceOnly = desc.referenceOnly;
+        this.promptData4Desc = desc;
     }
 
     public String getFirst() {

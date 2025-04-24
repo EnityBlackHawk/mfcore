@@ -121,6 +121,15 @@ public class MfMigrationStepFactory {
         return tmp;
     }
 
+    public IMfMigrationStep createGenerateReportStep(IMfStepObserver... observers) {
+        var tmp = new GenerateReportStep(printStream);
+        for (var o : observers) {
+            tmp.addObserver(o);
+        }
+        steps.add(tmp);
+        return tmp;
+    }
+
     public void setPrintStream(PrintStream printStream) {
         this.printStream = printStream;
     }

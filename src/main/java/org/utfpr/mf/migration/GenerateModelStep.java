@@ -34,6 +34,9 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
     @Injected(DefaultInjectParams.LLM_SERVICE)
     protected LLMService gptAssistant;
 
+    @Injected(DefaultInjectParams.UNSET)
+    protected PromptData4Desc promptData4Desc;
+
     public GenerateModelStep(){
         this(null, System.out);
     }
@@ -63,17 +66,17 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
         BEGIN("Building prompt");
         promptDataVersion = 4;
         INFO("Using PromptData" + promptDataVersion);
-        var promptDesc = new PromptData4Desc();
-        promptDesc.sqlTables = metadataInfo.getSql();
-        promptDesc.migrationPreference = migrationSpec.getPrioritize_performance() ? MigrationPreferences.PREFER_PERFORMANCE : MigrationPreferences.PREFER_CONSISTENCY;
-        promptDesc.allowReferences = migrationSpec.getAllow_ref();
-        promptDesc.framework = migrationSpec.getFramework();
-        promptDesc.cardinalityTable = metadataInfo.getRelations().toString();
-        promptDesc.useMarkdown = true;
-        promptDesc.queryList = migrationSpec.getWorkload() != null ? migrationSpec.getWorkload().stream().map(Query::new).toList() : new ArrayList<>();
-        promptDesc.customPrompts = migrationSpec.getCustom_prompt() != null ? migrationSpec.getCustom_prompt() : new ArrayList<>();
+        promptData4Desc = new PromptData4Desc();
+        promptData4Desc.sqlTables = metadataInfo.getSql();
+        promptData4Desc.migrationPreference = migrationSpec.getPrioritize_performance() ? MigrationPreferences.PREFER_PERFORMANCE : MigrationPreferences.PREFER_CONSISTENCY;
+        promptData4Desc.allowReferences = migrationSpec.getAllow_ref();
+        promptData4Desc.framework = migrationSpec.getFramework();
+        promptData4Desc.cardinalityTable = metadataInfo.getRelations().toString();
+        promptData4Desc.useMarkdown = true;
+        promptData4Desc.queryList = migrationSpec.getWorkload() != null ? migrationSpec.getWorkload().stream().map(Query::new).toList() : new ArrayList<>();
+        promptData4Desc.customPrompts = migrationSpec.getCustom_prompt() != null ? migrationSpec.getCustom_prompt() : new ArrayList<>();
 
-        var prompt = new PromptData4(promptDesc);
+        var prompt = new PromptData4(promptData4Desc);
         var p = prompt.next();
         this.prompt = p;
         int tokens = 0;
