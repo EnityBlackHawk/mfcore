@@ -17,6 +17,11 @@ class MarkdownContent {
         return this;
     }
 
+    fun addSubListItem(item : String) : MarkdownContent {
+        content.append("\t- ").append(item).append("\n")
+        return this
+    }
+
     fun addListItem(item : MarkdownContent) : MarkdownContent {
         content.append("- ").append(item.get()).append("\n")
         return this

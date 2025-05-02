@@ -2,6 +2,7 @@ package org.utfpr.mf.tools
 
 import org.utfpr.mf.annotation.FromRDB
 import org.utfpr.mf.annotation.ListOf
+import org.utfpr.mf.json.JsonType
 import org.utfpr.mf.metadata.DbMetadata
 import java.lang.reflect.ParameterizedType
 import java.sql.ResultSet
@@ -75,6 +76,9 @@ class QueryResult2 : QueryResult {
     override fun <T> asObject(clazz : Class<T>) : List<T> {
         if(metadata == null)
             throw Exception("Metadata required")
+
+
+
 
         val res = mutableListOf<T>()
 
@@ -178,10 +182,28 @@ class QueryResult2 : QueryResult {
                     val isColumnString = columnTypes[offset] == SqlDataType.VARCHAR
                     val query = "SELECT ${ann.projection} FROM ${ann.targetTable} " +
                             "WHERE $targetColumn = ${ if(isColumnString) "'${row[offset]}'" else row[offset]}"
-
                     val res = DataImporter.runQuery(query, metadata!!, QueryResult2::class.java)
-                    val newObj = if (ann.type == "array") res.populateListObject(field.genericType as ParameterizedType) else  res.asObject( field.type )
-                    field.set(obj, if (ann.type == "array") newObj else newObj.firstOrNull())
+
+                    if(res.rows.isEmpty()) {
+                        INFO("No rows found for query: $query")
+                        continue
+                    }
+
+                    val hasLoop = field.type.fields.any {
+                        if(it.isAnnotationPresent(ListOf::class.java)) {
+                            val listOf = it.getAnnotation(ListOf::class.java)
+                            return@any listOf.value.java == clazz
+                        }
+                        return@any it.type == clazz
+                    }
+
+                    if(hasLoop) {
+                        ERROR("Loop detected on field ${field.name} - thisType: ${clazz.simpleName} - foreignType: ${field.type.simpleName}")
+                        continue
+                    }
+
+                    val newObj = res.asObject( field.type )
+                    field.set(obj, newObj.firstOrNull())
                     continue
                 }
 

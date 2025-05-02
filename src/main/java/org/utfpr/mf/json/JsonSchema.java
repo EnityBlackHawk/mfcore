@@ -30,8 +30,8 @@ public class JsonSchema {
     private String column;
     @Description("[REQUIRED If !isAbstract] Table from RDB")
     private String table;
-    @Description("If this property is a reference to another document")
-    private Boolean reference = false;
+    @Description("[REQUIRE If type == object] Define the type of the relationship")
+    private String relationshipType = "none";
     @Description("[REQUIRED If reference] The name of the collection that this property references")
     private String docReferenceTo;
     @Description("[REQUIRED IF type == object] The properties of the object described by this JSON")
@@ -44,5 +44,10 @@ public class JsonSchema {
     private String projection = "*";
     @Description("[REQUIRED IF type == array] Describes the items of the array")
     private JsonSchema items;
+
+
+    public Boolean getReference() {
+        return relationshipType.equals(RelationshipType.REFERENCE) && (docReferenceTo != null && !docReferenceTo.isEmpty());
+    }
 
 }

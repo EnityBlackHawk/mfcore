@@ -83,14 +83,21 @@ public class GenerateReportStep extends MfMigrationStepEx<MigrationDatabaseRepor
 
 
         content.addTitle2("Model generation");
-        content.addPlainText("**LLM Model: **" + llmService.getDescription().model, '\n');
+        content.addPlainText("**LLM Model:** " + llmService.getDescription().model, '\n');
 
         content.addTitle3("LLM Explanation");
         content.addPlainText(llm_explanation, '\n');
 
-        content.addTitle3("JSON Schema");
+
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        content.addPlainText("""
+                <details>
+                <summary>
+                """, '\n');
+        content.addTitle3("JSON Schema");
+        content.addPlainText("\n</summary>\n", '\n');
         content.addCodeBlock(gson.toJson(recipes), "json");
+        content.addPlainText("\n</details>\n", '\n');
 
         if(input != null) {
             content.addTitle2("Migration Database Report");

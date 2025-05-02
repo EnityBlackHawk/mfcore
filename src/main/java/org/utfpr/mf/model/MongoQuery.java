@@ -37,11 +37,11 @@ public class MongoQuery implements IQuery<MongoConnection, AggregateIterable<Doc
         var collection = mongoConnection.getDatabase().getCollection(collectionName);
         long initialTime = System.nanoTime();
         var result = collection.aggregate(query);
-        var time = System.nanoTime() - initialTime;
         int count = 0;
         for(var document : result) {
             count++;
         }
+        var time = System.nanoTime() - initialTime;
         return count == 0 ? -1 : time;
     }
 }

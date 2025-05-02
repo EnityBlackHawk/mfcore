@@ -85,6 +85,7 @@ class LLMService(desc: LLMServiceDesc) : CodeSession("LLMService", LastSet), Cha
         }
 
         if(result == null) {
+            cacheController.save("LastError", result)
             throw RuntimeException("Unable do parse LLM response. Tried $count times")
         }
 

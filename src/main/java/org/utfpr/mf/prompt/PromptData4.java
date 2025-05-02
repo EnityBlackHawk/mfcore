@@ -24,6 +24,7 @@ public class PromptData4 extends PromptData3 {
 
     public PromptData4(DbMetadata dbMetadata, MigrationPreferences migrationPreference, Boolean allowReferences, Framework framework, @Nullable String cardinalityTable, Boolean useMarkdown, List<Query> queryList, List<String> remarks) {
         super(dbMetadata, migrationPreference, allowReferences, framework, cardinalityTable, useMarkdown, queryList, remarks);
+        referenceOnly = promptData4Desc.referenceOnly;
     }
 
     public PromptData4(PromptData4Desc desc) {
@@ -42,7 +43,7 @@ public class PromptData4 extends PromptData3 {
         c.addListItem("The relational schema and its relationships");
         c.addListItem("Cardinality information");
         c.addListItem("Frequently used queries");
-        c.addListItem("Data access frequency (embed vs reference)");
+        c.addListItem("Data access frequency" + (allowReferences ? "(embed vs reference)" : ""));
         c.addListItem("A custom JSON Schema output format");
 
         c.addTitle3("Input: Relational Schema");
@@ -60,11 +61,26 @@ public class PromptData4 extends PromptData3 {
             }
         }
 
+        c.addTitle3("Embedding vs Referencing Rules:");
+        c.addListItem("If two entities are frequently accessed together and the embedded data is small and stable, embed the related data inside the main document.");
+        c.addListItem("If the related data is large, frequently updated, or shared across many documents, reference it instead.");
+
         c.addTitle3("Modeling Guidelines");
-        c.addListItem("Modeling Guidelines");
-        c.addListItem("Use embedded documents for data that is frequently accessed together.");
-        c.addListItem("Use references (DBRef style) for data that is less frequently accessed.");
-        c.addListItem("Use cardinality to guide decisions (e.g. high cardinality suggests using references).");
+        if(allowReferences && migrationPreference == MigrationPreferences.PREFER_PERFORMANCE) {
+            c.addListItem("Use embedded documents for data that is frequently accessed together.");
+            c.addListItem("Use references (DBRef style) for data that is less frequently accessed.");
+            c.addListItem("Avoid references to maintain consistency and reduce complexity.");
+            c.addListItem("Use cardinality to guide decisions (e.g. high cardinality suggests using references).");
+        } else if (allowReferences && referenceOnly) {
+            c.addListItem("**Use references only**. Do not embed any data.");
+        } else if (allowReferences && migrationPreference == MigrationPreferences.PREFER_CONSISTENCY) {
+            c.addListItem("Use references for data that is frequently updated. Regardless the access pattern.");
+            c.addListItem("Use cardinality to guide decisions.");
+        }
+        else if(!allowReferences) {
+            c.addListItem("**Embed all data** to avoid references.");
+        }
+
         c.addListItem("Model to optimize the frequently used queries above.");
 
         c.addTitle3("Output Format");
@@ -85,19 +101,35 @@ public class PromptData4 extends PromptData3 {
                         "description": "Primary key"
                       },
                       "property_name": {
-                        "type": "object | string | number | boolean | array",
+                        "type": "object | string | number | boolean",
+                        "relationshipType": "embedded | reference | none",
                         "column": "column_name",
                         "table": "TableName",
                         "description": "Describe the field",
-                        "reference": true | false,
                         "docReferenceTo": "TargetCollectionName",
                         "referenceTo": {
                           "targetTable": "ForeignTableName",
                           "targetColumn": "PrimaryKey"
                         },
                         "properties": { ... },   // required if embedded
-                        "items": { ... },        // required if array
-                        "projection": "column"   // required if simple reference
+                        "items": { ... }        // required if array
+                      },
+                      "list": {
+                        "type": "array",
+                        "column": "column_name",
+                        "table": "TableName",
+                        "relationshipType": "embedded",
+                        "referenceTo": {
+                                "targetTable": "ForeignTableName",
+                                "targetColumn": "PrimaryKey"
+                        }
+                        "items": {
+                            "type": "object",
+                            "relationshipType": "embedded",
+                            "column": "column_name",
+                            "table": "TableName",
+                            "properties": { ... },
+                        }
                       }
                     }
                   }
@@ -106,18 +138,29 @@ public class PromptData4 extends PromptData3 {
 
         c.addTitle3("Important Constraints");
         c.addListItem("All fields must have: type, column, table.");
-        c.addListItem("All foreign keys must use referenceTo.");
-        c.addListItem("All objects must have one isId: true field.");
-        c.addListItem("Embedded documents: reference: false and must include properties.");
-        c.addListItem("References: reference: true with docReferenceTo.");
+        c.addListItem("All objects **must use referenceTo**.");
+        c.addListItem("All objects must have **only one** property with isId: true.");
+        c.addListItem("All properties with isId: true must be `type: string`.");
+        c.addListItem("Embedded documents: relationshipType must be set to `embedded` and must include properties.");
+
+        if(allowReferences) {
+            c.addListItem("References: `\"relationshipType\": \"reference\"` with docReferenceTo");
+        }
+
         c.addListItem("If a structure does not exist in the relational schema, add `\"isAbstract\": true.`");
-        c.addListItem("For arrays, use `\"type\": \"array\"` and include items.");
+
+        c.addListItem("For arrays:");
+        c.addSubListItem("use `\"type\": \"array\"`");
+        c.addSubListItem("Use `\"items\": { ... }` to describe the array items.");
+        c.addSubListItem("Use `\"relationshipType\": \"embedded\"`.");
+        c.addSubListItem("Add the `referenceTo` property with `targetTable` and `targetColumn`");
 
         c.addTitle3("Instructions");
         c.addListItem("Analyze the access patterns and cardinality to decide what to embed and what to reference.");
         c.addListItem("Match field and table names exactly as they appear in the schema.");
+        c.addListItem("Start with a short explanation (2–3 sentences) about why the schema was modeled that way.");
+        c.addListItem("After the explanation, generate the MongoDB model in JSON Schema format as shown above following your explanation.");
         c.addListItem("Output only the valid JSON list of schemas (no Markdown, no explanations, no comments).");
-        c.addListItem("After the JSON, include a short explanation (2–3 sentences) about why the schema was modeled that way.");
 
 
         return c.get();

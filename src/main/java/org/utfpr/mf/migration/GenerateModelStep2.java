@@ -51,7 +51,7 @@ public class GenerateModelStep2 extends GenerateModelStep{
         promptData4Desc.useMarkdown = true;
         promptData4Desc.queryList = migrationSpec.getWorkload() != null ? migrationSpec.getWorkload().stream().map(Query::new).toList() : new ArrayList<>();
         promptData4Desc.customPrompts = migrationSpec.getCustom_prompt() != null ? migrationSpec.getCustom_prompt() : new ArrayList<>();
-        //promptDesc.referenceOnly = migrationSpec.getReference_only();
+        promptData4Desc.referenceOnly = migrationSpec.getReference_only();
 
         var prompt = new PromptData4(promptData4Desc);
         var p = prompt.next();

@@ -8,6 +8,8 @@ import org.utfpr.mf.migration.params.BenchmarkResultList;
 import java.io.PrintStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 
@@ -40,6 +42,8 @@ public class BenchmarkStep extends MfMigrationStepEx<IQueryExecutor, BenchmarkRe
                 times.add(time);
             }
             IQuery query = input.next();
+            times.remove(Collections.max(times));
+            times.remove(Collections.min(times));
             long timeNano = times.stream().reduce(0L, Long::sum) / times.size();
             var br = new BenchmarkResult(query.getName(), query.getStringQuery(), timeNano);
             resultList.add(br);

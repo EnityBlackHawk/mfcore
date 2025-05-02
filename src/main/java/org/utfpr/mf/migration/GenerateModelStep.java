@@ -34,7 +34,7 @@ public class GenerateModelStep extends MfMigrationStepEx<MetadataInfo, Model>{
     @Injected(DefaultInjectParams.LLM_SERVICE)
     protected LLMService gptAssistant;
 
-    @Injected(DefaultInjectParams.UNSET)
+    @Export(DefaultInjectParams.UNSET)
     protected PromptData4Desc promptData4Desc;
 
     public GenerateModelStep(){

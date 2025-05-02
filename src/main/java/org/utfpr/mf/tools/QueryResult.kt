@@ -101,7 +101,8 @@ open class QueryResult : CodeSession{
         formatSting += "\n"
 
         sb.append(String.format(formatSting, *columns.toTypedArray()))
-        val vars = ":--:".repeatList(columns.size);
+        val vars = ":--:".repeatList(columns.size - 1).toMutableList()
+        vars.add(0, ":--")
         sb.append(String.format(formatSting, *vars.toTypedArray()))
 
         for (i in 0 until rows.size) {

@@ -1,9 +1,6 @@
 package org.utfpr.mf.reflection;
 
-import org.utfpr.mf.json.JsonSchema;
-import org.utfpr.mf.json.JsonSchemaList;
-import org.utfpr.mf.json.JsonType;
-import org.utfpr.mf.json.Reference;
+import org.utfpr.mf.json.*;
 import org.utfpr.mf.orms.ORM;
 import org.utfpr.mf.tools.CodeSession;
 import org.utfpr.mf.tools.TemplatedString;
@@ -36,10 +33,16 @@ public class JsonSchemaToClassConverter extends CodeSession {
 
         if(!value.getIsAbstract() && (value.getReferenceTo() == null || value.getReferenceTo().getTargetTable() == null)) {
 
+            if(value.getProperties() == null) {
+                INFO("Properties is null on " + field.getKey());
+                value.setProperties(new HashMap<>());
+            }
+
             var firstChild = value.getProperties().entrySet().stream().findFirst();
 
             if(firstChild.isEmpty()) {
-                throw new RuntimeException("ReferenceTo is null - All object fields must have a reference to another table\n Field: " + field.getKey());
+                ERROR("ReferenceTo is null - All object fields must have a reference to another table\n Field: " + field.getKey());
+                return null;
             }
 
             value.setReferenceTo(
@@ -52,7 +55,7 @@ public class JsonSchemaToClassConverter extends CodeSession {
 
         String innerClassName;
 
-        if(value.getReference() != null && value.getReference()) {
+        if(value.getReference()) {
 
             innerClassName = TemplatedString.capitalize(Objects.requireNonNull(value.getDocReferenceTo(), "Reference = true but docReference is null on field " + field.getKey() + " of " + parent));
 
@@ -78,15 +81,15 @@ public class JsonSchemaToClassConverter extends CodeSession {
             innerClass = convert(value, innerClassName);
         }
 
-        if(value.getReference() != null && value.getReference()) {
+        if(value.getReference()) {
             return new FieldMetadata(field.getKey(), innerClass.getClassName(), List.of(orm.getReferenceAnnotation()));
         }
 
         return new FieldMetadata(field.getKey(), innerClass.getClassName(), List.of());
     }
 
-    private FieldMetadata createField(Map.Entry<String, JsonSchema> field) {
-        boolean isId = field.getValue().getIsId() != null && field.getValue().getIsId();
+    private FieldMetadata createField(ClassMetadata clazz, Map.Entry<String, JsonSchema> field) {
+        boolean isId = field.getValue().getIsId() != null && field.getValue().getIsId() && hasId(clazz);
         switch (field.getValue().getType()) {
             case JsonType.STRING, JsonType.NULL -> {
                 return new FieldMetadata(field.getKey(), "java.lang.String", isId ? List.of(orm.getIdAnnotation()) : List.of());
@@ -109,7 +112,7 @@ public class JsonSchemaToClassConverter extends CodeSession {
                     return new FieldMetadata(field.getKey(), "java.util.List<" + className + ">", List.of());
                 }
 
-                FieldMetadata fmd = createField(Map.entry(field.getKey(), field.getValue().getItems()));
+                FieldMetadata fmd = createField(clazz, Map.entry(field.getKey(), field.getValue().getItems()));
                 return new FieldMetadata(field.getKey(), "java.util.List<" + fmd.getType() + ">", List.of());
             }
         }
@@ -127,21 +130,33 @@ public class JsonSchemaToClassConverter extends CodeSession {
             ERROR("All objects must have properties defined");
             root.setProperties(new HashMap<>());
         }
+        var meta = new ClassMetadata(className, fields);
 
         for(var field : root.getProperties().entrySet()) {
 
+            if(Objects.equals(field.getValue().getType(), JsonType.ARRAY)) {
+                field.getValue().setRelationshipType(RelationshipType.EMBEDDED);
+            }
+
             if( field.getValue().getReference() || field.getValue().getType().equals(JsonType.OBJECT)) {
-                fields.add(createObjectField(root, field));
+                var f = createObjectField(root, field);
+                if(f != null) {
+                    fields.add(f);
+                }
                 continue;
             }
 
-            fields.add(createField(field));
+            meta.getFields().add( createField(meta, field) );
 
         }
-        var meta = new ClassMetadata(className, fields);
+
         classes.put(className, meta);
         return meta;
 
+    }
+
+    public boolean hasId(ClassMetadata clazz) {
+        return clazz.getFields().stream().anyMatch( (f) -> f.getAnnotations().stream().anyMatch( (a) -> a.equals(orm.getIdAnnotation())));
     }
 
     public void checkAndAppend(JsonSchema schema, ClassMetadata classMetadata) {
@@ -150,7 +165,11 @@ public class JsonSchemaToClassConverter extends CodeSession {
         }
         for(var field : schema.getProperties().entrySet()) {
             if(classMetadata.getFields().stream().noneMatch(f -> Objects.equals(f.getName(), field.getKey()))) {
-                classMetadata.getFields().add( createField( field) );
+                if(field.getValue().getType().equals(JsonType.OBJECT)) {
+                    classMetadata.getFields().add( createObjectField(schema, field));
+                    continue;
+                }
+                classMetadata.getFields().add( createField(classMetadata, field) );
             }
         }
     }

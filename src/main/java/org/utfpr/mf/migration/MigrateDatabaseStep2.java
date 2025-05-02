@@ -42,12 +42,10 @@ public class MigrateDatabaseStep2 extends MigrateDatabaseStep{
 
         HashMap<String, Integer> classCount = new HashMap<>();
 
-        ArrayList<TemplatedThread> threads = new ArrayList<>();
+        //ArrayList<TemplatedThread> threads = new ArrayList<>();
 
         for(JsonSchema recipe : recepies)
         {
-
-            TemplatedThread<Void> thread = new TemplatedThread<>(() -> {
                 String className = TemplatedString.capitalize(recipe.getTitle());
 
                 BEGIN_SUB("Querying data from " + className);
@@ -68,17 +66,6 @@ public class MigrateDatabaseStep2 extends MigrateDatabaseStep{
                     count++;
                 }
                 classCount.put(className, count);
-                return null;
-            });
-            threads.add(thread);
-        }
-
-        for (TemplatedThread thread : threads) {
-            thread.runAsync();
-        }
-
-        for (TemplatedThread thread : threads) {
-            thread.await();
         }
 
         return classCount;
