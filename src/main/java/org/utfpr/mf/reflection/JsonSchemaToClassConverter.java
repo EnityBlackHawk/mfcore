@@ -89,7 +89,7 @@ public class JsonSchemaToClassConverter extends CodeSession {
     }
 
     private FieldMetadata createField(ClassMetadata clazz, Map.Entry<String, JsonSchema> field) {
-        boolean isId = field.getValue().getIsId() != null && field.getValue().getIsId() && hasId(clazz);
+        boolean isId = field.getValue().getIsId() != null && field.getValue().getIsId() && !hasId(clazz);
         switch (field.getValue().getType()) {
             case JsonType.STRING, JsonType.NULL -> {
                 return new FieldMetadata(field.getKey(), "java.lang.String", isId ? List.of(orm.getIdAnnotation()) : List.of());

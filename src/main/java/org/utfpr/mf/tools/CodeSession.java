@@ -8,8 +8,6 @@ public class CodeSession implements ISession {
     public static PrintStream LastSet;
     protected final PrintStream _printStream;
 
-
-
     public CodeSession(String className) {
         this(className, System.out);
     }

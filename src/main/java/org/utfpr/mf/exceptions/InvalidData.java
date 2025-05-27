@@ -6,8 +6,8 @@ package org.utfpr.mf.exceptions;
 //@ResponseStatus(org.springframework.http.HttpStatus.BAD_REQUEST)
 public class InvalidData extends RuntimeException{
 
-    public InvalidData(String step, String was) {
-        super("Invalid input data for step: " + step + ". Was: " + was);
+    public InvalidData(String step, String was, String required) {
+        super("Invalid input data for step: " + step + ". Was: " + was + ". Required: " + required);
     }
 
 }

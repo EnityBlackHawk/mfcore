@@ -20,12 +20,12 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
-public class GenerateReportStep extends MfMigrationStepEx<MigrationDatabaseReport, MarkdownDocument>{
+public class GenerateReportStep extends MfMigrationStepEx<MigrationDatabaseReport, MarkdownContent>{
 
 
 
 
-    @Injected(DefaultInjectParams.REPORT_PATH)
+    @Injected(value = DefaultInjectParams.REPORT_PATH, required = false)
     private String reportPath;
 
     @Injected(DefaultInjectParams.UNSET)
@@ -46,10 +46,10 @@ public class GenerateReportStep extends MfMigrationStepEx<MigrationDatabaseRepor
     }
 
     public GenerateReportStep(PrintStream printStream) {
-        super("Generate Report", printStream, MigrationDatabaseReport.class, MarkdownDocument.class);
+        super("Generate Report", printStream, MigrationDatabaseReport.class, MarkdownContent.class);
     }
 
-    private MarkdownDocument process(MigrationDatabaseReport input) {
+    private MarkdownContent process(MigrationDatabaseReport input) {
         MarkdownContent content = new MarkdownContent();
 
         content.addTitle1("Migration Report");
@@ -109,9 +109,12 @@ public class GenerateReportStep extends MfMigrationStepEx<MigrationDatabaseRepor
             content.addTable(qr);
         }
 
-        MarkdownDocument md = new MarkdownDocument(Objects.requireNonNull(reportPath, "Report path is not set"));
-        md.write(content);
-        return md;
+        if(reportPath != null) {
+            MarkdownDocument md = new MarkdownDocument(reportPath );
+            md.write(content);
+        }
+
+        return content;
 
     }
 

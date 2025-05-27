@@ -14,6 +14,7 @@ public class TemplatedThread<T> {
     private T result = null;
     private final Thread thread;
     private Function<T, Void> callback;
+    private Function<RuntimeException, Void> exceptionCallback;
 
     private boolean isStarted = false;
 
@@ -24,7 +25,12 @@ public class TemplatedThread<T> {
                 if(callback != null)
                     callback.apply(result);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+
+                if(exceptionCallback != null) {
+                    exceptionCallback.apply(new RuntimeException(e));
+                } else {
+                    throw new RuntimeException(e);
+                }
             }
         });
     }
@@ -47,8 +53,14 @@ public class TemplatedThread<T> {
         return result;
     }
 
-    public void then(Function<T, Void> callback) {
+    public TemplatedThread<T> then(Function<T, Void> callback) {
         this.callback = callback;
+        return this;
+    }
+
+    public TemplatedThread<T> catching(Function<RuntimeException, Void> exceptionCallback) {
+        this.exceptionCallback = exceptionCallback;
+        return this;
     }
 
     public T runBlocking() {

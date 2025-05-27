@@ -74,20 +74,14 @@ class LLMService(desc: LLMServiceDesc) : CodeSession("LLMService", LastSet), Cha
         if (cachePolicy == CachePolicy.CACHE_ONLY) {
             throw RuntimeException("No cache found, but CACHE_ONLY")
         }
-        var count = 0;
 
         result = try {
             func.apply(prompt)
         } catch (e : Exception) {
             ERROR("Unable to parse LLM response: " + e.message)
-            count++;
-            null
+            throw RuntimeException(e)
         }
 
-        if(result == null) {
-            cacheController.save("LastError", result)
-            throw RuntimeException("Unable do parse LLM response. Tried $count times")
-        }
 
         try {
             cacheController.save(md5, result)

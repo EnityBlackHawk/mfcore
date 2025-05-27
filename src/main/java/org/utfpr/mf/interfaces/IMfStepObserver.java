@@ -6,4 +6,7 @@ public interface IMfStepObserver<TInput, TOutput> {
     boolean OnStepEnd(String stepName, TOutput output);
     boolean OnStepCrash(String stepName, Throwable error);
     boolean OnStepError(String stepName, String message);
+    default boolean OnUpdate(String stepName, Object message, Class<?> messageType) {
+        return false;
+    }
 }

@@ -47,6 +47,7 @@ public class MigrateDatabaseStep2 extends MigrateDatabaseStep{
         for(JsonSchema recipe : recepies)
         {
                 String className = TemplatedString.capitalize(recipe.getTitle());
+                notifyUpdate("Converting " + className, String.class);
 
                 BEGIN_SUB("Querying data from " + className);
                 QueryResult2 qr = DataImporter.Companion.runQuery(
@@ -67,7 +68,7 @@ public class MigrateDatabaseStep2 extends MigrateDatabaseStep{
                 }
                 classCount.put(className, count);
         }
-
+        notifyUpdate("Migration completed", String.class);
         return classCount;
     }
 }

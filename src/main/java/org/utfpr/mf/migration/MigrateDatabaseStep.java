@@ -66,6 +66,7 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
         Map<String, Class<?>> compiledClasses = new HashMap<>();
         IMfPreCompileAction action = new MfDefaultPreCompileAction( new MfVerifyImportAction());
         try {
+            notifyUpdate("Compiling classes", String.class);
             compiledClasses = compiler.compile(generatedJavaCode.getCode(), params, action);
         } catch (Exception e) {
             throw new RuntimeException(e);

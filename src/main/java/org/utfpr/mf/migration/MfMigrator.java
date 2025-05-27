@@ -46,6 +46,12 @@ public class MfMigrator extends CodeSession {
     public void addStep(IMfMigrationStep step) {
         steps.add(step);
     }
+    public void clearSteps() {
+        steps.clear();
+    }
+    public void setSteps(List<IMfMigrationStep> steps) {
+        this.steps = new ArrayList<>(steps);
+    }
 
     public TemplatedThread<Object> executeAsync(Object firstInput) {
 

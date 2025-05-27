@@ -79,6 +79,14 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
         return rest;
     }
 
+    protected boolean notifyUpdate(String message, Class<?> messageType) {
+        boolean result = true;
+        for(var o : observers) {
+            result &= o.OnUpdate(getClassName(), message, messageType);
+        }
+        return result;
+    }
+
     protected void notifyCrash(Throwable error) {
         for(var o : observers) {
             o.OnStepCrash(getClassName(), error);
@@ -122,7 +130,7 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
     @Override
     public boolean validateInput(Object input) {
         if(!hasValidInput(input)) {
-            notifyCrash(new InvalidData(getClass().getName(), input == null ? "null" : input.getClass().getName()));
+            notifyCrash(new InvalidData(getClass().getName(), input == null ? "null" : input.getClass().getName(), inputType.getName()));
             ERROR("Invalid input data: " + (input == null ? "null" : input.getClass().getName()));
             return false;
         }
