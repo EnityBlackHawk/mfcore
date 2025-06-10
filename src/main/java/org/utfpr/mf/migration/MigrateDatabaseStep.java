@@ -15,6 +15,7 @@ import org.utfpr.mf.mongoConnection.MongoConnectionCredentials;
 import org.utfpr.mf.runtimeCompiler.*;
 import org.utfpr.mf.tools.DataImporter;
 import org.utfpr.mf.tools.QueryResult;
+import org.utfpr.mf.tools.UpdateType;
 
 import java.io.PrintStream;
 import java.util.HashMap;
@@ -66,7 +67,7 @@ public class MigrateDatabaseStep extends MfMigrationStepEx<GeneratedJavaCode, Mi
         Map<String, Class<?>> compiledClasses = new HashMap<>();
         IMfPreCompileAction action = new MfDefaultPreCompileAction( new MfVerifyImportAction());
         try {
-            notifyUpdate("Compiling classes", String.class);
+            notifyUpdate(new UpdateType("compile", "Compiling classes"), UpdateType.class);
             compiledClasses = compiler.compile(generatedJavaCode.getCode(), params, action);
         } catch (Exception e) {
             throw new RuntimeException(e);

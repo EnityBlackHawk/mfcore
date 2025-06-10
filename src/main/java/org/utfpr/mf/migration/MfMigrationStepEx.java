@@ -79,7 +79,7 @@ public abstract class MfMigrationStepEx<TInput, TOutput> extends CodeSession imp
         return rest;
     }
 
-    protected boolean notifyUpdate(String message, Class<?> messageType) {
+    protected boolean notifyUpdate(Object message, Class<?> messageType) {
         boolean result = true;
         for(var o : observers) {
             result &= o.OnUpdate(getClassName(), message, messageType);
